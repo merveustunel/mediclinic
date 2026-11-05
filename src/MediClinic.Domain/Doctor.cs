@@ -2,13 +2,16 @@ namespace MediClinic.Domain;
 
 public sealed class Doctor : Staff
 {
+    // EF materialization only.
+    private Doctor(Guid id) : base(id) { }
+
     public Doctor(Guid id, string firstName, string lastName, Department department, string specialty)
         : base(id, firstName, lastName, department, "Doctor")
     {
         Specialty = Guard.Required(specialty, nameof(specialty));
     }
 
-    public string Specialty { get; }
+    public string Specialty { get; } = null!;
     public override string Role => "Doctor";
 
     public bool CanProvide(MedicalService service)
