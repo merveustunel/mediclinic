@@ -57,4 +57,4 @@ dotnet ef database update --project src/MediClinic.Infrastructure -- "Data Sourc
 
 The initial migration and snapshot are versioned. Web does **not** call EnsureCreated or Migrate at startup in any environment. Production migration execution is a separate, deliberate deployment operation; a reviewed migration bundle can also be used. Integration tests keep a SQLite in-memory connection open, apply the real migrations, then exercise separate contexts for round trips, graph fixup, status updates, time queries and database constraint enforcement. They do not use EF's nonrelational InMemory provider.
 
-Identity, authentication, new controllers/UI, booking serialization and overlap rules are outside this task.
+Identity authentication and user-domain associations are documented in [auth-design.md](auth-design.md). Booking serialization and overlap rules remain out of scope.
