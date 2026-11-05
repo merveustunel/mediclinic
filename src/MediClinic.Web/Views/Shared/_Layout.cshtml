@@ -7,6 +7,21 @@
 </head>
 <body>
     <header><a asp-controller="Home" asp-action="Index">MediClinic</a></header>
+    <nav aria-label="Account">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        @foreach (var role in MediClinic.Infrastructure.Identity.AuthRoles.All)
+        {
+            if (User.IsInRole(role)) { <a asp-controller="Dashboard" asp-action="@role">@role dashboard</a> }
+        }
+        <form asp-controller="Account" asp-action="Logout" method="post"><button type="submit">Sign out</button></form>
+    }
+    else
+    {
+        <a asp-controller="Account" asp-action="Register">Register</a>
+        <a asp-controller="Account" asp-action="Login">Sign in</a>
+    }
+    </nav>
     <main>@RenderBody()</main>
 </body>
 </html>

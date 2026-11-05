@@ -1,3 +1,6 @@
+using MediClinic.Infrastructure.Identity;
+using MediClinic.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using MediClinic.Application;
 using MediClinic.Infrastructure;
 using Microsoft.Data.Sqlite;
@@ -12,7 +15,34 @@ if (connection.DataSource != ":memory:" && !Path.IsPathRooted(connection.DataSou
     connection.DataSource = Path.Combine(builder.Environment.ContentRootPath, connection.DataSource);
 builder.Services.AddInfrastructure(connection.ToString());
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequiredLength = 12;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+}).AddEntityFrameworkStores<MediClinicDbContext>().AddDefaultTokenProviders();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "__Host-MediClinic";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var role in AuthRoles.All) options.AddPolicy(role, policy => policy.RequireAuthenticatedUser().RequireRole(role));
+});
 var app = builder.Build();
+if (args.Contains("--bootstrap-identity"))
+{
+    await MediClinic.Web.IdentityBootstrap.RunAsync(app);
+    return;
+}
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -21,7 +51,11 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();
+
+public partial class Program { }

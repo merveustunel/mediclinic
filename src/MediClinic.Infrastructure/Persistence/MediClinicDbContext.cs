@@ -1,11 +1,13 @@
 using MediClinic.Domain;
+using MediClinic.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MediClinic.Infrastructure.Persistence;
 
-public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> options) : DbContext(options)
+public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Clinic> Clinics => Set<Clinic>();
     public DbSet<Branch> Branches => Set<Branch>();
@@ -24,6 +26,11 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        var user = modelBuilder.Entity<ApplicationUser>();
+        user.HasOne(x => x.Patient).WithOne().HasForeignKey<ApplicationUser>(x => x.PatientId).OnDelete(DeleteBehavior.Restrict);
+        user.HasOne(x => x.Staff).WithOne().HasForeignKey<ApplicationUser>(x => x.StaffId).OnDelete(DeleteBehavior.Restrict);
+        user.ToTable("AspNetUsers", t => t.HasCheckConstraint("CK_User_OnePerson", "\"PatientId\" IS NULL OR \"StaffId\" IS NULL"));
         var clinic = Root<Clinic>(modelBuilder, "Clinics");
         Text(clinic, nameof(Clinic.Name));
         clinic.HasMany(x => x.Branches).WithOne(x => x.Clinic).HasForeignKey("ClinicKey")
