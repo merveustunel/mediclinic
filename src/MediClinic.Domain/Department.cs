@@ -2,6 +2,9 @@ namespace MediClinic.Domain;
 
 public sealed class Department : Entity
 {
+    // EF materialization only; public creation still enforces domain invariants.
+    private Department(Guid id) : base(id) { }
+
     private readonly List<MedicalService> _services = [];
 
     internal Department(Guid id, Branch branch, string name) : base(id)
@@ -10,9 +13,9 @@ public sealed class Department : Entity
         Name = Guard.Required(name, nameof(name));
     }
 
-    public Branch Branch { get; }
+    public Branch Branch { get; } = null!;
     public Guid BranchId => Branch.Id;
-    public string Name { get; }
+    public string Name { get; } = null!;
     public IReadOnlyList<MedicalService> Services => _services.AsReadOnly();
 
     public MedicalService AddService(Guid id, string name, TimeSpan duration)

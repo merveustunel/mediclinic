@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\MediClinic.Domain\MediClinic.Domain.csproj" />
     <ProjectReference Include="..\..\src\MediClinic.Application\MediClinic.Application.csproj" />
+    <ProjectReference Include="..\..\src\MediClinic.Infrastructure\MediClinic.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

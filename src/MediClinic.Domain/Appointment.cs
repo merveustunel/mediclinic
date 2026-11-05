@@ -2,6 +2,9 @@ namespace MediClinic.Domain;
 
 public sealed class Appointment : Entity
 {
+    // EF materialization only; public creation still enforces domain invariants.
+    private Appointment(Guid id) : base(id) { }
+
     public Appointment(Guid id, Patient patient, Doctor doctor, MedicalService service, DateTimeOffset startsAt)
         : base(id)
     {
@@ -18,11 +21,11 @@ public sealed class Appointment : Entity
         EndsAt = startsAt.Add(service.Duration);
     }
 
-    public Patient Patient { get; }
+    public Patient Patient { get; } = null!;
     public Guid PatientId => Patient.Id;
-    public Doctor Doctor { get; }
+    public Doctor Doctor { get; } = null!;
     public Guid DoctorId => Doctor.Id;
-    public MedicalService Service { get; }
+    public MedicalService Service { get; } = null!;
     public Guid ServiceId => Service.Id;
     public Branch Branch => Service.Department.Branch;
     public Guid BranchId => Branch.Id;
