@@ -10,3 +10,4 @@ TestResults/
 .dist/
 *.db
 *.db-*
+*.db.before-demo-*.bak

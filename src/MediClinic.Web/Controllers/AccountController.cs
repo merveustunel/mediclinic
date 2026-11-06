@@ -10,7 +10,7 @@ namespace MediClinic.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public sealed class AccountController(UserManager<ApplicationUser> users, SignInManager<ApplicationUser> signIn,
-    RoleManager<IdentityRole> roles, MediClinicDbContext db) : Controller
+    RoleManager<IdentityRole> roles, MediClinicDbContext db, IWebHostEnvironment environment) : Controller
 {
     [AllowAnonymous, HttpGet] public IActionResult Register() => View(new RegisterModel());
     [AllowAnonymous, HttpPost] public async Task<IActionResult> Register(RegisterModel model)
@@ -49,6 +49,12 @@ public sealed class AccountController(UserManager<ApplicationUser> users, SignIn
     [AllowAnonymous, HttpPost] public async Task<IActionResult> Login(LoginModel model)
     {
         if (!ModelState.IsValid) return View(model);
+        var user = await users.FindByEmailAsync(model.Email.Trim());
+        if (!environment.IsDevelopment() && user != null && DemoSeed.IsDemoUser(user.Id))
+        {
+            ModelState.AddModelError("", "Unable to sign in with these credentials.");
+            return View(model);
+        }
         var result = await signIn.PasswordSignInAsync(model.Email.Trim(), model.Password, false, lockoutOnFailure: true);
         if (result.Succeeded) return RedirectToAction("Index", "Dashboard");
         ModelState.AddModelError("", "Unable to sign in with these credentials.");
