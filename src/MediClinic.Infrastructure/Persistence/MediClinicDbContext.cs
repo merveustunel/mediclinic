@@ -116,7 +116,7 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
         appointment.Navigation(x => x.Service).UsePropertyAccessMode(PropertyAccessMode.Field);
         appointment.Property(x => x.StartsAt).IsRequired();
         appointment.Property(x => x.EndsAt).IsRequired();
-        appointment.Property(x => x.Status).HasConversion<string>().IsRequired();
+        appointment.Property(x => x.Status).HasConversion<string>().IsRequired().IsConcurrencyToken();
         appointment.Property(x => x.DecisionReason);
         appointment.HasIndex("DoctorKey", nameof(Appointment.StartsAt));
         appointment.HasIndex("PatientKey", nameof(Appointment.StartsAt));

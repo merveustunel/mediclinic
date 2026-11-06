@@ -82,7 +82,7 @@ public sealed class PersistenceTests
     public async Task UtcTicksSupportSqlFilteringOrderingAndPreservePrecision()
     {
         await using var database = await Database.Create();
-        var instant = database.Fixture.Start.ToOffset(TimeSpan.FromHours(3)).AddTicks(17);
+        var instant = database.Fixture.Start.AddHours(1).ToOffset(TimeSpan.FromHours(3)).AddTicks(17);
         await using (var db = database.Context())
         {
             db.Attach(database.Fixture.Patient);
