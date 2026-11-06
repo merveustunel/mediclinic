@@ -1,4 +1,6 @@
 # mediclinic
+
+Milestone 6 provides an explicitly opt-in, Development-only demo setup against the existing migrated SQLite database. See [Demo setup and verification](docs/demo-verification.md) for safe Windows commands, secret configuration, demo logins, and the complete patient/staff verification workflow. No database reset or automatic migration is performed.
 Identity setup, roles, migration commands, and development bootstrap: [Authentication design](docs/auth-design.md).
 
 Milestone 5 adds patient booking and appointment history, plus department-scoped staff review. See [Appointment booking design](docs/appointment-booking-design.md) for scheduling, UTC storage, SQLite concurrency protection, authorization, migration deployment and manual checks.

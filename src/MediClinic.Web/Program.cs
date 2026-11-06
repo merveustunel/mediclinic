@@ -38,6 +38,11 @@ builder.Services.AddAuthorization(options =>
     foreach (var role in AuthRoles.All) options.AddPolicy(role, policy => policy.RequireAuthenticatedUser().RequireRole(role));
 });
 var app = builder.Build();
+if (args.Contains("--seed-demo"))
+{
+    await MediClinic.Web.DemoSeed.RunAsync(app);
+    return;
+}
 if (args.Contains("--bootstrap-identity"))
 {
     await MediClinic.Web.IdentityBootstrap.RunAsync(app);
