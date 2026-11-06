@@ -33,7 +33,7 @@ Required text has NOT NULL and nonblank checks; service duration must be positiv
 - DateTimeOffset uses UTC ticks in an `INTEGER`, preserving instants and 100 ns precision and allowing server-side comparisons/order/indexes. Original UTC offsets are intentionally lost; loaded values have offset zero. Appointment duration/end snapshots remain stored. Timezone presentation and recurring schedules need a separate future policy.
 - TimeSpan duration is an integer count of ticks; GUIDs are SQLite TEXT.
 - SQLite has dynamic typing and does not enforce declared string maximum lengths. No arbitrary length limits are introduced here.
-- SQLite has limited concurrent writers and no native database-generated rowversion. There is no booking concurrency or overlap prevention in this foundation.
+- SQLite has limited concurrent writers and no native database-generated rowversion. Milestone 5 adds database overlap triggers and an appointment Status concurrency token; see [appointment booking design](appointment-booking-design.md).
 - Some schema changes require table rebuilds. Review generated migrations and back up the database before deployment. SQLite lacks EF idempotent migration scripts; apply migrations against a known schema or use a reviewed migration bundle.
 - Not every DateTimeOffset member translates after conversion. Compare complete timestamp values for SQL range predicates; timezone/date-part calculations may need explicit application handling.
 
@@ -57,4 +57,4 @@ dotnet ef database update --project src/MediClinic.Infrastructure -- "Data Sourc
 
 The initial migration and snapshot are versioned. Web does **not** call EnsureCreated or Migrate at startup in any environment. Production migration execution is a separate, deliberate deployment operation; a reviewed migration bundle can also be used. Integration tests keep a SQLite in-memory connection open, apply the real migrations, then exercise separate contexts for round trips, graph fixup, status updates, time queries and database constraint enforcement. They do not use EF's nonrelational InMemory provider.
 
-Identity authentication and user-domain associations are documented in [auth-design.md](auth-design.md). Booking serialization and overlap rules remain out of scope.
+Identity authentication and user-domain associations are documented in [auth-design.md](auth-design.md). Booking serialization and overlap rules are documented in [appointment-booking-design.md](appointment-booking-design.md).

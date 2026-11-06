@@ -1,0 +1,30 @@
+@model MediClinic.Application.AppointmentSummary
+@using MediClinic.Domain
+@{ var staff = ViewContext.RouteData.Values["controller"]?.ToString() == "StaffAppointments"; }
+<h1>Appointment</h1>
+<p role="status">@TempData["Message"]</p>
+<dl>
+    <dt>Service</dt><dd>@Model.Service</dd><dt>Doctor</dt><dd>@Model.Doctor</dd><dt>Branch</dt><dd>@Model.Branch</dd>
+    <dt>Time (Europe/Istanbul)</dt><dd>@MediClinic.Application.Scheduling.Local(Model.StartsAt).ToString("yyyy-MM-dd HH:mm") – @MediClinic.Application.Scheduling.Local(Model.EndsAt).ToString("yyyy-MM-dd HH:mm")</dd>
+    <dt>Booked duration</dt><dd>@((Model.EndsAt - Model.StartsAt).TotalMinutes) minutes</dd>
+    <dt>Status</dt><dd>@Model.Status</dd><dt>Decision reason</dt><dd>@Model.Reason</dd>
+</dl>
+@if (!staff && Model.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
+{
+    <form asp-action="Cancel" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <label for="reason">Cancellation reason</label><textarea id="reason" name="Reason" required maxlength="2000"></textarea>
+        <button type="submit">Cancel appointment</button>
+    </form>
+}
+@if (staff && Model.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
+{
+    <form asp-action="Review" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <label for="reason">Reason (required for rejection)</label><textarea id="reason" name="Reason" maxlength="2000"></textarea>
+        @if (Model.Status == AppointmentStatus.Pending)
+        { <button name="Action" value="Confirm">Confirm</button><button name="Action" value="Reject">Reject</button> }
+        else { <button name="Action" value="Complete">Complete</button> }
+    </form>
+}
+<a asp-action="Index">Back to appointments</a>

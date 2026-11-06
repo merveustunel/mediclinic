@@ -1,0 +1,127 @@
+using System.Net;
+using System.Text.RegularExpressions;
+using MediClinic.Application;
+using MediClinic.Domain;
+using MediClinic.Infrastructure.Identity;
+using MediClinic.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace MediClinic.Tests;
+
+public sealed class BookingMvcTests
+{
+    private sealed class Site(BookingTests.Database data) : WebApplicationFactory<Program>
+    {
+        protected override void ConfigureWebHost(IWebHostBuilder builder) => builder.UseEnvironment("Testing")
+            .UseSetting("ConnectionStrings:MediClinic", data.ConnectionString)
+            .ConfigureServices(services => services.AddSingleton<TimeProvider>(data.Time));
+        public HttpClient Client() => CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
+        public async Task<HttpClient> Login(string id)
+        {
+            using var scope = Services.CreateScope();
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = (await users.FindByIdAsync(id))!;
+            var password = "Test-" + Guid.NewGuid().ToString("N") + "aA1!";
+            Assert.True((await users.AddPasswordAsync(user, password)).Succeeded);
+            var client = Client();
+            var result = await Post(client, "/Account/Login", "/Account/Login", new() { ["Email"] = user.Email!, ["Password"] = password });
+            Assert.Equal(HttpStatusCode.Redirect, result.StatusCode);
+            return client;
+        }
+    }
+    private static async Task<HttpResponseMessage> Post(HttpClient client, string page, string url, Dictionary<string, string> values)
+    {
+        var html = await client.GetStringAsync(page);
+        var token = Regex.Match(html, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"").Groups[1].Value;
+        Assert.NotEmpty(token);
+        values["__RequestVerificationToken"] = WebUtility.HtmlDecode(token);
+        return await client.PostAsync(url, new FormUrlEncodedContent(values));
+    }
+    private static Dictionary<string, string> Form(BookingTests.Database data)
+    {
+        var request = data.Request();
+        return new() { ["ClinicId"] = request.ClinicId.ToString(), ["BranchId"] = request.BranchId.ToString(),
+            ["DepartmentId"] = request.DepartmentId.ToString(), ["DoctorId"] = request.DoctorId.ToString(), ["ServiceId"] = request.ServiceId.ToString(),
+            ["LocalStart"] = request.LocalStart.ToString("yyyy-MM-ddTHH:mm:ss") };
+    }
+
+    [Fact]
+    public async Task PatientCanBrowseBookViewAndCancelThroughMvc()
+    {
+        await using var data = await BookingTests.Database.Create(); using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var request = data.Request();
+        var page = await client.GetStringAsync($"/Appointments/Book?ClinicId={request.ClinicId}&BranchId={request.BranchId}&DepartmentId={request.DepartmentId}&DoctorId={request.DoctorId}&ServiceId={request.ServiceId}&Date=2030-01-02");
+        Assert.Contains(data.Fixture.Clinic.Name, page);
+        Assert.Contains("Europe/Istanbul", page);
+        Assert.Contains("2030-01-02T12:00:00", page);
+        var form = Form(data);
+        var response = await Post(client, "/Appointments/Book", "/Appointments/Book", form);
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        var detailsUrl = response.Headers.Location!.OriginalString;
+        var details = await client.GetStringAsync(detailsUrl);
+        Assert.Contains("Pending", details); Assert.Contains(data.Fixture.Service.Name, details);
+        await using var db = data.Context(); var appointment = await db.Appointments.SingleAsync();
+        Assert.Equal(data.Fixture.Patient.Id, db.Entry(appointment).Property<Guid>("PatientKey").CurrentValue);
+        var cancel = await Post(client, detailsUrl, "/Appointments/Cancel", new() { ["Id"] = appointment.Id.ToString(), ["Reason"] = "Changed plans" });
+        Assert.Equal(HttpStatusCode.Redirect, cancel.StatusCode);
+        Assert.Contains("Cancelled", await client.GetStringAsync(detailsUrl));
+    }
+
+    [Fact]
+    public async Task MvcEnforcesPatientIsolationStaffScopeAndAntiforgery()
+    {
+        await using var data = await BookingTests.Database.Create();
+        Guid id;
+        await using (var db = data.Context()) id = await data.Service(db).Book(data.PatientId, data.Request());
+        using var site = new Site(data);
+        using var anonymous = site.Client();
+        Assert.Equal(HttpStatusCode.Redirect, (await anonymous.GetAsync("/Appointments")).StatusCode);
+        using var other = await site.Login(data.OtherPatientId);
+        Assert.Equal(HttpStatusCode.NotFound, (await other.GetAsync($"/Appointments/Details/{id}")).StatusCode);
+        Assert.DoesNotContain(id.ToString(), await other.GetStringAsync("/Appointments"));
+        Assert.Equal(HttpStatusCode.Redirect, (await other.GetAsync("/StaffAppointments")).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await other.PostAsync("/Appointments/Cancel", new FormUrlEncodedContent(new Dictionary<string, string> { ["Id"] = id.ToString(), ["Reason"] = "No" }))).StatusCode);
+        await Post(other, "/Appointments/Book", "/Appointments/Cancel", new() { ["Id"] = id.ToString(), ["Reason"] = "No" });
+        using var staff = await site.Login(data.OtherStaffId);
+        Assert.Equal(HttpStatusCode.NotFound, (await staff.GetAsync($"/StaffAppointments/Details/{id}")).StatusCode);
+        Assert.DoesNotContain(id.ToString(), await staff.GetStringAsync("/StaffAppointments"));
+        await Post(staff, "/Account/Login", "/StaffAppointments/Review", new() { ["Id"] = id.ToString(), ["Action"] = "Confirm" });
+        await using var verify = data.Context(); Assert.Equal(AppointmentStatus.Pending, (await verify.Appointments.SingleAsync()).Status);
+    }
+
+    [Theory]
+    [InlineData("PatientId")][InlineData("Role")][InlineData("Status")]
+    public async Task BookingRejectsOwnershipAndPrivilegeInjection(string field)
+    {
+        await using var data = await BookingTests.Database.Create(); using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var form = Form(data); form[field] = data.OtherPatientId;
+        Assert.Equal(HttpStatusCode.BadRequest, (await Post(client, "/Appointments/Book", "/Appointments/Book", form)).StatusCode);
+        await using var verify = data.Context(); Assert.Empty(await verify.Appointments.ToListAsync());
+    }
+
+    [Fact]
+    public async Task StaffCanConfirmAndRejectWithReasonButCannotCompleteEarly()
+    {
+        await using var data = await BookingTests.Database.Create();
+        Guid first, second;
+        await using (var db = data.Context())
+        {
+            first = await data.Service(db).Book(data.PatientId, data.Request());
+            second = await data.Service(db).Book(data.PatientId, data.Request(data.Fixture.Start.AddMinutes(30)));
+        }
+        using var site = new Site(data); using var client = await site.Login(data.StaffId);
+        var firstUrl = $"/StaffAppointments/Details/{first}"; var secondUrl = $"/StaffAppointments/Details/{second}";
+        await Post(client, firstUrl, "/StaffAppointments/Review", new() { ["Id"] = first.ToString(), ["Action"] = "Confirm" });
+        await Post(client, firstUrl, "/StaffAppointments/Review", new() { ["Id"] = first.ToString(), ["Action"] = "Complete" });
+        Assert.Contains("Confirmed", await client.GetStringAsync(firstUrl));
+        await Post(client, secondUrl, "/StaffAppointments/Review", new() { ["Id"] = second.ToString(), ["Action"] = "Reject", ["Reason"] = " " });
+        Assert.Contains("Pending", await client.GetStringAsync(secondUrl));
+        await Post(client, secondUrl, "/StaffAppointments/Review", new() { ["Id"] = second.ToString(), ["Action"] = "Reject", ["Reason"] = "Unavailable" });
+        Assert.Contains("Rejected", await client.GetStringAsync(secondUrl));
+        Assert.Contains("Unavailable", await client.GetStringAsync(secondUrl));
+    }
+}

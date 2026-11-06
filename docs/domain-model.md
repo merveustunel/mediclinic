@@ -46,6 +46,8 @@ Rejected, Cancelled, and Completed are terminal. Repeating an operation or takin
 
 Availability intervals require end > start. Covers accepts positive intervals and includes exact matching start/end boundaries. Availability is descriptive: appointments do not yet reserve availability, check overlaps, require future dates, or allocate slots. Doctor specialty is descriptive; eligibility currently uses department membership only. No transfer/removal policies, authorization rules, booking quotas, audit history, global uniqueness, or concurrency guarantees are implemented.
 
+These are Domain-layer boundaries. Milestone 5 implements future-time/availability checks, scoped authorization and SQLite overlap protection in the application/persistence boundary while preserving this domain model; see [appointment booking design](appointment-booking-design.md).
+
 ## Class diagram
 
 ```mermaid
