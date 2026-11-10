@@ -1,12 +1,12 @@
 @model MediClinic.Web.Models.RegisterModel
-<h1>Register as a patient</h1>
+<h1>Hasta kaydı</h1>
 <form asp-action="Register" method="post">
 <div asp-validation-summary="All"></div>
-<label asp-for="Email"></label><input asp-for="Email" autocomplete="email" />
-<label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" />
-<label asp-for="FirstName"></label><input asp-for="FirstName" />
-<label asp-for="LastName"></label><input asp-for="LastName" />
-<label asp-for="DateOfBirth"></label><input asp-for="DateOfBirth" />
-<p>Use at least 12 characters with uppercase, lowercase, a number and a symbol.</p>
-<button type="submit">Register</button>
+<label asp-for="Email">E-posta</label><input asp-for="Email" autocomplete="email" />
+<label asp-for="Password">Parola</label><input asp-for="Password" autocomplete="new-password" />
+<label asp-for="FirstName">Ad</label><input asp-for="FirstName" />
+<label asp-for="LastName">Soyad</label><input asp-for="LastName" />
+<label asp-for="DateOfBirth">Doğum tarihi</label><input asp-for="DateOfBirth" />
+<p>Büyük harf, küçük harf, rakam ve simge içeren en az 12 karakter kullanın.</p>
+<button type="submit">Kayıt ol</button>
 </form>
