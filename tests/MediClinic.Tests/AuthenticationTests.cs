@@ -90,7 +90,7 @@ public sealed class AuthenticationTests
         using var site = new Site(); using var client = await site.Client();
         var first = await (await Post(client, "Register", Registration())).Content.ReadAsStringAsync();
         var duplicate = await (await Post(client, "Register", Registration())).Content.ReadAsStringAsync();
-        Assert.Contains("Registration received", first); Assert.Contains("Registration received", duplicate);
+        Assert.Contains("Kayıt talebiniz alındı", WebUtility.HtmlDecode(first)); Assert.Contains("Kayıt talebiniz alındı", WebUtility.HtmlDecode(duplicate));
         foreach (var email in new[] { Email, "unknown@example.test" })
         {
             var response = await Post(client, "Login", new() { ["Email"] = email, ["Password"] = "Wrong-credentials1!" });
@@ -124,6 +124,15 @@ public sealed class AuthenticationTests
         await Post(client, "Login", new() { ["Email"] = Email, ["Password"] = Password });
         foreach (var target in AuthRoles.All)
             Assert.Equal(target == role ? HttpStatusCode.OK : HttpStatusCode.Redirect, (await client.GetAsync("/Dashboard/" + target)).StatusCode);
+        var shell = WebUtility.HtmlDecode(await client.GetStringAsync("/Dashboard/" + role));
+        Assert.Contains("<html lang=\"tr\">", shell);
+        Assert.Contains("href=\"#main-content\"", shell);
+        Assert.Contains("aria-current=\"page\"", shell);
+        Assert.Contains("action=\"/Account/Logout\"", shell);
+        Assert.Contains("name=\"__RequestVerificationToken\"", shell);
+        Assert.Equal(role == AuthRoles.Patient, shell.Contains("href=\"/Appointments\""));
+        Assert.Equal(role == AuthRoles.Patient, shell.Contains("href=\"/Appointments/Book\""));
+        Assert.Equal(role == AuthRoles.Staff, shell.Contains("href=\"/StaffAppointments\""));
         using var verify = site.Services.CreateScope();
         var restored = await verify.ServiceProvider.GetRequiredService<MediClinicDbContext>().Users.Include(x => x.Staff).SingleAsync();
         if (role == AuthRoles.Staff) Assert.NotNull(restored.Staff);

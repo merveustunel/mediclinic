@@ -1,11 +1,11 @@
 @model MediClinic.Web.Models.BookingModel
-<h1>Book an appointment</h1>
-<p>All scheduling times are local to Europe/Istanbul. Select a compatible clinic / branch / department / doctor / service combination, then choose an available time. New requests are Pending.</p>
+<h1>Randevu oluştur</h1>
+<p>Tüm saatler Europe/Istanbul saat dilimindedir. Klinik / şube / bölüm / doktor / hizmet seçiminizi yapın ve uygun bir saat seçin. Yeni talepler inceleme için beklemeye alınır.</p>
 <div asp-validation-summary="All" role="alert"></div>
 <form method="get" asp-action="Book" id="selection">
-    <label for="option">Clinic / branch / department / doctor / service</label>
+    <label for="option">Klinik / şube / bölüm / doktor / hizmet</label>
     <select id="option" required>
-        <option value="">Choose a combination</option>
+        <option value="">Bir seçenek seçin</option>
         @foreach (var option in Model.Options)
         {
             <option value="@option.ServiceId" data-clinic="@option.ClinicId" data-branch="@option.BranchId" data-department="@option.DepartmentId" data-doctor="@option.DoctorId" selected="@(option.DoctorId == Model.DoctorId && option.ServiceId == Model.ServiceId)">@option.Clinic / @option.Branch / @option.Department / @option.Doctor / @option.Service (@option.Duration.TotalMinutes min)</option>
@@ -13,23 +13,23 @@
     </select>
     <input type="hidden" name="ClinicId" value="@Model.ClinicId" /><input type="hidden" name="BranchId" value="@Model.BranchId" />
     <input type="hidden" name="DepartmentId" value="@Model.DepartmentId" /><input type="hidden" name="DoctorId" value="@Model.DoctorId" /><input type="hidden" name="ServiceId" value="@Model.ServiceId" />
-    <label asp-for="Date">Local date</label><input asp-for="Date" type="date" required />
-    <button type="submit">Show available times</button>
+    <label asp-for="Date">Randevu tarihi</label><input asp-for="Date" type="date" required />
+    <button type="submit">Uygun saatleri göster</button>
 </form>
 @if (Model.Slots.Count > 0)
 {
     <form asp-action="Book" method="post">
         <input asp-for="ClinicId" type="hidden" /><input asp-for="BranchId" type="hidden" /><input asp-for="DepartmentId" type="hidden" />
         <input asp-for="DoctorId" type="hidden" /><input asp-for="ServiceId" type="hidden" /><input asp-for="Date" type="hidden" />
-        <label asp-for="LocalStart">Available local time</label>
+        <label asp-for="LocalStart">Uygun randevu saati</label>
         <select asp-for="LocalStart" required>
             @foreach (var slot in Model.Slots) { <option value="@slot.ToString("yyyy-MM-ddTHH:mm:ss")">@slot.ToString("yyyy-MM-dd HH:mm")</option> }
         </select>
-        <button type="submit">Request appointment</button>
+        <button type="submit">Randevu talep et</button>
     </form>
 }
-else if (Model.DoctorId != Guid.Empty) { <p>No available times loaded. Choose a date and show available times.</p> }
-<a asp-action="Index">My appointments</a>
+else if (Model.DoctorId != Guid.Empty) { <p>Uygun saat yüklenmedi. Bir tarih seçerek uygun saatleri görüntüleyin.</p> }
+<a asp-action="Index">Randevularım</a>
 <script>
 document.getElementById('selection').addEventListener('submit', function () {
     const option = document.getElementById('option').selectedOptions[0];

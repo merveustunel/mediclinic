@@ -1,2 +1,3 @@
 @model string
-<h1>@Model</h1><p>You are signed in. Business management features are not available yet.</p>
+@{ var title = User.IsInRole("ClinicAdmin") ? "Yönetici paneli" : User.IsInRole("Staff") ? "Personel paneli" : "Hasta paneli"; }
+<h1>@title</h1><p>Oturumunuz açık. İşlemlerinize gezinme menüsünden ulaşabilirsiniz.</p>

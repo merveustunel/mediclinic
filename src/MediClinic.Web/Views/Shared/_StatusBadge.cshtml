@@ -1,0 +1,13 @@
+@model MediClinic.Domain.AppointmentStatus
+@{
+    var (style, label) = Model switch
+    {
+        MediClinic.Domain.AppointmentStatus.Pending => ("pending", "Beklemede"),
+        MediClinic.Domain.AppointmentStatus.Confirmed => ("confirmed", "Onaylandı"),
+        MediClinic.Domain.AppointmentStatus.Completed => ("completed", "Tamamlandı"),
+        MediClinic.Domain.AppointmentStatus.Cancelled => ("cancelled", "İptal edildi"),
+        MediClinic.Domain.AppointmentStatus.Rejected => ("rejected", "Reddedildi"),
+        _ => ("unknown", "Bilinmeyen durum")
+    };
+}
+<span class="status-badge status-@style" data-status="@Model">@label</span>

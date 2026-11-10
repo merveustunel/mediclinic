@@ -1,29 +1,79 @@
+@using MediClinic.Infrastructure.Identity
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var authenticated = User.Identity?.IsAuthenticated == true;
+    var role = User.IsInRole(AuthRoles.ClinicAdmin) ? "Klinik yöneticisi" : User.IsInRole(AuthRoles.Staff) ? "Personel" : User.IsInRole(AuthRoles.Patient) ? "Hasta" : "Hesap";
+    var title = ViewData["Title"]?.ToString() ?? (controller switch
+    {
+        "Appointments" => action == "Book" ? "Randevu oluştur" : action == "Details" ? "Randevu detayı" : "Randevularım",
+        "StaffAppointments" => action == "Details" ? "Randevu detayı" : "Randevu inceleme",
+        "Dashboard" => "Genel bakış",
+        "Account" => action switch { "Login" => "Giriş yap", "Register" => "Hasta kaydı", "AccessDenied" => "Erişim engellendi", _ => "Hesap" },
+        _ => "Hoş geldiniz"
+    });
+}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MediClinic</title>
+    <meta name="theme-color" content="#6953C8" />
+    <title>@title - MediClinic</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
 <body>
-    <header><a asp-controller="Home" asp-action="Index">MediClinic</a></header>
-    <nav aria-label="Account">
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        @if (User.IsInRole("Patient")) { <a asp-controller="Appointments" asp-action="Index">My appointments</a> }
-        @if (User.IsInRole("Staff")) { <a asp-controller="StaffAppointments" asp-action="Index">Review appointments</a> }
-        @foreach (var role in MediClinic.Infrastructure.Identity.AuthRoles.All)
-        {
-            if (User.IsInRole(role)) { <a asp-controller="Dashboard" asp-action="@role">@role dashboard</a> }
-        }
-        <form asp-controller="Account" asp-action="Logout" method="post"><button type="submit">Sign out</button></form>
-    }
-    else
-    {
-        <a asp-controller="Account" asp-action="Register">Register</a>
-        <a asp-controller="Account" asp-action="Login">Sign in</a>
-    }
-    </nav>
-    <main>@RenderBody()</main>
+    <a class="skip-link" href="#main-content">İçeriğe geç</a>
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Uygulama menüsü">
+            <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark" aria-hidden="true">+</span> MediClinic</a>
+            <p class="sidebar-caption">SAĞLIK YÖNETİMİ</p>
+            <details class="navigation" open>
+                <summary>Gezinme menüsü</summary>
+                <nav aria-label="Ana gezinme">
+                    @if (authenticated)
+                    {
+                        @foreach (var item in AuthRoles.All.Where(User.IsInRole))
+                        {
+                            <a asp-controller="Dashboard" asp-action="@item" aria-current="@(controller == "Dashboard" && action == item ? "page" : null)">@(item == AuthRoles.Patient ? "Hasta paneli" : item == AuthRoles.Staff ? "Personel paneli" : "Yönetici paneli")</a>
+                        }
+                        @if (User.IsInRole(AuthRoles.Patient))
+                        {
+                            <a asp-controller="Appointments" asp-action="Index" aria-current="@(controller == "Appointments" && action != "Book" ? "page" : null)">Randevularım</a>
+                            <a asp-controller="Appointments" asp-action="Book" aria-current="@(controller == "Appointments" && action == "Book" ? "page" : null)">Randevu oluştur</a>
+                        }
+                        @if (User.IsInRole(AuthRoles.Staff))
+                        {
+                            <a asp-controller="StaffAppointments" asp-action="Index" aria-current="@(controller == "StaffAppointments" ? "page" : null)">Randevu inceleme</a>
+                        }
+                    }
+                    else
+                    {
+                        <a asp-controller="Home" asp-action="Index" aria-current="@(controller == "Home" ? "page" : null)">Ana sayfa</a>
+                        <a asp-controller="Account" asp-action="Login" aria-current="@(action == "Login" ? "page" : null)">Giriş yap</a>
+                        <a asp-controller="Account" asp-action="Register" aria-current="@(action == "Register" ? "page" : null)">Hasta kaydı</a>
+                    }
+                </nav>
+            </details>
+            <p class="sidebar-note">Sağlığınız için, birlikte.<br /><small>MediClinic · Hasta ve klinik portalı</small></p>
+        </aside>
+        <div class="workspace">
+            <header class="topbar">
+                <div><p class="eyebrow">MediClinic</p><p class="page-title">@title</p></div>
+                <div class="user-context">
+                    @if (authenticated)
+                    {
+                        <div class="user-info"><span class="user-name">@User.Identity!.Name</span><small>@role</small></div>
+                        <form asp-controller="Account" asp-action="Logout" method="post"><button class="button-secondary" type="submit">Çıkış yap</button></form>
+                    }
+                    else { <a class="button button-secondary" asp-controller="Account" asp-action="Login">Giriş yap</a> }
+                </div>
+            </header>
+            <main id="main-content" tabindex="-1"><div class="content-card">@RenderBody()</div></main>
+            <footer class="app-footer">MediClinic · Sağlık hizmetlerine kolay erişim</footer>
+        </div>
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
