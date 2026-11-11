@@ -14,7 +14,7 @@ namespace MediClinic.Tests;
 
 public sealed class BookingMvcTests
 {
-    private sealed class Site(BookingTests.Database data) : WebApplicationFactory<Program>
+    internal sealed class Site(BookingTests.Database data) : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder) => builder.UseEnvironment("Testing")
             .UseSetting("ConnectionStrings:MediClinic", data.ConnectionString)
