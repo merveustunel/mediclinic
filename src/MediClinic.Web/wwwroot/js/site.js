@@ -13,3 +13,23 @@
         }
     });
 })();
+
+// Reveal only on explicit request; never read or copy the password value.
+document.querySelectorAll('[data-password-toggle]').forEach(button => {
+    const input = document.getElementById(button.dataset.passwordToggle);
+    if (!input || input.type !== 'password') return;
+    button.hidden = false;
+    const mask = () => {
+        input.type = 'password';
+        button.setAttribute('aria-pressed', 'false');
+        button.textContent = 'Parolayı göster';
+    };
+    button.addEventListener('click', () => {
+        const reveal = input.type === 'password';
+        input.type = reveal ? 'text' : 'password';
+        button.setAttribute('aria-pressed', String(reveal));
+        button.textContent = reveal ? 'Parolayı gizle' : 'Parolayı göster';
+    });
+    input.form?.addEventListener('submit', mask);
+    window.addEventListener('pagehide', mask);
+});

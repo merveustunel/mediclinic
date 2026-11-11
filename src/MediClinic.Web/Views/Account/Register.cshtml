@@ -1,12 +1,43 @@
 @model MediClinic.Web.Models.RegisterModel
-<h1>Hasta kaydı</h1>
-<form asp-action="Register" method="post">
-<div asp-validation-summary="All"></div>
-<label asp-for="Email">E-posta</label><input asp-for="Email" autocomplete="email" />
-<label asp-for="Password">Parola</label><input asp-for="Password" autocomplete="new-password" />
-<label asp-for="FirstName">Ad</label><input asp-for="FirstName" />
-<label asp-for="LastName">Soyad</label><input asp-for="LastName" />
-<label asp-for="DateOfBirth">Doğum tarihi</label><input asp-for="DateOfBirth" />
-<p>Büyük harf, küçük harf, rakam ve simge içeren en az 12 karakter kullanın.</p>
-<button type="submit">Kayıt ol</button>
-</form>
+@{ ViewData["Title"] = "Hasta kaydı"; }
+<section class="auth-panel" aria-labelledby="auth-title">
+    <p class="eyebrow">MEDICLINIC’E KATILIN</p>
+    <h1 id="auth-title">Hasta kaydı</h1>
+    <p class="auth-intro">Hasta hesabınızı oluşturmak için bilgilerinizi girin. Tüm alanlar zorunludur.</p>
+    <form asp-action="Register" method="post" class="auth-form">
+        <div asp-validation-summary="All" role="alert" aria-label="Kayıt hataları"><p>İşlem tamamlanamadı. Aşağıdaki bilgileri kontrol edin.</p></div>
+        <div class="auth-name-grid">
+            <div class="auth-field">
+                <label asp-for="FirstName">Ad</label>
+                <input asp-for="FirstName" autocomplete="given-name" aria-describedby="FirstName-error" aria-invalid="@(ViewData.ModelState["FirstName"]?.Errors.Count > 0 ? "true" : null)" />
+                <span asp-validation-for="FirstName" id="FirstName-error" class="field-error"></span>
+            </div>
+            <div class="auth-field">
+                <label asp-for="LastName">Soyad</label>
+                <input asp-for="LastName" autocomplete="family-name" aria-describedby="LastName-error" aria-invalid="@(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "true" : null)" />
+                <span asp-validation-for="LastName" id="LastName-error" class="field-error"></span>
+            </div>
+        </div>
+        <div class="auth-field">
+            <label asp-for="Email">E-posta</label>
+            <input asp-for="Email" autocomplete="email" aria-describedby="Email-error" aria-invalid="@(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "true" : null)" />
+            <span asp-validation-for="Email" id="Email-error" class="field-error"></span>
+        </div>
+        <div class="auth-field">
+            <label asp-for="Password">Parola</label>
+            <div class="password-control">
+                <input asp-for="Password" autocomplete="new-password" aria-describedby="Password-error Password-hint" aria-invalid="@(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "true" : null)" />
+                <button type="button" class="button-secondary password-toggle" data-password-toggle="Password" aria-controls="Password" aria-pressed="false" hidden>Parolayı göster</button>
+            </div>
+            <p id="Password-hint" class="field-hint">Büyük harf, küçük harf, rakam ve simge içeren en az 12 karakter kullanın.</p>
+            <span asp-validation-for="Password" id="Password-error" class="field-error"></span>
+        </div>
+        <div class="auth-field">
+            <label asp-for="DateOfBirth">Doğum tarihi</label>
+            <input asp-for="DateOfBirth" autocomplete="bday" aria-describedby="DateOfBirth-error" aria-invalid="@(ViewData.ModelState["DateOfBirth"]?.Errors.Count > 0 ? "true" : null)" />
+            <span asp-validation-for="DateOfBirth" id="DateOfBirth-error" class="field-error"></span>
+        </div>
+        <button type="submit" class="auth-submit">Kayıt ol</button>
+    </form>
+    <p class="auth-footer">Zaten hesabınız var mı? <a asp-action="Login">Giriş yapın</a></p>
+</section>

@@ -1,8 +1,26 @@
 @model MediClinic.Web.Models.LoginModel
-<h1>Giriş yap</h1>
-<form asp-action="Login" method="post">
-<div asp-validation-summary="All"></div>
-<label asp-for="Email">E-posta</label><input asp-for="Email" autocomplete="username" />
-<label asp-for="Password">Parola</label><input asp-for="Password" autocomplete="current-password" />
-<button type="submit">Giriş yap</button>
-</form>
+@{ ViewData["Title"] = "Giriş yap"; }
+<section class="auth-panel" aria-labelledby="auth-title">
+    <p class="eyebrow">HESABINIZA ERİŞİN</p>
+    <h1 id="auth-title">Giriş yap</h1>
+    <p class="auth-intro">MediClinic hesabınızla size özel panelinize ulaşın.</p>
+    <form asp-action="Login" method="post" class="auth-form">
+        <div asp-validation-summary="All" role="alert" aria-label="Giriş hataları"><p>İşlem tamamlanamadı. Aşağıdaki bilgileri kontrol edin.</p></div>
+        <div class="auth-field">
+            <label asp-for="Email">E-posta</label>
+            <input asp-for="Email" autocomplete="username" aria-describedby="Email-error" aria-invalid="@(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "true" : null)" />
+            <span asp-validation-for="Email" id="Email-error" class="field-error"></span>
+        </div>
+        <div class="auth-field">
+            <label asp-for="Password">Parola</label>
+            <div class="password-control">
+                <input asp-for="Password" autocomplete="current-password" aria-describedby="Password-error Password-hint" aria-invalid="@(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "true" : null)" />
+                <button type="button" class="button-secondary password-toggle" data-password-toggle="Password" aria-controls="Password" aria-pressed="false" hidden>Parolayı göster</button>
+            </div>
+            <p id="Password-hint" class="field-hint">Parolanız büyük ve küçük harflere duyarlıdır.</p>
+            <span asp-validation-for="Password" id="Password-error" class="field-error"></span>
+        </div>
+        <button type="submit" class="auth-submit">Giriş yap</button>
+    </form>
+    <p class="auth-footer">Henüz hesabınız yok mu? <a asp-action="Register">Hasta kaydı oluşturun</a></p>
+</section>
