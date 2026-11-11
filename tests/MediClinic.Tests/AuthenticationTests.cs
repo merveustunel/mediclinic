@@ -16,6 +16,59 @@ namespace MediClinic.Tests;
 
 public sealed class AuthenticationTests
 {
+    [Theory]
+    [InlineData("Login", "current-password")]
+    [InlineData("Register", "new-password")]
+    public async Task AuthFormsAssociateLabelsErrorsAndPasswordControls(string action, string autocomplete)
+    {
+        using var site = new Site(); using var client = await site.Client();
+        var html = WebUtility.HtmlDecode(await client.GetStringAsync("/Account/" + action));
+        Assert.Contains("method=\"post\"", html);
+        Assert.Contains("action=\"/Account/" + action + "\"", html);
+        Assert.Contains("name=\"__RequestVerificationToken\"", html);
+        Assert.Contains("role=\"alert\"", html);
+        Assert.Contains("autocomplete=\"" + autocomplete + "\"", html);
+        Assert.Contains("data-password-toggle=\"Password\"", html);
+        Assert.Contains("aria-controls=\"Password\"", html);
+        Assert.Contains("aria-pressed=\"false\" hidden", html);
+        foreach (var field in action == "Login" ? new[] { "Email", "Password" } : new[] { "Email", "Password", "FirstName", "LastName", "DateOfBirth" })
+        {
+            Assert.Contains("for=\"" + field + "\"", html);
+            Assert.Contains("id=\"" + field + "-error\"", html);
+            Assert.Contains("aria-describedby=\"" + field + "-error", html);
+        }
+    }
+
+    [Theory]
+    [InlineData("Login")]
+    [InlineData("Register")]
+    public async Task InvalidAuthFormsMarkFieldsAndNeverEchoPasswords(string action)
+    {
+        using var site = new Site(); using var client = await site.Client();
+        var submittedPassword = "Invalid-" + Guid.NewGuid().ToString("N");
+        var response = await Post(client, action, new() { ["Email"] = "invalid", ["Password"] = submittedPassword });
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("validation-summary-errors", html);
+        Assert.Contains("field-validation-error", html);
+        Assert.Matches("<input[^>]*aria-invalid=\"true\"[^>]*id=\"Email\"", html);
+        Assert.DoesNotContain(submittedPassword, html);
+        Assert.Contains("type=\"password\"", html);
+        Assert.Equal(HttpStatusCode.Redirect, (await client.GetAsync("/Dashboard")).StatusCode);
+    }
+
+    [Fact]
+    public async Task AccessDeniedKeepsForbiddenStatusAndOffersSafeNavigation()
+    {
+        using var site = new Site(); using var client = await site.Client();
+        var response = await client.GetAsync("/Account/AccessDenied");
+        var html = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Contains("Erişim engellendi", html);
+        Assert.Contains("href=\"/Account/Login\"", html);
+        Assert.DoesNotContain("href=\"/Dashboard\"", html);
+    }
+
     // Each test uses a real migrated SQLite file, independent cookies, and HTTPS.
     private sealed class Site : WebApplicationFactory<Program>
     {
@@ -121,7 +174,10 @@ public sealed class AuthenticationTests
             Assert.True((await roles.CreateAsync(new IdentityRole(role))).Succeeded);
             Assert.True((await users.AddToRoleAsync(user, role)).Succeeded);
         }
-        await Post(client, "Login", new() { ["Email"] = Email, ["Password"] = Password });
+        var login = await Post(client, "Login", new() { ["Email"] = Email, ["Password"] = Password });
+        Assert.Equal("/Dashboard", login.Headers.Location!.OriginalString);
+        var landing = await client.GetAsync(login.Headers.Location);
+        Assert.Equal("/Dashboard/" + role, landing.Headers.Location!.OriginalString);
         foreach (var target in AuthRoles.All)
             Assert.Equal(target == role ? HttpStatusCode.OK : HttpStatusCode.Redirect, (await client.GetAsync("/Dashboard/" + target)).StatusCode);
         var shell = WebUtility.HtmlDecode(await client.GetStringAsync("/Dashboard/" + role));
