@@ -47,11 +47,14 @@ var selected = Model.Selection!;
 <button name="Stage" value="2" class="button-secondary">Uygun saatleri göster</button>
 <p>@Model.Date.ToString("dd MMMM yyyy, dddd", tr)</p>
 @if (Model.Slots.Count == 0) { <p class="empty-state" role="status">Bu tarihte uygun saat bulunmuyor. Başka bir tarih seçin.</p> }
-else {
-<fieldset class="booking-times"><legend>Uygun saatler: bir saat seçin</legend><div class="booking-slot-grid">
-@foreach (var slot in Model.Slots) { <label class="booking-slot"><input type="radio" name="LocalStart" value="@slot.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)" checked="@(slot == Model.LocalStart)"/><span>@slot.ToString("HH:mm", tr)</span></label> }
-</div></fieldset><button name="Stage" value="3">Talep özetini gör</button>
+@if (Model.TimeCards.Count > 0) {
+<fieldset class="booking-times"><legend>Randevu saatleri: uygun bir saat seçin</legend><div class="booking-slot-grid">
+@foreach (var card in Model.TimeCards) {
+    <label class="booking-slot @(card.IsPast ? "booking-slot-past" : null)"><input type="radio" name="LocalStart" value="@card.LocalStart.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)" disabled="@card.IsPast" checked="@(!card.IsPast && card.LocalStart == Model.LocalStart)"/><span>@card.LocalStart.ToString("HH:mm", tr)@if (card.IsPast) { <small class="booking-slot-note">Geçmiş saat</small> }</span></label>
 }
+</div></fieldset>
+}
+@if (Model.Slots.Count > 0) { <button name="Stage" value="3">Talep özetini gör</button> }
 }
 else
 {

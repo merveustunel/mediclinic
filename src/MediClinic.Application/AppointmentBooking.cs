@@ -21,6 +21,7 @@ public interface IAppointmentBooking
 
 public static class Scheduling
 {
+    public const int SlotIntervalMinutes = 15;
     public static TimeZoneInfo Zone { get; } = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
     public static DateTimeOffset ToUtc(DateTime local)
     {

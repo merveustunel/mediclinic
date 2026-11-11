@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MediClinic.Web.Controllers;
 
 [Authorize(Policy = AuthRoles.Patient)]
-public sealed class AppointmentsController(IAppointmentBooking booking) : Controller
+public sealed class AppointmentsController(IAppointmentBooking booking, TimeProvider clock) : Controller
 {
     private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
     public async Task<IActionResult> Index(string? status)
@@ -39,6 +39,10 @@ public sealed class AppointmentsController(IAppointmentBooking booking) : Contro
 
     private async Task PrepareBooking(BookingModel model)
     {
+        var today = DateOnly.FromDateTime(Scheduling.Local(clock.GetUtcNow()));
+        var hasDate = Request.HasFormContentType
+            ? Request.Form.ContainsKey(nameof(model.Date)) : Request.Query.ContainsKey(nameof(model.Date));
+        if (!hasDate) model.Date = today.AddDays(1);
         // Never render framework binding errors (which can contain raw submitted values).
         if (!ModelState.IsValid)
         {
@@ -68,8 +72,17 @@ public sealed class AppointmentsController(IAppointmentBooking booking) : Contro
             if (model.Stage == 3 && !ModelState.IsValid) model.Stage = 2;
             if (model.Stage >= 2 && ModelState.IsValid)
             {
+                if (model.Date < today)
+                {
+                    ModelState.AddModelError(nameof(model.Date), "Geçmiş bir tarihe randevu alınamaz. Lütfen bugün veya ileri bir tarih seçin.");
+                    model.Stage = 2;
+                    model.LocalStart = null;
+                    return;
+                }
                 model.Slots = await booking.Slots(UserId, model.DoctorId, model.ServiceId, model.Date);
-                if (model.Stage == 3 && (!model.LocalStart.HasValue || !model.Slots.Contains(model.LocalStart.Value)))
+                model.PrepareTimeCards(clock.GetUtcNow());
+                if (model.Stage == 3 && (!model.LocalStart.HasValue || !model.Slots.Contains(model.LocalStart.Value)
+                    || Scheduling.ToUtc(model.LocalStart.Value) <= clock.GetUtcNow()))
                 {
                     ModelState.AddModelError("", model.LocalStart.HasValue
                         ? "Seçtiğiniz saat artık uygun değil. Lütfen güncel saatlerden birini seçin."

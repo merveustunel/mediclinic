@@ -137,3 +137,43 @@ also reached stage two, with the manual button visible and no time selected.
 The Turkish loading message and disabled Continue state were observed before the
 GET completed. The enhanced selection stage had no horizontal overflow at 320,
 390, 768 or 1440 CSS pixels.
+
+## Elapsed time cards
+
+The controller uses the injected TimeProvider for the default booking date, the
+current Istanbul calendar date, and the snapshot passed to the presentation model.
+On today's Istanbul date, elapsed positions in the day grid appear as disabled
+radio cards labelled **Geçmiş saat**, with muted colors, 0.65 opacity and a disabled
+cursor. Hover and checked styling cannot make them appear selectable. The grid
+interval is shared through `Scheduling.SlotIntervalMinutes`, preserving the existing
+15-minute grid without duplicating availability logic.
+
+These markers run from local midnight through the current instant. They describe
+elapsed time only: they do not assert that a doctor previously worked those hours
+or that a slot was previously available. Past occupied and unoccupied times look
+identical; no historical availability, patient details or unavailability reasons
+are exposed. Future cards are drawn exclusively from the authoritative Slots result,
+so occupied or otherwise unavailable future starts are never added by presentation.
+Future dates have no elapsed markers. Empty availability messaging remains visible
+when no genuinely available slots exist, even if elapsed markers are shown.
+
+Classification converts each local start to UTC and compares DateTimeOffset instants;
+formatted strings and browser clocks are not involved. Exact-now cards are disabled.
+Review also checks the injected clock again. Final submission still reloads Slots
+and calls the existing Book service, whose strict future-time, availability, overlap,
+ownership and lifecycle rules remain intact. Past dates receive a specific Turkish
+validation message and remain at the date-selection stage. No database schema,
+Identity policy or staff/admin workflow changes are involved.
+
+Regression coverage includes elapsed and future starts on the same day, exact-now
+rejection in the service and MVC submission, stale displayed slots, past dates,
+occupied future slots, Istanbul midnight across a different UTC calendar date,
+equivalent UTC offsets, disabled radio semantics and future-date behavior.
+Browser checks against the existing temporary fixture database confirmed muted,
+disabled cards with the accessible label, unchanged hover opacity, interactive future-date
+cards, the Turkish past-date alert and no overflow at 320, 390, 768 or 1440px.
+
+Final verification for this follow-up: build succeeded with zero warnings/errors;
+all 165 .NET tests and all 5 JavaScript regressions passed. Build and .NET tests used
+`--artifacts-path "$env:TEMP/mediclinic-past-slot-artifacts"` to avoid locking the
+running application's outputs. The existing application database was untouched.
