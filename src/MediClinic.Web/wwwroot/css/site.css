@@ -85,6 +85,12 @@ dd { margin-left: 0; font-weight: 500; }
 }
 @media (prefers-reduced-motion: no-preference) { a, button { transition: background-color .15s ease; } }
 
+/* Patient dashboard adapts to the content width, including the tablet sidebar. */
+.dashboard-metrics, .dashboard-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--space-2); margin-block: var(--space-3); }
+.dashboard-metrics dt { margin: 0; }
+.dashboard-metrics dd { margin: .5rem 0 0; font-size: 2rem; font-weight: 750; color: var(--primary); }
+.dashboard-details > div { min-width: 0; }
+.dashboard-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 /* Account screens use the shared Modern Purple tokens. */
 .auth-panel { width: 100%; max-width: 32rem; margin-inline: auto; padding-block: clamp(.5rem, 2vw, 1.5rem); }
 .auth-panel .eyebrow { margin-bottom: .75rem; }
