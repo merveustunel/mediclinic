@@ -188,7 +188,7 @@ public sealed class DemoVerificationTests
         {
             ["ClinicId"] = option.ClinicId.ToString(), ["BranchId"] = option.BranchId.ToString(),
             ["DepartmentId"] = option.DepartmentId.ToString(), ["DoctorId"] = option.DoctorId.ToString(),
-            ["ServiceId"] = option.ServiceId.ToString(), ["LocalStart"] = slot.ToString("yyyy-MM-ddTHH:mm:ss")
+            ["Date"] = date.ToString("yyyy-MM-dd"), ["ServiceId"] = option.ServiceId.ToString(), ["LocalStart"] = slot.ToString("yyyy-MM-ddTHH:mm:ss")
         };
         var created = await Post(patient, selection, "/Appointments/Book", Form());
         Assert.Equal(HttpStatusCode.Redirect, created.StatusCode);
