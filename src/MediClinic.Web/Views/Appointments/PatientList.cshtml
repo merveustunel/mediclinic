@@ -1,0 +1,59 @@
+@model MediClinic.Web.Models.PatientAppointmentsModel
+@using MediClinic.Application
+@using System.Globalization
+@{ ViewData["Title"] = "Randevularım"; }
+<header class="appointments-heading">
+    <div>
+        <p class="eyebrow">RANDEVULARIM</p>
+        <h1>Randevularınızı takip edin</h1>
+        <p class="field-hint">Geçmiş ve yaklaşan randevularınızı inceleyin, durumlarını kolayca takip edin.</p>
+    </div>
+    <a class="button" asp-action="Book">Yeni randevu oluştur</a>
+</header>
+<nav class="appointment-filters" aria-label="Randevu durumu filtreleri">
+    @foreach (var filter in MediClinic.Web.Models.PatientAppointmentsModel.Filters)
+    {
+        <a class="button button-secondary" asp-action="Index" asp-route-status="@(filter.Value == "" ? null : filter.Value)"
+           aria-current="@((Model.Status ?? "") == filter.Value ? "page" : null)">@filter.Label</a>
+    }
+</nav>
+<p class="field-hint">@Model.Appointments.Count randevu gösteriliyor. Saatler İstanbul saatine (Europe/Istanbul) göre gösterilir.</p>
+@if (Model.Appointments.Count == 0)
+{
+    <section class="empty-state" aria-labelledby="appointments-empty-title">
+        @if (Model.TotalCount == 0)
+        {
+            <h2 id="appointments-empty-title">Henüz randevunuz bulunmuyor</h2>
+            <p>Sağlık planınıza ilk randevunuzu oluşturarak başlayabilirsiniz.</p>
+            <a class="button" asp-action="Book">Yeni randevu oluştur</a>
+        }
+        else
+        {
+            <h2 id="appointments-empty-title">Bu durumda randevunuz bulunmuyor</h2>
+            <p>Diğer durumları seçebilir veya tüm randevularınızı görüntüleyebilirsiniz.</p>
+            <a class="button button-secondary" asp-action="Index">Tüm randevuları görüntüle</a>
+        }
+    </section>
+}
+else
+{
+    <div class="patient-appointments">
+        <table class="appointments-table">
+            <caption class="visually-hidden">Randevularınız, başlangıç tarihine göre yeniden eskiye</caption>
+            <thead><tr><th scope="col">Doktor</th><th scope="col">Hizmet</th><th scope="col">Şube</th><th scope="col">Tarih ve saat</th><th scope="col">Durum</th><th scope="col">İşlem</th></tr></thead>
+            <tbody>
+            @foreach (var item in Model.Appointments)
+            {
+                <tr>
+                    <td><span class="appointment-field-label" aria-hidden="true">Doktor</span>@item.Doctor</td>
+                    <td><span class="appointment-field-label" aria-hidden="true">Hizmet</span>@item.Service</td>
+                    <td><span class="appointment-field-label" aria-hidden="true">Şube</span>@item.Branch</td>
+                    <td><span class="appointment-field-label" aria-hidden="true">Tarih ve saat</span><time datetime="@item.StartsAt.ToString("O", CultureInfo.InvariantCulture)">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.GetCultureInfo("tr-TR"))</time></td>
+                    <td><span class="appointment-field-label" aria-hidden="true">Durum</span><partial name="_StatusBadge" model="item.Status" /></td>
+                    <td><a asp-action="Details" asp-route-id="@item.Id">Detayları görüntüle<span class="visually-hidden">: @item.Doctor, @Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.GetCultureInfo("tr-TR"))</span></a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

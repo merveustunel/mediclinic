@@ -11,9 +11,15 @@ namespace MediClinic.Web.Controllers;
 public sealed class AppointmentsController(IAppointmentBooking booking) : Controller
 {
     private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? status)
     {
-        try { return View("List", await booking.List(UserId, false)); }
+        try
+        {
+            var appointments = await booking.List(UserId, false);
+            if (!PatientAppointmentsModel.IsValidFilter(status))
+                return BadRequest("Geçersiz randevu durumu.");
+            return View("PatientList", PatientAppointmentsModel.Create(appointments, status));
+        }
         catch (BookingException) { return Forbid(); }
     }
     public async Task<IActionResult> Details(Guid id)
