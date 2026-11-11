@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MediClinic.Web.Controllers;
 
-[Authorize(Policy = AuthRoles.Staff)]
+[Authorize(Roles = AuthRoles.Staff + "," + AuthRoles.ClinicAdmin)]
 public sealed class StaffAppointmentsController(IAppointmentBooking booking) : Controller
 {
     private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -21,6 +21,7 @@ public sealed class StaffAppointmentsController(IAppointmentBooking booking) : C
         try { var item = await booking.Find(UserId, id, true); return item == null ? NotFound() : View("~/Views/Appointments/Details.cshtml", item); }
         catch (BookingException) { return Forbid(); }
     }
+    [Authorize(Policy = AuthRoles.Staff)]
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Review([Bind("Id,Action,Reason")] AppointmentActionModel model)
     {

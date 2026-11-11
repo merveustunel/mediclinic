@@ -157,3 +157,10 @@ dd { margin-left: 0; font-weight: 500; }
 .booking-slot-note { display: block; font-size: .75rem; font-weight: 400; }
 .booking-slot-past, .booking-slot-past:hover, .booking-slot-past:has(:checked) { opacity: .65; color: var(--muted); background: var(--background); border-color: var(--border); cursor: not-allowed; }
 .booking-slot-past input { cursor: not-allowed; }
+
+.staff-appointment-list { list-style: none; padding: 0; margin: 0; }
+.staff-appointment-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding-block: 1.25rem; border-bottom: 1px solid var(--border); }
+.staff-appointment-list li:last-child { border-bottom: 0; }
+.staff-appointment-list li > div { flex: 1 1 15rem; min-width: 0; overflow-wrap: anywhere; }
+.staff-appointment-list p { margin-block: .4rem; }
+.staff-appointment-list a { white-space: normal; }

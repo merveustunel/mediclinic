@@ -203,6 +203,13 @@ public sealed class AuthenticationTests
         Assert.Equal("/Dashboard", login.Headers.Location!.OriginalString);
         var landing = await client.GetAsync(login.Headers.Location);
         Assert.Equal("/Dashboard/" + role, landing.Headers.Location!.OriginalString);
+        if (role == AuthRoles.ClinicAdmin)
+        {
+            // A role without an organizational staff link must fail closed.
+            Assert.Contains("/Account/AccessDenied", (await client.GetAsync("/Dashboard/ClinicAdmin")).Headers.Location!.OriginalString);
+            Assert.Contains("/Account/AccessDenied", (await client.GetAsync("/Dashboard/Staff")).Headers.Location!.OriginalString);
+            return;
+        }
         foreach (var target in AuthRoles.All)
             Assert.Equal(target == role ? HttpStatusCode.OK : HttpStatusCode.Redirect, (await client.GetAsync("/Dashboard/" + target)).StatusCode);
         var shell = WebUtility.HtmlDecode(await client.GetStringAsync("/Dashboard/" + role));

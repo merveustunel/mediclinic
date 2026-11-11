@@ -43,7 +43,7 @@
                             <a asp-controller="Appointments" asp-action="Index" aria-current="@(controller == "Appointments" && action != "Book" ? "page" : null)">Randevularım</a>
                             <a asp-controller="Appointments" asp-action="Book" aria-current="@(controller == "Appointments" && action == "Book" ? "page" : null)">Randevu oluştur</a>
                         }
-                        @if (User.IsInRole(AuthRoles.Staff))
+                        @if (User.IsInRole(AuthRoles.Staff) || User.IsInRole(AuthRoles.ClinicAdmin))
                         {
                             <a asp-controller="StaffAppointments" asp-action="Index" aria-current="@(controller == "StaffAppointments" ? "page" : null)">Randevu inceleme</a>
                         }

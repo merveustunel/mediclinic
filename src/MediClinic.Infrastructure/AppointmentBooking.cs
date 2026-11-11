@@ -7,14 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MediClinic.Infrastructure;
 
-public sealed class AppointmentBooking(MediClinicDbContext db, TimeProvider clock) : IAppointmentBooking
+public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvider clock) : IAppointmentBooking
 {
-    private async Task<ApplicationUser> User(string id, string role)
+    private async Task<ApplicationUser> User(string id, string role, bool allowAdmin = false)
     {
         var user = await db.Users.Include(x => x.Patient).Include(x => x.Staff).ThenInclude(x => x!.Department)
             .SingleOrDefaultAsync(x => x.Id == id);
         if (user == null || !await (from ur in db.UserRoles join r in db.Roles on ur.RoleId equals r.Id
-                where ur.UserId == id && r.Name == role select ur).AnyAsync()
+                where ur.UserId == id && (r.Name == role || (allowAdmin && role == AuthRoles.Staff && r.Name == AuthRoles.ClinicAdmin)) select ur).AnyAsync()
             || (role == AuthRoles.Patient ? user.Patient == null : user.Staff == null))
             throw new BookingException("This account is not authorized for this operation.");
         return user;
@@ -85,19 +85,19 @@ public sealed class AppointmentBooking(MediClinicDbContext db, TimeProvider cloc
         return appointment.Id;
     }
 
-    private async Task<IQueryable<Appointment>> Scoped(string userId, bool staff)
+    private async Task<IQueryable<Appointment>> Scoped(string userId, bool staff, bool allowAdmin = false)
     {
-        var user = await User(userId, staff ? AuthRoles.Staff : AuthRoles.Patient);
+        var user = await User(userId, staff ? AuthRoles.Staff : AuthRoles.Patient, allowAdmin);
         var query = db.Appointments.Include(x => x.Doctor).Include(x => x.Service).ThenInclude(x => x.Department).ThenInclude(x => x.Branch);
         return staff ? query.Where(x => x.Service.Department.Id == user.Staff!.Department.Id)
             : query.Where(x => EF.Property<Guid>(x, "PatientKey") == user.PatientId);
     }
     private static AppointmentSummary Summary(Appointment x) => new(x.Id, x.Service.Name, x.Doctor.FullName, x.Branch.Name, x.StartsAt, x.EndsAt, x.Status, x.DecisionReason);
     public async Task<IReadOnlyList<AppointmentSummary>> List(string userId, bool staff) =>
-        (await (await Scoped(userId, staff)).OrderByDescending(x => x.StartsAt).ToListAsync()).Select(Summary).ToList();
+        (await (await Scoped(userId, staff, true)).OrderByDescending(x => x.StartsAt).ToListAsync()).Select(Summary).ToList();
     public async Task<AppointmentSummary?> Find(string userId, Guid id, bool staff)
     {
-        var appointment = await (await Scoped(userId, staff)).SingleOrDefaultAsync(x => x.Id == id);
+        var appointment = await (await Scoped(userId, staff, true)).SingleOrDefaultAsync(x => x.Id == id);
         return appointment == null ? null : Summary(appointment);
     }
     public async Task Act(string userId, Guid id, string action, string? reason)

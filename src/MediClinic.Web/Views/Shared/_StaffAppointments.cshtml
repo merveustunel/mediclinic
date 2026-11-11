@@ -1,0 +1,13 @@
+@model IReadOnlyList<MediClinic.Application.StaffDashboardAppointment>
+@using MediClinic.Application
+@using System.Globalization
+<ul class="staff-appointment-list">
+@foreach (var item in Model)
+{
+    <li>
+        <div><strong>@item.Patient</strong><p>@item.Service · @item.Doctor</p><small>@item.Branch</small></div>
+        <div><time datetime="@item.StartsAt.ToString("O")">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.GetCultureInfo("tr-TR"))</time><p><partial name="_StatusBadge" model="item.Status" /></p></div>
+        <a class="button button-secondary" asp-controller="StaffAppointments" asp-action="Details" asp-route-id="@item.Id" aria-label="@(item.Patient + " randevu detayını görüntüle")">Detayları incele</a>
+    </li>
+}
+</ul>
