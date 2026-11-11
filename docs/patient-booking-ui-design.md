@@ -11,7 +11,8 @@ All booking interface text is Turkish; database names are displayed unchanged.
    department, doctor and service. Each list is derived from `IAppointmentBooking.Options`
    and filtered by every preceding identifier. Duplicate identifiers are collapsed;
    names are sorted using Turkish collation. Unavailable descendants are disabled.
-   Select an option and submit **Seçenekleri güncelle** to load its descendants.
+   With JavaScript, changes automatically reload descendants from the existing GET
+   page. Without JavaScript, submit **Seçenekleri güncelle** after each selection.
    Changing an ancestor clears incompatible descendants and reports the change.
 2. **Tarih ve saat:** the selected service context remains visible. A native date
    field reloads available slots. Native radio cards support Tab, Space and arrow
@@ -22,8 +23,9 @@ All booking interface text is Turkish; database names are displayed unchanged.
    a POST. The existing details route confirms successful creation. Every stage
    explains that requests begin as Pending (Beklemede) and require staff review.
 
-All transitions are ordinary server-rendered form submissions. No booking JavaScript,
-external dependencies or frontend framework is required. GETs never create or reserve
+Stage transitions are ordinary server-rendered form submissions. Optional local
+JavaScript enhances cascading through read-only GET requests; no external dependencies
+or frontend framework is required. GETs never create or reserve
 appointments. Existing populated links without a stage parameter still show slots.
 The selected date is preserved when editing service selections. Browser-native date
 picker appearance follows the browser locale; surrounding dates explicitly use `tr-TR`.
@@ -87,3 +89,51 @@ overflowed horizontally; selects measured 47px and slot cards at least 48px high
 and the existing global 44px button minimum are retained. Screen-reader testing and
 cross-browser/device testing were not performed. A build attempted while the browser
 server held the Web DLL hit a Windows file lock; stop the server before rebuilding.
+
+## Automatic cascading follow-up
+
+`wwwroot/js/booking.js` enhances only the stage-one form. It fetches the same Book GET
+with `Stage=1`, parses its server-rendered selects, and replaces their options without
+replacing the controls themselves. Keyboard focus therefore remains on the changed
+select. JavaScript contains no catalog data or booking rules. The service selection
+is retained locally and enables Continue without another request. No doctor, service
+or appointment time is chosen automatically.
+
+Each parent change clears all descendants immediately and preserves its ancestors.
+Loading is communicated in Turkish through a polite status region and `aria-busy`;
+Continue is disabled until loading finishes and all five selections are complete.
+AbortController cancels superseded requests, and a monotonic revision also rejects
+late responses even if cancellation cannot stop their delivery. Duplicate Continue
+submissions are suppressed. The manual button is hidden only after initialization;
+unsupported browsers, absent JavaScript, or a failed/redirected/invalid response retain
+or restore the native GET fallback and its instructions. Server authorization,
+antiforgery, scheduling checks and schema are unchanged.
+
+Run `node --test tests/booking-cascade.test.cjs` for dependency-free JavaScript
+regressions: all cascade levels, ancestor preservation, descendant clearing, empty
+results, loading/submission guards, rapid changes with out-of-order responses, network
+failure, and unsupported enhancement. The MVC suite separately verifies the visible
+manual fallback, server-rendered enhancement hooks and invalid descendant rejection.
+
+Follow-up verification: the isolated build completed with zero warnings/errors,
+all 159 .NET tests passed, and all 5 Node regressions passed. Commands used:
+
+```powershell
+dotnet build MediClinic.sln --artifacts-path "$env:TEMP/mediclinic-cascade-artifacts"
+dotnet test MediClinic.sln --artifacts-path "$env:TEMP/mediclinic-cascade-artifacts" --no-build --no-restore
+node --test tests/booking-cascade.test.cjs
+```
+
+The separate output directory avoids DLL locks from the existing application on
+port 5080, which was left running. Browser checks used port 7663 with the previously
+created temporary fixture database, without reseeding or changing the application
+database. With JavaScript enabled, all five selections led to stage two without a
+manual update; focus stayed on each select. Rapid clinic changes retained the latest
+clinic and its branches. Every descendant, including doctor and service, remained
+unselected until explicitly chosen. Option nodes are cloned before insertion to
+avoid a native select automatically changing the donor's selected option during
+node removal. With application JavaScript resources blocked, all five manual updates
+also reached stage two, with the manual button visible and no time selected.
+The Turkish loading message and disabled Continue state were observed before the
+GET completed. The enhanced selection stage had no horizontal overflow at 320,
+390, 768 or 1440 CSS pixels.

@@ -12,7 +12,8 @@
 {
 <section class="card"><h2>1. Hizmetinizi seçin</h2><p id="selection-help">Önce kliniği seçip “Seçenekleri güncelle” düğmesine basın. Ardından sırayla şube, bölüm, doktor ve hizmet seçin. Üst seçimi değiştirirseniz alt seçimleri yeniden yapın.</p>
 @if (Model.Options.Count == 0) { <p class="empty-state">Şu anda randevu alınabilecek hizmet bulunmuyor. Lütfen daha sonra tekrar deneyin.</p> }
-<form method="get" asp-action="Book" aria-describedby="selection-help">
+<form method="get" asp-action="Book" aria-describedby="selection-help" data-booking-selection>
+<p data-booking-status role="status" aria-live="polite"></p>
 <input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"/>
 <div class="booking-fields">
 @{ var candidates = Model.Options; var fields = new[] { ("ClinicId", "Klinik", Model.ClinicId), ("BranchId", "Şube", Model.BranchId), ("DepartmentId", "Bölüm", Model.DepartmentId), ("DoctorId", "Doktor", Model.DoctorId), ("ServiceId", "Hizmet", Model.ServiceId) }; }
@@ -26,8 +27,9 @@
     candidates = candidates.Where(x => (i switch { 0 => x.ClinicId, 1 => x.BranchId, 2 => x.DepartmentId, 3 => x.DoctorId, _ => x.ServiceId }) == field.Item3).ToArray();
 }
 </div>
-<div class="booking-actions"><button name="Stage" value="1" class="button-secondary">Seçenekleri güncelle</button><button name="Stage" value="2">Tarih ve saate devam et</button></div>
+<div class="booking-actions"><button name="Stage" value="1" class="button-secondary" data-booking-update>Seçenekleri güncelle</button><button name="Stage" value="2" data-booking-continue>Tarih ve saate devam et</button></div>
 </form></section>
+<script src="~/js/booking.js" asp-append-version="true" defer></script>
 }
 else
 {

@@ -113,6 +113,10 @@ public sealed class BookingMvcTests
         var initial = WebUtility.HtmlDecode(await client.GetStringAsync(path));
         Assert.DoesNotContain("<script>", initial);
         Assert.Contains("name=\"ClinicId\"", initial);
+        Assert.Contains("data-booking-selection", initial);
+        Assert.Contains("/js/booking.js", initial);
+        Assert.Matches("<button[^>]*data-booking-update[^>]*>Seçenekleri güncelle</button>", initial);
+        Assert.DoesNotMatch("<button[^>]*hidden[^>]*data-booking-update", initial);
         Assert.Matches("name=\"BranchId\"[^>]*disabled", initial);
         var accumulated = new Dictionary<string, string> { ["Stage"] = "1" };
         foreach (var key in new[] { "ClinicId", "BranchId", "DepartmentId", "DoctorId", "ServiceId" })
@@ -134,6 +138,23 @@ public sealed class BookingMvcTests
         var result = await Post(client, path, path, values);
         Assert.Equal(HttpStatusCode.Redirect, result.StatusCode);
         Assert.Equal(AppointmentStatus.Pending, (await db.Appointments.SingleAsync()).Status);
+    }
+
+    [Fact]
+    public async Task StageOneGetPreservesValidAncestorsAndRejectsInvalidDescendants()
+    {
+        await using var data = await BookingTests.Database.Create();
+        using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var values = Form(data); values["Stage"] = "1"; values.Remove("LocalStart");
+        values["DepartmentId"] = data.Other.Department.Id.ToString();
+        var html = WebUtility.HtmlDecode(await client.GetStringAsync("/Appointments/Book?" + await new FormUrlEncodedContent(values).ReadAsStringAsync()));
+        Assert.Contains($"value=\"{values["ClinicId"]}\" selected", html);
+        Assert.Contains($"value=\"{values["BranchId"]}\" selected", html);
+        Assert.DoesNotContain($"value=\"{values["DepartmentId"]}\" selected", html);
+        Assert.Matches("name=\"DoctorId\"[^>]*disabled", html);
+        Assert.Matches("name=\"ServiceId\"[^>]*disabled", html);
+        Assert.Contains("seçim geçersiz", html);
+        await using var db = data.Context(); Assert.Empty(await db.Appointments.ToListAsync());
     }
 
     [Fact]
