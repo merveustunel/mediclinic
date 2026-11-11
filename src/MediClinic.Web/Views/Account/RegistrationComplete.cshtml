@@ -1,1 +1,10 @@
-<h1>Kayıt talebiniz alındı</h1><p>Bilgileriniz uygunsa hesabınız hazırdır. Giriş yapmayı deneyebilirsiniz.</p><a asp-action="Login">Giriş yap</a>
+@{ ViewData["Title"] = "Kayıt talebiniz alındı"; }
+<section class="auth-panel auth-result" aria-labelledby="auth-title">
+    <span class="auth-mark" aria-hidden="true">✓</span>
+    <p class="eyebrow">SONRAKİ ADIM</p>
+    <h1 id="auth-title">Kayıt talebiniz alındı</h1>
+    <p class="auth-intro">Bilgileriniz uygunsa hesabınız hazırdır. Giriş yapmayı deneyebilirsiniz.</p>
+    <p>Devam etmek için e-posta adresinizi ve parolanızı kullanarak giriş yapın.</p>
+    <a class="button" asp-action="Login">Giriş yap</a>
+    <a class="auth-home" asp-controller="Home" asp-action="Index">Ana sayfaya dön</a>
+</section>

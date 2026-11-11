@@ -84,3 +84,26 @@ dd { margin-left: 0; font-weight: 500; }
     .app-footer { padding: 0 1rem 1rem; }
 }
 @media (prefers-reduced-motion: no-preference) { a, button { transition: background-color .15s ease; } }
+
+/* Account screens use the shared Modern Purple tokens. */
+.auth-panel { width: 100%; max-width: 32rem; margin-inline: auto; padding-block: clamp(.5rem, 2vw, 1.5rem); }
+.auth-panel .eyebrow { margin-bottom: .75rem; }
+.auth-intro, .field-hint, .auth-footer { color: var(--muted); }
+.auth-panel .auth-form { margin-block: 1.5rem; }
+.auth-name-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.auth-field { min-width: 0; }
+.password-control { display: flex; flex-wrap: wrap; gap: .5rem; }
+.password-control input { flex: 1 1 12rem; min-width: 0; }
+.password-toggle { flex: 0 0 auto; font-size: .875rem; }
+.password-toggle[hidden] { display: none; }
+.field-hint { font-size: .875rem; margin: .5rem 0; }
+.field-error { display: block; color: #8d2037; font-size: .875rem; overflow-wrap: anywhere; }
+.field-validation-valid { display: none; }
+.auth-submit { width: 100%; }
+.auth-footer { border-top: 1px solid var(--border); padding-top: 1.25rem; }
+.auth-result { text-align: center; }
+.auth-mark { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; margin: 0 auto 1.5rem; background: var(--soft); color: var(--primary); border-radius: 50%; font-size: 1.75rem; font-weight: 700; }
+.auth-home { display: block; margin-top: 1rem; padding-block: .5rem; }
+@media (max-width: 480px) {
+    .auth-name-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
