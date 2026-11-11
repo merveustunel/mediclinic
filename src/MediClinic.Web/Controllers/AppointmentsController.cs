@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MediClinic.Web.Controllers;
 
 [Authorize(Policy = AuthRoles.Patient)]
-public sealed class AppointmentsController(IAppointmentBooking booking) : Controller
+public sealed class AppointmentsController(IAppointmentBooking booking, TimeProvider clock) : Controller
 {
     private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
     public async Task<IActionResult> Index(string? status)
@@ -28,35 +28,91 @@ public sealed class AppointmentsController(IAppointmentBooking booking) : Contro
         catch (BookingException) { return Forbid(); }
     }
     [HttpGet]
-    public async Task<IActionResult> Book([Bind("ClinicId,BranchId,DepartmentId,DoctorId,ServiceId,Date")] BookingModel model)
+    public async Task<IActionResult> Book([Bind("ClinicId,BranchId,DepartmentId,DoctorId,ServiceId,Date,LocalStart,Stage")] BookingModel model)
     {
         ModelState.Remove(nameof(model.LocalStart));
+        if (!Request.Query.ContainsKey(nameof(model.Stage)) && model.ServiceId != Guid.Empty)
+            model.Stage = 2; // Preserve existing fully populated booking links.
+        await PrepareBooking(model);
+        return View(model);
+    }
+
+    private async Task PrepareBooking(BookingModel model)
+    {
+        var today = DateOnly.FromDateTime(Scheduling.Local(clock.GetUtcNow()));
+        var hasDate = Request.HasFormContentType
+            ? Request.Form.ContainsKey(nameof(model.Date)) : Request.Query.ContainsKey(nameof(model.Date));
+        if (!hasDate) model.Date = today.AddDays(1);
+        // Never render framework binding errors (which can contain raw submitted values).
+        if (!ModelState.IsValid)
+        {
+            ModelState.Clear();
+            ModelState.AddModelError("", "Seçimleri ve tarih bilgisini kontrol edin.");
+        }
         try
         {
             model.Options = await booking.Options(UserId);
-            if (model.DoctorId != Guid.Empty && model.ServiceId != Guid.Empty && ModelState.IsValid)
+            var candidates = model.Options;
+            var ids = new[] { model.ClinicId, model.BranchId, model.DepartmentId, model.DoctorId, model.ServiceId };
+            Func<BookingOption, Guid>[] keys = [x => x.ClinicId, x => x.BranchId, x => x.DepartmentId, x => x.DoctorId, x => x.ServiceId];
+            for (var i = 0; i < ids.Length; i++)
+            {
+                candidates = candidates.Where(x => keys[i](x) == ids[i]).ToArray();
+                if (ids[i] == Guid.Empty || candidates.Count == 0)
+                {
+                    if (ids[i] != Guid.Empty) ModelState.AddModelError("", "Seçenekler değişti veya seçim geçersiz. Lütfen seçimlerinizi güncelleyin.");
+                    for (var j = i; j < ids.Length; j++) ids[j] = Guid.Empty;
+                    break;
+                }
+            }
+            (model.ClinicId, model.BranchId, model.DepartmentId, model.DoctorId, model.ServiceId) = (ids[0], ids[1], ids[2], ids[3], ids[4]);
+            if (model.Selection == null && model.Stage >= 2)
+                ModelState.AddModelError("", "Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın.");
+            model.Stage = model.Selection == null ? 1 : Math.Clamp(model.Stage, 1, 3);
+            if (model.Stage == 3 && !ModelState.IsValid) model.Stage = 2;
+            if (model.Stage >= 2 && ModelState.IsValid)
+            {
+                if (model.Date < today)
+                {
+                    ModelState.AddModelError(nameof(model.Date), "Geçmiş bir tarihe randevu alınamaz. Lütfen bugün veya ileri bir tarih seçin.");
+                    model.Stage = 2;
+                    model.LocalStart = null;
+                    return;
+                }
                 model.Slots = await booking.Slots(UserId, model.DoctorId, model.ServiceId, model.Date);
+                model.PrepareTimeCards(clock.GetUtcNow());
+                if (model.Stage == 3 && (!model.LocalStart.HasValue || !model.Slots.Contains(model.LocalStart.Value)
+                    || Scheduling.ToUtc(model.LocalStart.Value) <= clock.GetUtcNow()))
+                {
+                    ModelState.AddModelError("", model.LocalStart.HasValue
+                        ? "Seçtiğiniz saat artık uygun değil. Lütfen güncel saatlerden birini seçin."
+                        : "Lütfen uygun saatlerden birini seçin.");
+                    model.Stage = 2;
+                    model.LocalStart = null;
+                }
+            }
         }
-        catch (BookingException ex) { ModelState.AddModelError("", ex.Message); }
-        return View(model);
+        catch (BookingException) { model.Stage = 1; ModelState.AddModelError("", "Seçenekler veya uygun saatler yüklenemedi. Tarihi ve seçimlerinizi kontrol edin."); }
     }
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Book([Bind("ClinicId,BranchId,DepartmentId,DoctorId,ServiceId,LocalStart,Date")] BookingModel model, CancellationToken cancellationToken)
     {
         if (Request.Form.Keys.Any(x => new[] { "PatientId", "StaffId", "Role", "Roles", "Status", "EndsAt" }.Contains(x, StringComparer.OrdinalIgnoreCase)))
             return BadRequest();
-        if (ModelState.IsValid)
+        model.Stage = 3;
+        await PrepareBooking(model);
+        if (model.Selection == null) ModelState.AddModelError("", "Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın.");
+        if (ModelState.IsValid && model.Selection != null && model.Stage == 3)
         {
             try
             {
                 var id = await booking.Book(UserId, new(model.ClinicId, model.BranchId, model.DepartmentId, model.DoctorId, model.ServiceId, model.LocalStart!.Value));
-                TempData["Message"] = "Appointment requested. Awaiting staff review.";
+                TempData["Message"] = "Randevu talebiniz alındı. Beklemede; personel incelemesinden sonra sonuçlandırılacaktır.";
                 return RedirectToAction(nameof(Details), new { id });
             }
-            catch (BookingException ex) { ModelState.AddModelError("", ex.Message); }
+            catch (BookingException) { ModelState.AddModelError("", "Randevu oluşturulamadı. Seçtiğiniz saat dolmuş olabilir. Güncel saatleri kontrol ederek tekrar deneyin."); model.Stage = 2; }
         }
-        try { model.Options = await booking.Options(UserId); }
-        catch (BookingException) { return Forbid(); }
         return View(model);
     }
     [HttpPost, ValidateAntiForgeryToken]

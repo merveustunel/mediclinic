@@ -52,7 +52,7 @@ public sealed class AppointmentBooking(MediClinicDbContext db, TimeProvider cloc
         catch (ArgumentOutOfRangeException) { latestEnd = DateTimeOffset.MaxValue; }
         var busy = await Blocking(doctorId).Where(x => x.StartsAt < latestEnd && x.EndsAt > start).ToListAsync();
         var slots = new List<DateTime>();
-        for (var time = start; time < end; time = time.AddMinutes(15))
+        for (var time = start; time < end; time = time.AddMinutes(Scheduling.SlotIntervalMinutes))
         {
             DateTimeOffset finish;
             try { finish = time.Add(service.Duration); }

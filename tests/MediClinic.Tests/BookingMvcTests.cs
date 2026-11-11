@@ -46,7 +46,7 @@ public sealed class BookingMvcTests
         var request = data.Request();
         return new() { ["ClinicId"] = request.ClinicId.ToString(), ["BranchId"] = request.BranchId.ToString(),
             ["DepartmentId"] = request.DepartmentId.ToString(), ["DoctorId"] = request.DoctorId.ToString(), ["ServiceId"] = request.ServiceId.ToString(),
-            ["LocalStart"] = request.LocalStart.ToString("yyyy-MM-ddTHH:mm:ss") };
+            ["Date"] = "2030-01-02", ["LocalStart"] = request.LocalStart.ToString("yyyy-MM-ddTHH:mm:ss") };
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class BookingMvcTests
     {
         await using var data = await BookingTests.Database.Create(); using var site = new Site(data); using var client = await site.Login(data.PatientId);
         var request = data.Request();
-        var page = await client.GetStringAsync($"/Appointments/Book?ClinicId={request.ClinicId}&BranchId={request.BranchId}&DepartmentId={request.DepartmentId}&DoctorId={request.DoctorId}&ServiceId={request.ServiceId}&Date=2030-01-02");
+        var page = await client.GetStringAsync($"/Appointments/Book?ClinicId={request.ClinicId}&BranchId={request.BranchId}&DepartmentId={request.DepartmentId}&DoctorId={request.DoctorId}&ServiceId={request.ServiceId}&Date=2030-01-02&Stage=2");
         Assert.Contains(data.Fixture.Clinic.Name, page);
         Assert.Contains("Europe/Istanbul", page);
         Assert.Contains("2030-01-02T12:00:00", page);
@@ -101,6 +101,97 @@ public sealed class BookingMvcTests
         var form = Form(data); form[field] = data.OtherPatientId;
         Assert.Equal(HttpStatusCode.BadRequest, (await Post(client, "/Appointments/Book", "/Appointments/Book", form)).StatusCode);
         await using var verify = data.Context(); Assert.Empty(await verify.Appointments.ToListAsync());
+    }
+
+    [Fact]
+    public async Task CascadingSelectionsAndReviewWorkWithoutJavascript()
+    {
+        await using var data = await BookingTests.Database.Create();
+        using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var values = Form(data); values.Remove("LocalStart"); values["Stage"] = "1";
+        var path = "/Appointments/Book";
+        var initial = WebUtility.HtmlDecode(await client.GetStringAsync(path));
+        Assert.DoesNotContain("<script>", initial);
+        Assert.Contains("name=\"ClinicId\"", initial);
+        Assert.Contains("data-booking-selection", initial);
+        Assert.Contains("/js/booking.js", initial);
+        Assert.Matches("<button[^>]*data-booking-update[^>]*>Seçenekleri güncelle</button>", initial);
+        Assert.DoesNotMatch("<button[^>]*hidden[^>]*data-booking-update", initial);
+        Assert.Matches("name=\"BranchId\"[^>]*disabled", initial);
+        var accumulated = new Dictionary<string, string> { ["Stage"] = "1" };
+        foreach (var key in new[] { "ClinicId", "BranchId", "DepartmentId", "DoctorId", "ServiceId" })
+        {
+            accumulated[key] = values[key];
+            var html = WebUtility.HtmlDecode(await client.GetStringAsync(path + "?" + await new FormUrlEncodedContent(accumulated).ReadAsStringAsync()));
+            Assert.Contains($"value=\"{values[key]}\" selected", html);
+            Assert.DoesNotContain($"value=\"{data.Other.Doctor.Id}\"", html);
+        }
+        values["Stage"] = "2";
+        var slots = WebUtility.HtmlDecode(await client.GetStringAsync(path + "?" + await new FormUrlEncodedContent(values).ReadAsStringAsync()));
+        Assert.Contains("type=\"radio\"", slots); Assert.Contains("02 Ocak 2030", slots);
+        Assert.DoesNotContain("<select", slots);
+        values["Stage"] = "3"; values["LocalStart"] = "2030-01-02T12:00:00";
+        var review = WebUtility.HtmlDecode(await client.GetStringAsync(path + "?" + await new FormUrlEncodedContent(values).ReadAsStringAsync()));
+        foreach (var label in new[] { "Klinik", "Şube", "Bölüm", "Doktor", "Hizmet", "Tarih", "Saat", "Süre", "Beklemede", "12:00", "30 dakika", "Randevu talebini gönder" })
+            Assert.Contains(label, review);
+        await using var db = data.Context(); Assert.Empty(await db.Appointments.ToListAsync());
+        var result = await Post(client, path, path, values);
+        Assert.Equal(HttpStatusCode.Redirect, result.StatusCode);
+        Assert.Equal(AppointmentStatus.Pending, (await db.Appointments.SingleAsync()).Status);
+    }
+
+    [Fact]
+    public async Task StageOneGetPreservesValidAncestorsAndRejectsInvalidDescendants()
+    {
+        await using var data = await BookingTests.Database.Create();
+        using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var values = Form(data); values["Stage"] = "1"; values.Remove("LocalStart");
+        values["DepartmentId"] = data.Other.Department.Id.ToString();
+        var html = WebUtility.HtmlDecode(await client.GetStringAsync("/Appointments/Book?" + await new FormUrlEncodedContent(values).ReadAsStringAsync()));
+        Assert.Contains($"value=\"{values["ClinicId"]}\" selected", html);
+        Assert.Contains($"value=\"{values["BranchId"]}\" selected", html);
+        Assert.DoesNotContain($"value=\"{values["DepartmentId"]}\" selected", html);
+        Assert.Matches("name=\"DoctorId\"[^>]*disabled", html);
+        Assert.Matches("name=\"ServiceId\"[^>]*disabled", html);
+        Assert.Contains("seçim geçersiz", html);
+        await using var db = data.Context(); Assert.Empty(await db.Appointments.ToListAsync());
+    }
+
+    [Fact]
+    public async Task StaleSlotAndTamperedHierarchyCannotCreateAppointment()
+    {
+        await using var data = await BookingTests.Database.Create();
+        using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var values = Form(data); values["Stage"] = "3";
+        var url = "/Appointments/Book?" + await new FormUrlEncodedContent(values).ReadAsStringAsync();
+        Assert.Contains("Randevu talebini", WebUtility.HtmlDecode(await client.GetStringAsync(url)));
+        await using (var db = data.Context()) await data.Service(db).Book(data.OtherPatientId, data.Request());
+        var stale = await Post(client, "/Appointments/Book", "/Appointments/Book", values);
+        Assert.Contains("artık uygun değil", WebUtility.HtmlDecode(await stale.Content.ReadAsStringAsync()));
+        values["ClinicId"] = data.Other.Clinic.Id.ToString();
+        var tampered = await Post(client, "/Appointments/Book", "/Appointments/Book", values);
+        Assert.Contains("seçim geçersiz", WebUtility.HtmlDecode(await tampered.Content.ReadAsStringAsync()));
+        await using var verify = data.Context(); Assert.Single(await verify.Appointments.ToListAsync());
+    }
+
+    [Fact]
+    public async Task EmptyAvailabilityMissingSlotAndMalformedDateShowTurkishFeedback()
+    {
+        await using var data = await BookingTests.Database.Create();
+        using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var values = Form(data); values["Stage"] = "2"; values["Date"] = "2030-01-03";
+        var html = WebUtility.HtmlDecode(await client.GetStringAsync("/Appointments/Book?" + await new FormUrlEncodedContent(values).ReadAsStringAsync()));
+        Assert.Contains("Bu tarihte uygun saat bulunmuyor", html);
+        values["Date"] = "2030-01-02"; values.Remove("LocalStart"); values["Stage"] = "3";
+        html = WebUtility.HtmlDecode(await client.GetStringAsync("/Appointments/Book?" + await new FormUrlEncodedContent(values).ReadAsStringAsync()));
+        Assert.Contains("birini seçin", html);
+        values["Date"] = "invalid";
+        var invalid = await Post(client, "/Appointments/Book", "/Appointments/Book", values);
+        Assert.Contains("tarih bilgisini kontrol edin", WebUtility.HtmlDecode(await invalid.Content.ReadAsStringAsync()));
+        await using var db = data.Context(); Assert.Empty(await db.Appointments.ToListAsync());
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM MedicalServices");
+        html = WebUtility.HtmlDecode(await client.GetStringAsync("/Appointments/Book"));
+        Assert.Contains("randevu alınabilecek hizmet bulunmuyor", html);
     }
 
     [Fact]
