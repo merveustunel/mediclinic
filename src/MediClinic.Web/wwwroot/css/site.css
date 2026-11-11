@@ -136,3 +136,20 @@ dd { margin-left: 0; font-weight: 500; }
 @container (max-width: 400px) {
     .appointments-table tr { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Booking uses native forms and radios so every stage works without scripts. */
+.booking-steps { display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; list-style: none; margin-block: 1.5rem; }
+.booking-steps li { flex: 1 1 10rem; padding: .75rem; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); }
+.booking-steps [aria-current="step"] { background: var(--soft); color: var(--primary); border-color: var(--primary); font-weight: 700; }
+.booking-steps span { font-weight: 750; margin-right: .5rem; }
+.booking-fields, .booking-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; }
+.booking-fields > div, .booking-summary > div { min-width: 0; }
+.booking-summary dd { margin: .25rem 0; }
+.booking-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+.booking-times { min-width: 0; border: 0; padding: 0; margin-block: 1.5rem; }
+.booking-times legend { font-weight: 650; margin-bottom: .75rem; }
+.booking-slot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); gap: .75rem; }
+.booking-slot { display: flex; align-items: center; gap: .5rem; padding: .75rem; margin: 0; border: 1px solid var(--border); border-radius: 9px; cursor: pointer; min-height: 48px; }
+.booking-slot input[type="radio"] { width: 1.25rem; min-height: 1.25rem; height: 1.25rem; margin: 0; accent-color: var(--primary); flex-shrink: 0; }
+.booking-slot:has(:checked) { background: var(--soft); border-color: var(--primary); }
+.booking-slot:focus-within { outline: 3px solid var(--primary); outline-offset: 3px; }

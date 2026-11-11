@@ -1,39 +1,64 @@
 @model MediClinic.Web.Models.BookingModel
-<h1>Randevu oluştur</h1>
-<p>Tüm saatler Europe/Istanbul saat dilimindedir. Klinik / şube / bölüm / doktor / hizmet seçiminizi yapın ve uygun bir saat seçin. Yeni talepler inceleme için beklemeye alınır.</p>
+@using System.Globalization
+@{ var tr = CultureInfo.GetCultureInfo("tr-TR"); ViewData["Title"] = "Randevu oluştur"; }
+<div class="appointments-heading"><div><p class="eyebrow">SAĞLIĞINIZ İÇİN BİR ADIM</p><h1>Randevu oluştur</h1><p>Size uygun hizmeti ve zamanı seçin. Tüm saatler Europe/Istanbul saat dilimindedir.</p></div><a asp-action="Index">Randevularım</a></div>
+<ol class="booking-steps" aria-label="Randevu aşamaları">
+@foreach (var step in new[] { (1, "Hizmet seçimi"), (2, "Tarih ve saat"), (3, "Kontrol ve talep") })
+{ <li aria-current="@(Model.Stage == step.Item1 ? "step" : null)"><span>@step.Item1</span> @step.Item2</li> }
+</ol>
 <div asp-validation-summary="All" role="alert"></div>
-<form method="get" asp-action="Book" id="selection">
-    <label for="option">Klinik / şube / bölüm / doktor / hizmet</label>
-    <select id="option" required>
-        <option value="">Bir seçenek seçin</option>
-        @foreach (var option in Model.Options)
-        {
-            <option value="@option.ServiceId" data-clinic="@option.ClinicId" data-branch="@option.BranchId" data-department="@option.DepartmentId" data-doctor="@option.DoctorId" selected="@(option.DoctorId == Model.DoctorId && option.ServiceId == Model.ServiceId)">@option.Clinic / @option.Branch / @option.Department / @option.Doctor / @option.Service (@option.Duration.TotalMinutes min)</option>
-        }
-    </select>
-    <input type="hidden" name="ClinicId" value="@Model.ClinicId" /><input type="hidden" name="BranchId" value="@Model.BranchId" />
-    <input type="hidden" name="DepartmentId" value="@Model.DepartmentId" /><input type="hidden" name="DoctorId" value="@Model.DoctorId" /><input type="hidden" name="ServiceId" value="@Model.ServiceId" />
-    <label asp-for="Date">Randevu tarihi</label><input asp-for="Date" type="date" required />
-    <button type="submit">Uygun saatleri göster</button>
-</form>
-@if (Model.Slots.Count > 0)
+<p class="alert">Yeni randevular <strong>Beklemede</strong> durumunda oluşturulur. Talebiniz personel tarafından incelenir; gönderim kesin onay anlamına gelmez.</p>
+@if (Model.Stage == 1)
 {
-    <form asp-action="Book" method="post">
-        <input asp-for="ClinicId" type="hidden" /><input asp-for="BranchId" type="hidden" /><input asp-for="DepartmentId" type="hidden" />
-        <input asp-for="DoctorId" type="hidden" /><input asp-for="ServiceId" type="hidden" /><input asp-for="Date" type="hidden" />
-        <label asp-for="LocalStart">Uygun randevu saati</label>
-        <select asp-for="LocalStart" required>
-            @foreach (var slot in Model.Slots) { <option value="@slot.ToString("yyyy-MM-ddTHH:mm:ss")">@slot.ToString("yyyy-MM-dd HH:mm")</option> }
-        </select>
-        <button type="submit">Randevu talep et</button>
-    </form>
+<section class="card"><h2>1. Hizmetinizi seçin</h2><p id="selection-help">Önce kliniği seçip “Seçenekleri güncelle” düğmesine basın. Ardından sırayla şube, bölüm, doktor ve hizmet seçin. Üst seçimi değiştirirseniz alt seçimleri yeniden yapın.</p>
+@if (Model.Options.Count == 0) { <p class="empty-state">Şu anda randevu alınabilecek hizmet bulunmuyor. Lütfen daha sonra tekrar deneyin.</p> }
+<form method="get" asp-action="Book" aria-describedby="selection-help">
+<input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"/>
+<div class="booking-fields">
+@{ var candidates = Model.Options; var fields = new[] { ("ClinicId", "Klinik", Model.ClinicId), ("BranchId", "Şube", Model.BranchId), ("DepartmentId", "Bölüm", Model.DepartmentId), ("DoctorId", "Doktor", Model.DoctorId), ("ServiceId", "Hizmet", Model.ServiceId) }; }
+@for (var i = 0; i < fields.Length; i++)
+{
+    var field = fields[i];
+    var choices = candidates.Select(x => i switch { 0 => (x.ClinicId, x.Clinic), 1 => (x.BranchId, x.Branch), 2 => (x.DepartmentId, x.Department), 3 => (x.DoctorId, x.Doctor), _ => (x.ServiceId, x.Service) }).Distinct().OrderBy(x => x.Item2, StringComparer.Create(tr, false)).ToArray();
+    <div><label for="@field.Item1">@field.Item2</label><select id="@field.Item1" name="@field.Item1" disabled="@(choices.Length == 0)"><option value="@Guid.Empty">@(choices.Length == 0 ? "Önce üst seçimi tamamlayın" : "Seçin")</option>
+    @foreach (var choice in choices) { <option value="@choice.Item1" selected="@(choice.Item1 == field.Item3)">@choice.Item2</option> }
+    </select></div>
+    candidates = candidates.Where(x => (i switch { 0 => x.ClinicId, 1 => x.BranchId, 2 => x.DepartmentId, 3 => x.DoctorId, _ => x.ServiceId }) == field.Item3).ToArray();
 }
-else if (Model.DoctorId != Guid.Empty) { <p>Uygun saat yüklenmedi. Bir tarih seçerek uygun saatleri görüntüleyin.</p> }
-<a asp-action="Index">Randevularım</a>
-<script>
-document.getElementById('selection').addEventListener('submit', function () {
-    const option = document.getElementById('option').selectedOptions[0];
-    for (const key of ['Clinic', 'Branch', 'Department', 'Doctor']) this.elements[key + 'Id'].value = option.dataset[key.toLowerCase()];
-    this.elements.ServiceId.value = option.value;
-});
-</script>
+</div>
+<div class="booking-actions"><button name="Stage" value="1" class="button-secondary">Seçenekleri güncelle</button><button name="Stage" value="2">Tarih ve saate devam et</button></div>
+</form></section>
+}
+else
+{
+var selected = Model.Selection!;
+<section class="card"><h2>@(Model.Stage == 2 ? "2. Tarih ve saat seçin" : "3. Talebinizi kontrol edin")</h2>
+<dl class="booking-summary">
+<div><dt>Klinik</dt><dd>@selected.Clinic</dd></div><div><dt>Şube</dt><dd>@selected.Branch</dd></div><div><dt>Bölüm</dt><dd>@selected.Department</dd></div><div><dt>Doktor</dt><dd>@selected.Doctor</dd></div><div><dt>Hizmet</dt><dd>@selected.Service</dd></div><div><dt>Süre</dt><dd>@selected.Duration.TotalMinutes.ToString(tr) dakika</dd></div>
+@if (Model.Stage == 3) { <div><dt>Tarih</dt><dd>@Model.LocalStart!.Value.ToString("dd MMMM yyyy, dddd", tr)</dd></div><div><dt>Saat</dt><dd>@Model.LocalStart!.Value.ToString("HH:mm", tr)</dd></div> }
+</dl>
+<form asp-action="Book" method="get">
+<input type="hidden" name="ClinicId" value="@Model.ClinicId"/><input type="hidden" name="BranchId" value="@Model.BranchId"/><input type="hidden" name="DepartmentId" value="@Model.DepartmentId"/><input type="hidden" name="DoctorId" value="@Model.DoctorId"/><input type="hidden" name="ServiceId" value="@Model.ServiceId"/>
+@if (Model.Stage == 2)
+{
+<label for="booking-date">Randevu tarihi</label><input id="booking-date" name="Date" type="date" required value="@Model.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"/>
+<button name="Stage" value="2" class="button-secondary">Uygun saatleri göster</button>
+<p>@Model.Date.ToString("dd MMMM yyyy, dddd", tr)</p>
+@if (Model.Slots.Count == 0) { <p class="empty-state" role="status">Bu tarihte uygun saat bulunmuyor. Başka bir tarih seçin.</p> }
+else {
+<fieldset class="booking-times"><legend>Uygun saatler: bir saat seçin</legend><div class="booking-slot-grid">
+@foreach (var slot in Model.Slots) { <label class="booking-slot"><input type="radio" name="LocalStart" value="@slot.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)" checked="@(slot == Model.LocalStart)"/><span>@slot.ToString("HH:mm", tr)</span></label> }
+</div></fieldset><button name="Stage" value="3">Talep özetini gör</button>
+}
+}
+else
+{
+<input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"/>
+<input type="hidden" name="LocalStart" value="@Model.LocalStart!.Value.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)"/>
+@Html.AntiForgeryToken()
+<button type="submit" formmethod="post">Randevu talebini gönder</button>
+<button name="Stage" value="2" class="button-secondary">Tarih ve saati değiştir</button>
+}
+<button name="Stage" value="1" class="button-secondary" formnovalidate>Hizmet seçimini değiştir</button>
+</form></section>
+}
