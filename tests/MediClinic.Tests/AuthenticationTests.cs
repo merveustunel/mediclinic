@@ -17,6 +17,31 @@ namespace MediClinic.Tests;
 public sealed class AuthenticationTests
 {
     [Theory]
+    [InlineData("Login", "")]
+    [InlineData("Login", "   ")]
+    [InlineData("Register", "")]
+    [InlineData("Register", "   ")]
+    public async Task MissingAuthCredentialsShowTurkishRequiredMessages(string action, string value)
+    {
+        using var site = new Site(); using var client = await site.Client();
+        var form = WebUtility.HtmlDecode(await client.GetStringAsync("/Account/" + action));
+        Assert.Contains("data-val-required=\"E-posta alanı zorunludur.\"", form);
+        Assert.Contains("data-val-required=\"Parola alanı zorunludur.\"", form);
+        var data = Registration();
+        data["Email"] = value; data["Password"] = value;
+        var response = await Post(client, action, data);
+        var html = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Matches("<span[^>]*id=\"Email-error\"[^>]*>E-posta alanı zorunludur.</span>", html);
+        Assert.Matches("<span[^>]*id=\"Password-error\"[^>]*>Parola alanı zorunludur.</span>", html);
+        Assert.DoesNotContain("The Email field is required.", html);
+        Assert.DoesNotContain("The Password field is required.", html);
+        Assert.Equal(HttpStatusCode.Redirect, (await client.GetAsync("/Dashboard")).StatusCode);
+        using var scope = site.Services.CreateScope();
+        Assert.Empty(await scope.ServiceProvider.GetRequiredService<MediClinicDbContext>().Users.ToListAsync());
+    }
+
+    [Theory]
     [InlineData("Login", "current-password")]
     [InlineData("Register", "new-password")]
     public async Task AuthFormsAssociateLabelsErrorsAndPasswordControls(string action, string autocomplete)
@@ -147,7 +172,7 @@ public sealed class AuthenticationTests
         foreach (var email in new[] { Email, "unknown@example.test" })
         {
             var response = await Post(client, "Login", new() { ["Email"] = email, ["Password"] = "Wrong-credentials1!" });
-            Assert.Contains("Unable to sign in with these credentials.", await response.Content.ReadAsStringAsync());
+            Assert.Contains("E-posta veya parola hatalı.", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
             Assert.Equal(HttpStatusCode.Redirect, (await client.GetAsync("/Dashboard/Patient")).StatusCode);
         }
         using var scope = site.Services.CreateScope();
@@ -209,7 +234,7 @@ public sealed class AuthenticationTests
         for (var attempt = 0; attempt < 5; attempt++)
             await Post(client, "Login", new() { ["Email"] = Email, ["Password"] = "Incorrect1!" });
         var response = await Post(client, "Login", new() { ["Email"] = Email, ["Password"] = Password });
-        Assert.Contains("Unable to sign in with these credentials.", await response.Content.ReadAsStringAsync());
+        Assert.Contains("E-posta veya parola hatalı.", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
         using var scope = site.Services.CreateScope();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         Assert.True(await users.IsLockedOutAsync((await users.FindByEmailAsync(Email))!));

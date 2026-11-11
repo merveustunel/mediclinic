@@ -52,12 +52,12 @@ public sealed class AccountController(UserManager<ApplicationUser> users, SignIn
         var user = await users.FindByEmailAsync(model.Email.Trim());
         if (!environment.IsDevelopment() && user != null && DemoSeed.IsDemoUser(user.Id))
         {
-            ModelState.AddModelError("", "Unable to sign in with these credentials.");
+            ModelState.AddModelError("", "E-posta veya parola hatalı.");
             return View(model);
         }
         var result = await signIn.PasswordSignInAsync(model.Email.Trim(), model.Password, false, lockoutOnFailure: true);
         if (result.Succeeded) return RedirectToAction("Index", "Dashboard");
-        ModelState.AddModelError("", "Unable to sign in with these credentials.");
+        ModelState.AddModelError("", "E-posta veya parola hatalı.");
         return View(model);
     }
     [Authorize, HttpPost] public async Task<IActionResult> Logout()
