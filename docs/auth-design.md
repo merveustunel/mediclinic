@@ -65,3 +65,11 @@ Identity supplies salted password hashing, password validation (12 characters, u
 Successful and duplicate registrations render the same confirmation without auto-login; login failures use the same message for unknown, locked, and incorrect-password accounts. Identity credential checks are not a constant-time endpoint; generic messages do not eliminate timing side channels. No email confirmation is required because email delivery is excluded; email ownership is unverified and must not authorize clinical record claims. Production rate limiting, MFA, recovery/delivery, shared data-protection key provisioning, secret provisioning and audited administration remain deployment/future work. No patient data or passwords are logged by the account controllers.
 
 Integration tests exercise the real MVC pipeline over HTTPS using migrated temporary SQLite databases: registration and persisted links, login/logout, every role landing and cross-role denial, generic invalid credentials and duplicate registration, rejected privilege injection, anti-forgery enforcement, secure cookie flags, lockout, invalid registration rollback, production bootstrap rejection, and upgrading an existing clinical database. Existing domain/persistence tests remain in place.
+
+## M7.2.1 Turkish authentication validation
+
+Login and registration explicitly use “E-posta alanı zorunludur.” and “Parola alanı zorunludur.” for required credentials. Login failures, including unknown accounts, incorrect passwords, lockout and demo accounts outside Development, use “E-posta veya parola hatalı.” without revealing account status. Identity policies, antiforgery, routes and redirects are unchanged.
+
+Regression coverage checks rendered validation attributes and server-side field messages for empty and whitespace-only credentials on both forms, plus generic Turkish failures through the existing authentication and demo integration tests.
+
+Verification (2026-11-11, Windows, .NET SDK 8.0.425): `dotnet build MediClinic.sln --no-restore` succeeded with no warnings or errors. The initial sandboxed `dotnet test MediClinic.sln --no-restore` run had 106 passes and 30 failures due to denied Windows Event Log access (`Cannot open log for source '.NET Runtime'`); the same test command rerun outside the sandbox passed all 136 tests (0 failures, 0 skipped).

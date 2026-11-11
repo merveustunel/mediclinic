@@ -161,7 +161,7 @@ public sealed class DemoVerificationTests
         using var client = site.Client();
         var response = await Login(client, "demo.patient@example.test", site.Password);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("Unable to sign in", await response.Content.ReadAsStringAsync());
+        Assert.Contains("E-posta veya parola hatalı.", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
         Assert.Equal(HttpStatusCode.Redirect, (await client.GetAsync("/Appointments")).StatusCode);
     }
 
