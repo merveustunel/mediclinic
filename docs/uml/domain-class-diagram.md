@@ -28,6 +28,8 @@ classDiagram
         +string Specialty
         +string Role
         +CanProvide(MedicalService service) bool
+        +Offers(MedicalService service) bool
+        +AssignServices(IEnumerable~MedicalService~ services) void
     }
     class Clinic {
         +string Name
@@ -45,6 +47,16 @@ classDiagram
     class MedicalService {
         +string Name
         +TimeSpan Duration
+        +decimal Price
+        +Update(string name, int durationMinutes, decimal price) void
+    }
+    class WorkingHours {
+        +Guid BranchId
+        +DayOfWeek Day
+        +bool Closed
+        +TimeOnly Opens
+        +TimeOnly Closes
+        +Update(bool closed, TimeOnly opens, TimeOnly closes) void
     }
     class StaffAvailability {
         +DateTimeOffset StartsAt
@@ -55,6 +67,7 @@ classDiagram
         +DateTimeOffset StartsAt
         +DateTimeOffset EndsAt
         +AppointmentStatus Status
+        +decimal Price
         +string DecisionReason
         +Confirm() void
         +Reject(string reason) void
@@ -79,15 +92,18 @@ classDiagram
     Entity <|-- MedicalService
     Entity <|-- StaffAvailability
     Entity <|-- Appointment
+    Entity <|-- WorkingHours
     Clinic "1" *-- "0..*" Branch : Branches / Clinic
     Branch "1" *-- "0..*" Department : Departments / Branch
+    Branch "1" <-- "0..7" WorkingHours : BranchId
     Department "1" *-- "0..*" MedicalService : Services / Department
     Department "1" <-- "0..*" Staff : Department
     Staff "1" <-- "0..*" StaffAvailability : Staff
     Patient "1" <-- "0..*" Appointment : Patient
     Doctor "1" <-- "0..*" Appointment : Doctor
     MedicalService "1" <-- "0..*" Appointment : Service
+    Doctor "0..*" --> "0..*" MedicalService : explicit Services
     Appointment --> AppointmentStatus : Status
 ```
 
-`DecisionReason` is nullable. Appointment.Branch is derived from Service.Department.Branch, not an independent editable association. Navigation ID properties derive from the referenced entity; EF uses shadow foreign keys for these relationships. Read-only parent collections are not arbitrary public setters.
+`DecisionReason`, appointment `Price`, and working-hours `Opens`/`Closes` are nullable. Appointment Price and StartsAt/EndsAt retain booking-time price/duration; NULL price is unknown legacy data. Appointment.Branch derives from Service.Department.Branch. WorkingHours associates by BranchId, with a unique branch/day pair; missing weekdays are unrestricted. DoctorServices persists the explicit many-to-many assignment. ClinicAdministrator is an Infrastructure authorization record; see [architecture](layered-architecture.md). Navigation IDs otherwise derive from referenced entities; EF uses shadow FKs for those relationships. Read-only collections protect mutation.

@@ -1,12 +1,14 @@
 # M11 employee, doctor services and availability management
 
+> Historical M11 report. M12 integrates branch hours and price snapshots. The [M13 audit](final-requirements-audit.md) and [runbook](database-migration-runbook.md) supersede verification totals and operational instructions below. Bootstrap uses environment configuration; Web has no UserSecretsId.
+
 Based on latest main `2b3fb1d`, including merged PR #16. Reuses the Domain staff/doctor/person/department/service/availability graph, Application scheduling conventions and booking contracts, Infrastructure Identity/EF context, MVC shell and migrated SQLite tests. Management follows M10's existing scoped Web-to-DbContext composition. No duplicate employee or organization models were introduced.
 
 ## Administrator access
 
 **Çalışan yönetimi** requires both the Identity `ClinicAdmin` role and an explicit `ClinicAdministrators(UserId, ClinicId)` grant. Every employee, department, service and availability request derives scope from that grant. Submitted employee and interval IDs must match stored relationships. Out-of-scope requests return 404; an admin without grants has an empty list and cannot register employees. All mutations are POSTs protected by antiforgery validation. Public registration remains Patient-only.
 
-Provision an initial administrator through the existing Development-only `--bootstrap-identity` command, supplying `Bootstrap:Email`, `Bootstrap:Password` and `Bootstrap:Role=ClinicAdmin` through local user-secrets/environment configuration. Never put credentials in command arguments or source control. Existing administrators need no new account. A trusted operator must then explicitly grant the verified account access to the intended clinic using the parameterized procedure in [M10 provisioning](clinic-management.md#scope-and-trusted-provisioning). Neither startup, migration, employee creation nor the demo seed grants administrator access.
+Provision an initial verified administrator through the Development-only `--bootstrap-identity` command, supplying `Bootstrap:Email`, `Bootstrap:Password` and `Bootstrap:Role=ClinicAdmin` through local environment configuration (Web has no UserSecretsId). Never put credentials in command arguments or source control. Existing administrators need no new account. A trusted operator must then explicitly grant that verified account access to the intended clinic using the repeatable procedure in the [M13 runbook](database-migration-runbook.md#initial-administrator-provisioning). Neither startup, migration, employee creation nor demo seed grants administrator access.
 
 ## Employee behavior
 
@@ -48,4 +50,4 @@ Tests cover real Identity/MVC authorization and antiforgery, unlinked and cross-
 
 Final verification: Windows and isolated WSL builds passed with **0 warnings / 0 errors**; EF reports **no pending model changes**. The full .NET suite passed **194/194, 0 failed, 0 skipped** in WSL (47 seconds). The JavaScript suite passed **5/5** on Windows. Windows Application Control blocked EF tooling and test discovery, so authoritative .NET execution uses the documented isolated Ubuntu WSL source copy, excluding database files, secrets and Windows build outputs. No security policy was changed. The workspace SQLite SHA-256 remained `92046304EE79DA7BAF971F3B8FF73A59519DA15C365415F765CC7A9F88088883`. Responsive forms use native labeled controls, fieldsets, table captions/headers and a horizontally scrollable table container. Physical browser and assistive-technology review remains manual.
 
-M12 should intersect branch working hours with doctor availability and appointment conflicts. Working hours do not yet restrict booking. Holidays, split branch hours, notifications, invitation/recovery flows, concurrency conflict UI and multi-department employment are future extensions; no extra administrator privileges are implied.
+M12 intersects configured branch hours with doctor availability and conflicts, and snapshots prices. Missing weekday hours remain unrestricted. Holidays, split branch hours, notifications, invitation/recovery flows, concurrency conflict UI and multi-department employment remain future extensions; no extra administrator privileges are implied.

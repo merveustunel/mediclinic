@@ -1,137 +1,76 @@
 # MediClinic
 
-M11 adds scoped Turkish **Çalışan yönetimi**, optional Staff account provisioning, explicit doctor-service assignments and appointment-safe availability management. See [M11 migration, authorization, provisioning and M12 notes](docs/staff-management.md). Apply the additive migration explicitly after backup; startup does not update an existing database.
+ASP.NET Core MVC / .NET 8 OOP course project for clinic appointments. M13 audits main including merged PR #18. **Submission remains conditional:** the original database needs an explicitly approved upgrade and initial administrator provisioning; live browser workflows remain unverified because the local HTTPS certificate is untrusted. See the [final requirements audit](docs/final-requirements-audit.md) and [submission checklist](docs/submission-checklist.md).
 
-## M10 institution management
+## Features and roles
 
-ClinicAdmin users with explicit clinic grants can manage clinics, branches, departments, service duration/decimal TRY prices and branch working hours through **Kurum yönetimi**. The role alone grants no clinic ownership. See [M10 design, safe migration and trusted scope provisioning](docs/clinic-management.md). The additive `ClinicManagement` migration gives existing services a documented 0 TRY default and leaves all administrator grants and working hours unconfigured. Apply it explicitly after backing up the selected database; startup and seeds do not assign access. Working hours will be integrated with booking in M12. Historical M8/M9 audits below describe the earlier submission.
-
-MediClinic is an ASP.NET Core MVC clinic appointment application prepared as an **Object-Oriented Programming course project**. It demonstrates an encapsulated domain model, inheritance, polymorphism, persistent relationships and role-authorized workflows. M8/M9 stabilizes and documents the existing application for final submission without adding product modules.
-
-## Features and user roles
-
-- Patient registration, login and POST logout using ASP.NET Core Identity.
-- Patient dashboard with summary counts and next upcoming appointment.
-- Three-stage booking: clinic → branch → department → doctor → service, Istanbul date/time selection, then request review. Native forms also work without JavaScript.
-- Patient appointment history, status filters, owned details and cancellation with a reason.
-- Staff dashboard, department-scoped appointment list, status/date filters and details.
-- Staff confirmation, rejection with reason and completion at or after the scheduled end.
-- SQLite persistence, explicit EF migrations, overlap triggers and optimistic concurrency for decisions.
+- Clinic, multiple branches, departments, medical services with duration and decimal TRY prices.
+- Scoped clinic/employee administration, doctor specialties, explicit service assignments, availability and branch working hours.
+- Patient registration, login, dashboard, three-stage booking, owned details/history and reasoned cancellation.
+- Department-scoped staff dashboard, confirmation/rejection and completion after the appointment ends.
+- Appointment duration/price snapshots, overlap triggers and optimistic concurrency for decisions.
 
 | Identity role | Access |
 | --- | --- |
-| Patient | Own dashboard, booking, history/details/cancellation; requires linked Patient. |
-| Staff | Department dashboard/list/details and review; requires linked Staff. |
-| ClinicAdmin | Department-scoped dashboard/list/details when linked to Staff. Does not implicitly receive Staff mutation permissions. The bootstrap creates an unlinked admin, which cannot read clinical data. |
+| Patient | Own appointments; requires linked Patient. Public registration grants only this role. |
+| Staff | Department-scoped appointments and decisions; requires linked Staff. Doctors use this Identity role. |
+| ClinicAdmin | Clinic/employee management requires explicit ClinicAdministrators grants. Clinical reads separately require a Staff link; clinical mutations additionally require Staff role. |
 
-Doctor is a domain class, not an Identity role. Identity permissions are separate from Person.Role. All requested patient/staff features were found implemented; see the [code-backed final audit](docs/final-audit.md).
+Doctor is a domain subtype, not a separate Identity role. A role or job title alone does not confer clinic ownership. The inspected local database has Patient/Staff accounts only, with no ClinicAdmin account. Bootstrap and demo seed never create clinic grants.
 
-## Technology and solution architecture
-
-.NET 8 / C# 12, ASP.NET Core MVC and Razor, ASP.NET Core Identity 8.0.22, EF Core SQLite 8.0.22, xUnit 2.9.3 and WebApplicationFactory, with plain JavaScript/CSS. No frontend package installation or build is needed.
+## Architecture and OOP
 
 | Project | Responsibility |
 | --- | --- |
-| [Domain](src/MediClinic.Domain) | Entity/Person hierarchy, clinic catalog, appointment state machine and invariants; framework independent. |
-| [Application](src/MediClinic.Application) | IAppointmentBooking, request/read DTOs and Istanbul scheduling conversion. |
-| [Infrastructure](src/MediClinic.Infrastructure) | Booking/query implementation, Identity model, DbContext, SQLite mappings/migrations. |
-| [Web](src/MediClinic.Web) | MVC, Identity configuration, policies, UI and explicit Development tooling. |
-| [Tests](tests/MediClinic.Tests) | Domain, persistence and MVC integration tests using isolated SQLite databases. |
+| [Domain](src/MediClinic.Domain) | Entity/Person abstraction, inheritance and polymorphism; guarded private state and read-only collections. |
+| [Application](src/MediClinic.Application) | Booking contracts, DTOs, Istanbul scheduling. |
+| [Infrastructure](src/MediClinic.Infrastructure) | Booking, scoped clinical queries, Identity, EF Core SQLite and six migrations. |
+| [Web](src/MediClinic.Web) | MVC/Razor, authentication/policies and scoped management transactions. |
+| [Tests](tests/MediClinic.Tests) | Domain, database and Identity/MVC integration tests with temporary SQLite. |
 
-Web composes services and accesses Identity/DbContext directly for transactional registration. This is a pragmatic layered design. See the [architecture diagram](docs/uml/layered-architecture.md).
+See [OOP evidence](docs/oop-principles.md), [class UML](docs/uml/domain-class-diagram.md), [use cases](docs/uml/use-cases.md), [booking sequence](docs/uml/appointment-booking-sequence.md), [lifecycle](docs/uml/appointment-lifecycle.md) and [architecture](docs/uml/layered-architecture.md). Web directly uses DbContext for management/registration; this is a pragmatic layered design.
 
-## OOP principles
+## Setup and verification
 
-Abstract Entity supplies identity; abstract Person supplies shared names and the Role contract. Patient and Staff inherit Person; Doctor inherits Staff. Overridden Role properties demonstrate runtime polymorphism. Private setters, guarded business methods and read-only collections protect encapsulation. Clinic/Branch/Department own catalog children; Appointment associates Patient, Doctor and MedicalService. See [OOP principles with actual methods/tests](docs/oop-principles.md) and [domain UML](docs/uml/domain-class-diagram.md).
-
-## Setup requirements and development configuration
-
-Run commands from the repository root. Install the **.NET 8 SDK** compatible with [global.json](global.json) (8.0.425, latestPatch), Git and a trusted HTTPS development certificate. First restore needs NuGet access. Linux needs time-zone data for Europe/Istanbul. Node.js 18+ is optional for the JavaScript regression tests.
+Run from the repository root with .NET SDK compatible with [global.json](global.json), Git and NuGet access. Node 18+ runs JavaScript tests; Python 3 runs optional database-safety tooling/tests. Linux needs Europe/Istanbul time-zone data. No frontend install/build is needed.
 
 ```powershell
-dotnet --version
 dotnet tool restore
 dotnet restore MediClinic.sln
 dotnet build MediClinic.sln --no-restore
-dotnet dev-certs https --trust
+dotnet test MediClinic.sln --no-build --no-restore --logger 'trx;LogFileName=m13.trx'
+node --test tests/booking-cascade.test.cjs
+python tests/database-safety.test.py
+dotnet ef migrations has-pending-model-changes --project src/MediClinic.Infrastructure --no-build
+dotnet ef migrations list --project src/MediClinic.Infrastructure --no-build --no-connect
 ```
 
-On Linux, trust an appropriate local certificate using your platform's process. Authentication cookies are always Secure; use HTTPS for demos. The HTTPS profile is in [launchSettings.json](src/MediClinic.Web/Properties/launchSettings.json).
+M13 results: build 0 warnings/errors; .NET **208 passed / 0 failed / 0 skipped** in approved Windows execution; JavaScript **5/0/0**; Python safety checks **5/0/0**. Restricted Windows Event Log failures and the successful retry are recorded in the [audit](docs/final-requirements-audit.md). Never disable security controls or treat failed/empty discovery as passing.
 
-Web's default `Data Source=mediclinic.db;Foreign Keys=True` resolves against the Web content root. Migration tooling defaults to `src/MediClinic.Web/mediclinic.db` relative to the repository root. Use an absolute override so both target the same database. In PowerShell:
+## Database safety and startup
+
+The default runtime database is [src/MediClinic.Web/mediclinic.db](src/MediClinic.Web/mediclinic.db), resolved against the Web content root. The design-time factory resolves its default path from the repository root. Always specify an absolute connection path. Inspect process/deployment overrides before treating this as the active deployed database.
+
+Existing databases must follow the [safe backup, rehearsal and approval-gated original migration runbook](docs/database-migration-runbook.md). Six migrations exist, through BookingIntegration. Startup, bootstrap and demo seed do not automatically migrate. Do not reset an existing database or use EnsureCreated.
+
+For verification, use only the isolated migrated copy:
 
 ```powershell
 $env:ASPNETCORE_ENVIRONMENT = 'Development'
-$databasePath = Join-Path (Get-Location) 'src/MediClinic.Web/mediclinic.db'
-$env:ConnectionStrings__MediClinic = "Data Source=$databasePath;Foreign Keys=True"
+$env:ConnectionStrings__MediClinic = 'Data Source=C:/Projects/mediclinic/.dist/m13/browser.db;Foreign Keys=True'
+dotnet run --no-launch-profile --project src/MediClinic.Web -- --urls https://localhost:7443
 ```
 
-Settings: [appsettings.json](src/MediClinic.Web/appsettings.json), [appsettings.Development.json](src/MediClinic.Web/appsettings.Development.json). Supply secrets locally through environment variables; Web does not declare UserSecretsId. Do not commit passwords/databases. Public registration creates only Patient accounts. See [privileged Development bootstrap](docs/auth-design.md).
+Use a trusted local development HTTPS certificate (standard setup: `dotnet dev-certs https --trust`). Cookies remain Secure, HttpOnly and SameSite=Lax; do not downgrade to HTTP. Certificate trust was not changed by M13; browser navigation returned ERR_CERT_AUTHORITY_INVALID. Default HTTPS launch profile uses port 7222.
 
-## Database and migration instructions
+Supply credentials locally through environment configuration; never commit them. [Demo setup](docs/demo-verification.md) is explicit and Development-only; use synthetic accounts/data on a disposable copy. Existing demo passwords are preserved, so choosing a different seed password does not rotate them. Initial administrator identity and grant steps are in the [runbook](docs/database-migration-runbook.md#initial-administrator-provisioning).
 
-For an existing database, stop writers and make a consistent SQLite backup first, handling WAL correctly. Preserve records; do not delete/reset the database or replace migrations with EnsureCreated.
+## Scheduling and limitations
 
-```powershell
-# Inspect without connecting to the application database.
-dotnet ef migrations list --project src/MediClinic.Infrastructure --no-connect
-dotnet ef migrations has-pending-model-changes --project src/MediClinic.Infrastructure
-# Explicitly update the selected local database.
-dotnet ef database update --project src/MediClinic.Infrastructure
-```
+- Missing branch weekday hours are unrestricted for migration compatibility; explicitly configure all seven days to restrict the full week. Configured hours intersect doctor availability and conflicts. No clinic-level inherited schedule, holidays, split shifts or overnight branch hours.
+- New appointments snapshot price and duration; legacy prices remain NULL/unknown, distinct from zero. No payments or historical billing reconstruction.
+- One department per employee; transfers with history/availability are restricted. No global admin override, grant-management UI, deletion, rescheduling, notifications, recovery, MFA or forced initial-password rotation.
+- Turkish UI includes some English framework errors/demo labels. Keyboard, screen-reader, responsive and live browser checks remain pending.
+- SQLite contention may require retry. Completion is a staff action after EndsAt. Completed appointments continue to block their intervals.
 
-Three migrations exist: InitialPersistence, IdentityAuthentication and AppointmentScheduling. The last adds overlap triggers and refuses legacy overlapping blocking appointments instead of deleting history. Investigate such data before migrating. Startup/seeding never migrate automatically. A fresh database has no bookable catalog/availability until provisioned; the optional demo adds them.
-
-## Application startup
-
-Keep the Development/connection variables in the same terminal:
-
-```powershell
-dotnet run --project src/MediClinic.Web --launch-profile https
-```
-
-Open `https://localhost:7222`. Alternatively:
-
-```powershell
-dotnet run --no-launch-profile --project src/MediClinic.Web -- --urls https://localhost:7043
-```
-
-The explicit-port command needs ASPNETCORE_ENVIRONMENT set as above; without a launch profile the environment defaults to Production. Neither command implicitly seeds data.
-
-## Test commands
-
-```powershell
-dotnet build MediClinic.sln
-dotnet test MediClinic.sln --no-restore --logger "trx;LogFileName=m8-m9.trx"
-node --test tests/booking-cascade.test.cjs
-```
-
-Tests use temporary SQLite databases and real migrations, not the local demo database. TRX stays in the ignored test-project TestResults directory. See [final evidence and Windows fallback](docs/submission-checklist.md). Do not change security policy or count aborted discovery as passing.
-
-## Demo verification
-
-Follow [safe demo setup](docs/demo-verification.md) to supply locally chosen passwords and run `--seed-demo` explicitly against a migrated Development database. It preserves existing records/credentials and adds weekday availability over a rolling 14-day horizon. The `@example.test` accounts are synthetic; the repository supplies no password.
-
-Use **Hasta paneli → Randevu oluştur**, select the demo catalog, then **Tarih ve saate devam et → Uygun saatleri göster → Talep özetini gör → Randevu talebini gönder**. Staff uses **Personel paneli → Randevu inceleme → Detayları görüntüle**. Verify confirmation, cancellation, rejection, isolation and completion after EndsAt using the [current walkthrough](docs/submission-checklist.md#manual-demo-walkthrough). Earlier milestone docs retain historical English labels/test totals; this README and the final checklist describe the submission.
-
-## Documentation index
-
-- [Final feature and quality audit](docs/final-audit.md)
-- [Submission checklist, test evidence and manual demo](docs/submission-checklist.md)
-- [OOP principles](docs/oop-principles.md)
-- UML: [classes](docs/uml/domain-class-diagram.md), [use cases](docs/uml/use-cases.md), [lifecycle](docs/uml/appointment-lifecycle.md), [booking sequence](docs/uml/appointment-booking-sequence.md), [layers](docs/uml/layered-architecture.md)
-- Design history: [domain](docs/domain-model.md), [persistence](docs/persistence-design.md), [authentication](docs/auth-design.md), [booking](docs/appointment-booking-design.md), [demo](docs/demo-verification.md)
-- UI: [shared](docs/ui-design.md), [patient dashboard](docs/patient-dashboard-design.md), [patient appointments](docs/patient-appointments-ui-design.md), [patient booking](docs/patient-booking-ui-design.md), [staff dashboard](docs/staff-dashboard-design.md), [staff appointments](docs/staff-appointments-ui-design.md)
-
-## Known limitations
-
-- Course scope excludes email verification/recovery, MFA, public privileged registration, catalog/availability administration UI, payments, notifications and rescheduling.
-- ClinicAdmin has no global clinical override; default bootstrap admin is unlinked. Clinical reads require a Staff link and remain department-scoped.
-- Navigation/statuses/booking/staff feedback and patient cancellation are Turkish. Some default Identity/DataAnnotations/model-binding registration errors and synthetic demo labels remain English; full localization is incomplete.
-- Completion is a staff action, not automatic. Pending/Confirmed cancellation and Pending review have no scheduled-start cutoff. Completed appointments still block their intervals.
-- SQLite concurrent writes may require refresh/retry. Trusted provisioning must preserve role/person link semantics.
-- Automated MVC tests do not establish visual accessibility or browser compatibility. Final keyboard, screen-reader, responsive and interactive demo checks remain in the checklist. This milestone did not seed, migrate or modify the existing application database.
-
-## M12 booking integration
-
-Appointment price snapshots, branch working-hours policies, migration order and manual verification are documented in [Booking integration](docs/booking-integration.md). Existing SQLite data is preserved; migration application remains an explicit operator step.
+Current design detail: [clinic management](docs/clinic-management.md), [staff management](docs/staff-management.md), [booking integration](docs/booking-integration.md), [authentication](docs/auth-design.md). Earlier milestone reports are historical; M13 audit/checklist supersede their totals, migration counts and readiness claims.

@@ -1,10 +1,12 @@
 # M12 booking integration
 
+Current backup/WAL handling, rehearsal results and approval-gated original migration instructions are in the [M13 audit](final-requirements-audit.md) and [runbook](database-migration-runbook.md). This document describes M12 behavior.
+
 ## Prices and legacy data
 
 New appointments persist the service price at creation as a decimal rounded to two places (TRY). Duration continues to be snapshotted by StartsAt/EndsAt. Subsequent catalog edits do not change either snapshot. Patient and staff details show the same clinic, branch, department, doctor, service, duration, charge, Istanbul time and status within existing access scopes.
 
-`20261112164410_BookingIntegration` only adds nullable `Appointments.Price` (decimal precision 11, scale 2; SQLite TEXT). Existing rows receive NULL: the historical charge is unknown, displayed as ìBilinmiyor (eski kay˝t)î. NULL does not mean free. No catalog-based historical backfill is performed. New zero-priced services snapshot 0.00 TRY. SQLite does not itself enforce decimal scale; public domain creation rounds the catalog decimal to two places.
+`20261112164410_BookingIntegration` only adds nullable `Appointments.Price` (decimal precision 11, scale 2; SQLite TEXT). Existing rows receive NULL: the historical charge is unknown, displayed as ‚ÄúBilinmiyor (eski kayƒ±t)‚Äù. NULL does not mean free. No catalog-based historical backfill is performed. New zero-priced services snapshot 0.00 TRY. SQLite does not itself enforce decimal scale; public domain creation rounds the catalog decimal to two places.
 
 ## Working hours
 
@@ -16,8 +18,8 @@ Slot discovery and final booking call the same hours predicate. Booking INSERT h
 
 ## Migration order and operator steps
 
-1. Stop writers and back up the existing SQLite file and any WAL/SHM files using a SQLite-safe backup procedure.
-2. Review existing migration history. Apply in order: InitialPersistence õ IdentityAuthentication õ AppointmentScheduling õ ClinicManagement õ StaffManagement õ BookingIntegration. EF applies only pending migrations. Legacy overlaps can block AppointmentScheduling; resolve clinical history manually rather than deleting records.
+1. Stop writers and use SQLite's online backup API to include committed WAL data. Do not copy the main file alone or discard sidecars. See the exact [backup procedure](database-migration-runbook.md#consistent-backup-and-isolated-rehearsal).
+2. Review existing migration history. Apply in order: InitialPersistence ‚Ä∫ IdentityAuthentication ‚Ä∫ AppointmentScheduling ‚Ä∫ ClinicManagement ‚Ä∫ StaffManagement ‚Ä∫ BookingIntegration. EF applies only pending migrations. Legacy overlaps can block AppointmentScheduling; resolve clinical history manually rather than deleting records.
 3. Review the generated upgrade SQL on a copy before using `dotnet ef database update --project src/MediClinic.Infrastructure --startup-project src/MediClinic.Web` against the explicitly configured intended database.
 4. Verify row counts, foreign keys, historical prices remaining unknown, and historical duration/status preservation on that copy.
 

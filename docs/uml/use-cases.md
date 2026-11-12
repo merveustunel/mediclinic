@@ -7,7 +7,7 @@ flowchart LR
     Visitor[Visitor]
     Patient[Patient role with linked Patient]
     Staff[Staff role with linked Staff]
-    Admin[ClinicAdmin role with linked Staff]
+    Admin[ClinicAdmin role]
     Operator[Local development operator]
     subgraph MVC[MediClinic application]
         Home([View home])
@@ -25,6 +25,9 @@ flowchart LR
         Complete([Complete Confirmed appointment at or after EndsAt])
         Seed([Explicit Development demo seeding])
         Bootstrap([Explicit Development identity bootstrap])
+        Catalog([Manage granted clinics / branches / departments / services / hours])
+        Employees([Manage granted employees / doctor services / availability])
+        Grant([Explicit trusted initial clinic grant])
     end
     Visitor --> Home
     Visitor --> Register
@@ -41,10 +44,13 @@ flowchart LR
     Staff --> Reject
     Staff --> Complete
     Admin --> Logout
-    Admin --> SD
-    Admin --> Review
+    Admin -->|requires linked Staff| SD
+    Admin -->|requires linked Staff| Review
+    Admin -->|requires explicit clinic grant| Catalog
+    Admin -->|requires explicit clinic grant| Employees
     Operator --> Seed
     Operator --> Bootstrap
+    Operator --> Grant
 ```
 
-All roles log in through the same account endpoint. ClinicAdmin alone has read access only, restricted to its linked Staff department; an unlinked administrator cannot load clinical dashboard/list data. Review mutations additionally require the Staff role. Bootstrap creates an unlinked ClinicAdmin; it does not grant global clinical access. Doctor is a domain subtype, not an additional Identity role. There is no catalog-management, availability-management or account-relinking web use case.
+All roles share the login endpoint. Clinical reads for ClinicAdmin require a Staff link and remain department-scoped; review mutations additionally require Staff role. Catalog/employee management instead requires explicit clinic grants. Bootstrap creates an unlinked ClinicAdmin without grants; [trusted provisioning](../database-migration-runbook.md#initial-administrator-provisioning) is separate. Doctor uses Staff Identity role. No public privileged registration, account-relinking or grant-management web use case exists.
