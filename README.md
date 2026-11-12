@@ -1,5 +1,9 @@
 # MediClinic
 
+## M10 institution management
+
+ClinicAdmin users with explicit clinic grants can manage clinics, branches, departments, service duration/decimal TRY prices and branch working hours through **Kurum yönetimi**. The role alone grants no clinic ownership. See [M10 design, safe migration and trusted scope provisioning](docs/clinic-management.md). The additive `ClinicManagement` migration gives existing services a documented 0 TRY default and leaves all administrator grants and working hours unconfigured. Apply it explicitly after backing up the selected database; startup and seeds do not assign access. Working hours will be integrated with booking in M12. Historical M8/M9 audits below describe the earlier submission.
+
 MediClinic is an ASP.NET Core MVC clinic appointment application prepared as an **Object-Oriented Programming course project**. It demonstrates an encapsulated domain model, inheritance, polymorphism, persistent relationships and role-authorized workflows. M8/M9 stabilizes and documents the existing application for final submission without adding product modules.
 
 ## Features and user roles

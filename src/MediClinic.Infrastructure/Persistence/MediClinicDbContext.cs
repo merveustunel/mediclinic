@@ -19,6 +19,9 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
     public DbSet<StaffAvailability> StaffAvailabilities => Set<StaffAvailability>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
 
+    public DbSet<ClinicAdministrator> ClinicAdministrators => Set<ClinicAdministrator>();
+    public DbSet<WorkingHours> WorkingHours => Set<WorkingHours>();
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder.Properties<DateTimeOffset>().HaveConversion<UtcTicksConverter>();
@@ -27,6 +30,14 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        var administrator = modelBuilder.Entity<ClinicAdministrator>();
+        administrator.HasKey(x => new { x.UserId, x.ClinicId });
+        administrator.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
+        administrator.HasOne(x => x.Clinic).WithMany().HasForeignKey(x => x.ClinicId).OnDelete(DeleteBehavior.Restrict);
+        var hours = Root<WorkingHours>(modelBuilder, "WorkingHours");
+        hours.HasOne<Branch>().WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
+        hours.HasIndex(x => new { x.BranchId, x.Day }).IsUnique();
+        hours.ToTable(t => t.HasCheckConstraint("CK_WorkingHours_Range", "Day BETWEEN 0 AND 6 AND ((Closed = 1 AND Opens IS NULL AND Closes IS NULL) OR (Closed = 0 AND Opens IS NOT NULL AND Closes IS NOT NULL AND Opens < Closes))"));
         var user = modelBuilder.Entity<ApplicationUser>();
         user.HasOne(x => x.Patient).WithOne().HasForeignKey<ApplicationUser>(x => x.PatientId).OnDelete(DeleteBehavior.Restrict);
         user.HasOne(x => x.Staff).WithOne().HasForeignKey<ApplicationUser>(x => x.StaffId).OnDelete(DeleteBehavior.Restrict);
@@ -57,6 +68,7 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
         department.Navigation(x => x.Services).HasField("_services").UsePropertyAccessMode(PropertyAccessMode.Field);
 
         var service = Root<MedicalService>(modelBuilder, "MedicalServices");
+        service.Property(x => x.Price).HasPrecision(11, 2).HasDefaultValue(0m);
         service.Ignore(x => x.DepartmentId);
         service.Property<Guid>("DepartmentKey").HasColumnName("DepartmentId");
         Text(service, nameof(MedicalService.Name));
