@@ -9,6 +9,25 @@ namespace MediClinic.Infrastructure;
 
 public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvider clock) : IAppointmentBooking
 {
+    public async Task<IReadOnlyList<StaffAppointment>> StaffAppointments(string userId, AppointmentStatus? status, DateOnly? date)
+    {
+        var query = (await Scoped(userId, true, true)).AsNoTracking().Include(x => x.Patient).AsQueryable();
+        if (status.HasValue) query = query.Where(x => x.Status == status.Value);
+        if (date.HasValue)
+        {
+            var start = Scheduling.ToUtc(date.Value.ToDateTime(TimeOnly.MinValue));
+            var end = Scheduling.ToUtc(date.Value.AddDays(1).ToDateTime(TimeOnly.MinValue));
+            query = query.Where(x => x.StartsAt >= start && x.StartsAt < end);
+        }
+        return (await query.OrderByDescending(x => x.StartsAt).ThenBy(x => x.Id).ToListAsync())
+            .Select(x => new StaffAppointment(Summary(x), x.Patient.FullName)).ToList();
+    }
+
+    public async Task<StaffAppointment?> StaffAppointment(string userId, Guid id)
+    {
+        var item = await (await Scoped(userId, true, true)).AsNoTracking().Include(x => x.Patient).SingleOrDefaultAsync(x => x.Id == id);
+        return item == null ? null : new(Summary(item), item.Patient.FullName);
+    }
     private async Task<ApplicationUser> User(string id, string role, bool allowAdmin = false)
     {
         var user = await db.Users.Include(x => x.Patient).Include(x => x.Staff).ThenInclude(x => x!.Department)

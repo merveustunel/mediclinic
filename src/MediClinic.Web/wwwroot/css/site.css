@@ -164,3 +164,13 @@ dd { margin-left: 0; font-weight: 500; }
 .staff-appointment-list li > div { flex: 1 1 15rem; min-width: 0; overflow-wrap: anywhere; }
 .staff-appointment-list p { margin-block: .4rem; }
 .staff-appointment-list a { white-space: normal; }
+
+.staff-date-filter { display:flex; flex-wrap:wrap; align-items:end; gap:1rem; }
+.staff-date-filter > div { flex:0 1 18rem; min-width:0; }
+.staff-date-filter > button { margin:0; }
+.staff-details { background:var(--surface); padding:1.25rem; border:1px solid var(--border); border-radius:var(--radius); }
+.staff-details dd, .staff-reason { overflow-wrap:anywhere; white-space:pre-wrap; }
+.staff-actions form { margin-block:1.5rem; }
+.button-complete { background:#226849; }
+.button-complete:hover { background:#194f37; }
+.button-danger:hover { background:#852036; }
