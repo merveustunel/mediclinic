@@ -17,7 +17,7 @@
         <button type="submit">Randevuyu iptal et</button>
     </form>
 }
-@if (staff && Model.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
+@if (staff && User.IsInRole(MediClinic.Infrastructure.Identity.AuthRoles.Staff) && Model.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
 {
     <form asp-action="Review" method="post">
         <input type="hidden" name="Id" value="@Model.Id" />
