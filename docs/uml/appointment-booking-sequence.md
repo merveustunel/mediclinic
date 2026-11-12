@@ -14,14 +14,14 @@ sequenceDiagram
     MVC->>Booking: Options(UserId)
     Booking->>Booking: User(userId, Patient)
     Booking->>DB: Query user links/roles, doctors and services
-    DB-->>Booking: Linked patient / compatible catalog
+    DB-->>Booking: Linked patient / explicitly assigned services and prices
     Booking-->>MVC: BookingOption list
     MVC-->>Patient: Cascading selections
     Patient->>MVC: GET Book (Stage 2, date, selection)
     MVC->>MVC: PrepareBooking(model), Options(UserId)
     MVC->>Booking: Slots(UserId, DoctorId, ServiceId, Date)
-    Booking->>DB: Availability and Blocking(doctorId)
-    DB-->>Booking: Availability / occupied intervals
+    Booking->>DB: Availability, branch hours and Blocking(doctorId)
+    DB-->>Booking: Availability / configured hours / occupied intervals
     Booking-->>MVC: Future 15-minute starts fitting full duration
     MVC-->>Patient: Time cards
     Patient->>MVC: GET Book (Stage 3, LocalStart)
@@ -34,9 +34,11 @@ sequenceDiagram
     Booking->>DB: User, catalog hierarchy, availability, overlap checks
     alt Checks pass
         Booking->>Domain: new Appointment(id, patient, doctor, service, start)
-        Domain-->>Booking: Pending appointment with calculated EndsAt
+        Domain-->>Booking: Pending with EndsAt and price snapshots
         Booking->>DB: Appointments.Add(appointment), SaveChangesAsync()
         Note over DB: SQLite trigger rejects overlapping blocking writes
+        Booking->>DB: Revalidate assignment, availability, hours, duration and price under write lock
+        Note over Booking,DB: Commit only if still valid; otherwise rollback and retry feedback
         alt Saved
             DB-->>Booking: Persisted
             Booking-->>MVC: Appointment Id

@@ -1,5 +1,7 @@
 # M8/M9 final implementation audit
 
+> Historical M8/M9 evidence only. The [M13 final audit](final-requirements-audit.md), [current checklist](submission-checklist.md) and [README](../README.md) supersede feature gaps, test totals and readiness statements below.
+
 Date: 2026-11-12. Base: `1370707` (main, merged PR #14). Working tree was clean before branching from fetched origin/main. No unrelated changes were discarded; no product module or migration was added.
 
 ## Required feature traceability

@@ -11,3 +11,5 @@ TestResults/
 *.db
 *.db-*
 *.db.before-demo-*.bak
+__pycache__/
+*.pyc

@@ -1,5 +1,7 @@
 # M10 clinic management
 
+> Historical M10 report. M12 now integrates branch working hours; missing weekday rows are unrestricted. Current operational instructions and readiness are in the [M13 runbook](database-migration-runbook.md) and [audit](final-requirements-audit.md). Counts/results below describe M10 only.
+
 Based on main at `1b4f6b7`, including merged PR #15. The existing Domain entities, Application booking contracts, Infrastructure Identity/EF context, MVC shell and migrated SQLite test fixtures were audited and reused. Catalog operations use the existing Web-to-DbContext composition; no duplicate organization entities or service abstraction was introduced. Staff/clinical permissions and booking contracts are unchanged.
 
 ## Scope and trusted provisioning
@@ -50,7 +52,7 @@ Working hours use Turkey local wall-clock time, one non-overnight interval per w
 ## M11/M12 limitations
 
 - M11 staff/doctor administration and availability provisioning are separate; existing staff appointment workflows remain intact.
-- M12 must intersect branch working hours with doctor availability and appointment conflicts. **M10 working hours do not yet restrict booking.** Existing slot discovery still uses StaffAvailability.
+- M12 now intersects configured branch hours with availability and conflicts; missing weekdays remain unrestricted. See [booking integration](booking-integration.md).
 - No holidays, split shifts, overnight intervals, price history/payment collection, deletion or grant-management UI. Trusted provisioning is required for initial/existing-clinic grants.
 - Concurrent edits use the existing SQLite behavior; the last successful edit wins and a busy database can require retry.
 

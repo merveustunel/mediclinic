@@ -1,6 +1,6 @@
 # Object-oriented programming assessment
 
-M8/M9 audit: the existing Domain implements every requested OOP principle. No new hierarchy is needed. Examples below describe executable project code, rather than proposed features.
+M13 audit of main including PR #18: the Domain implements the four required OOP principles. Examples describe executable code. See the [current traceability matrix](final-requirements-audit.md) for verification limits and results.
 
 | Principle | Actual implementation | Verification |
 | --- | --- | --- |
@@ -13,6 +13,8 @@ M8/M9 audit: the existing Domain implements every requested OOP principle. No ne
 | Business rules / invariants | Constructors reject empty IDs/names, future UTC birth dates, non-positive service duration, invalid availability intervals, and incompatible doctor/service departments. `Confirm`, `Reject`, `Cancel`, `Complete` protect legal transitions; reject/cancel require reasons; completion requires the scheduled end to have arrived. | [AppointmentTests](../tests/MediClinic.Tests/AppointmentTests.cs), [StaffAvailabilityTests](../tests/MediClinic.Tests/StaffAvailabilityTests.cs), OrganizationTests and PersonTests. |
 
 ## Boundaries of the domain model
+
+M10–M12 extend encapsulation: [Doctor.AssignServices / Offers](../src/MediClinic.Domain/Doctor.cs) guard explicit service assignments, [MedicalService.Update](../src/MediClinic.Domain/MedicalService.cs) validates duration and decimal money, and [WorkingHours.Update](../src/MediClinic.Domain/WorkingHours.cs) protects branch-day intervals. Appointment snapshots service Price and duration; legacy materialization allows an unknown NULL price. CanProvide remains department compatibility; Offers additionally requires explicit assignment for new bookings. [BookingIntegrationTests](../tests/MediClinic.Tests/BookingIntegrationTests.cs), [EmployeeManagementTests](../tests/MediClinic.Tests/EmployeeManagementTests.cs) and [ClinicManagementTests](../tests/MediClinic.Tests/ClinicManagementTests.cs) verify these boundaries. Booking rechecks assignments, availability, hours, price and duration under the SQLite write lock before commit. ClinicAdministrator grants are Infrastructure authorization records, independent of Person.Role.
 
 The [Appointment constructor](../src/MediClinic.Domain/Appointment.cs) calculates and retains EndsAt from the service duration. It does **not** check current time, account roles, availability, booking horizon or database collisions. Those checks belong to [AppointmentBooking.Book](../src/MediClinic.Infrastructure/AppointmentBooking.cs), which receives a TimeProvider, validates the catalog hierarchy and patient link, and persists through EF Core. SQLite [overlap triggers](../src/MediClinic.Infrastructure/Persistence/Migrations/20261106022559_AppointmentScheduling.cs) protect concurrent writes; Status is an optimistic concurrency token in [MediClinicDbContext](../src/MediClinic.Infrastructure/Persistence/MediClinicDbContext.cs).
 
