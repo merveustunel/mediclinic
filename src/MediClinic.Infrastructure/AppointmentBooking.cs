@@ -11,7 +11,7 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
 {
     public async Task<IReadOnlyList<StaffAppointment>> StaffAppointments(string userId, AppointmentStatus? status, DateOnly? date)
     {
-        var query = (await Scoped(userId, true, true)).AsNoTracking().Include(x => x.Patient).AsQueryable();
+        var query = (await Scoped(userId, true)).AsNoTracking().Include(x => x.Patient).AsQueryable();
         if (status.HasValue) query = query.Where(x => x.Status == status.Value);
         if (date.HasValue)
         {
@@ -25,7 +25,7 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
 
     public async Task<StaffAppointment?> StaffAppointment(string userId, Guid id)
     {
-        var item = await (await Scoped(userId, true, true)).AsNoTracking().Include(x => x.Patient).SingleOrDefaultAsync(x => x.Id == id);
+        var item = await (await Scoped(userId, true)).AsNoTracking().Include(x => x.Patient).SingleOrDefaultAsync(x => x.Id == id);
         return item == null ? null : new(Summary(item), item.Patient.FullName);
     }
     // Missing days remain unrestricted for compatibility with pre-M10 schedules.

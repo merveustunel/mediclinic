@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace MediClinic.Web.Controllers;
 
-[Authorize(Roles = AuthRoles.Staff + "," + AuthRoles.ClinicAdmin)]
+[Authorize(Policy = AuthRoles.Staff)]
 public sealed class StaffAppointmentsController(IAppointmentBooking booking, TimeProvider clock) : Controller
 {
     private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
