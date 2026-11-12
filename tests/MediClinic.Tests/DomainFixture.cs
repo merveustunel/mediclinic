@@ -19,6 +19,7 @@ internal sealed class DomainFixture
             .AddDepartment(Guid.NewGuid(), "General medicine");
         Doctor = new Doctor(Guid.NewGuid(), "Sample", "Doctor", Department, "General medicine");
         Service = Department.AddService(Guid.NewGuid(), "Consultation", TimeSpan.FromMinutes(30));
+        Doctor.AssignServices([Service]);
     }
 
     internal Appointment Appointment() => new(Guid.NewGuid(), Patient, Doctor, Service, Start);

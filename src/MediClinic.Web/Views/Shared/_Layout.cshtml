@@ -34,6 +34,7 @@
                 <nav aria-label="Ana gezinme">
                     @if (User.IsInRole(AuthRoles.ClinicAdmin))
                     {
+                        <a asp-controller="EmployeeManagement" asp-action="Index">Çalışan yönetimi</a>
                         <a asp-controller="ClinicManagement" asp-action="Index">Kurum yönetimi</a>
                     }
                     @if (authenticated)

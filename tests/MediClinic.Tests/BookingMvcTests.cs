@@ -231,6 +231,7 @@ public sealed class BookingMvcTests
         var invalid = await Post(client, "/Appointments/Book", "/Appointments/Book", values);
         Assert.Contains("tarih bilgisini kontrol edin", WebUtility.HtmlDecode(await invalid.Content.ReadAsStringAsync()));
         await using var db = data.Context(); Assert.Empty(await db.Appointments.ToListAsync());
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM DoctorServices");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM MedicalServices");
         html = WebUtility.HtmlDecode(await client.GetStringAsync("/Appointments/Book"));
         Assert.Contains("randevu alınabilecek hizmet bulunmuyor", html);

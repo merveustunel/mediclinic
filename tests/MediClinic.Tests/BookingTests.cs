@@ -263,6 +263,6 @@ public sealed class BookingTests
         var fixture = new DomainFixture(); await fixture.SeedLegacy(db, fixture.Appointment(), fixture.Appointment());
         await Assert.ThrowsAsync<SqliteException>(() => migrator.MigrateAsync());
         Assert.Equal(2, await db.Appointments.CountAsync());
-        Assert.Equal(2, (await db.Database.GetPendingMigrationsAsync()).Count());
+        Assert.Equal(3, (await db.Database.GetPendingMigrationsAsync()).Count());
     }
 }

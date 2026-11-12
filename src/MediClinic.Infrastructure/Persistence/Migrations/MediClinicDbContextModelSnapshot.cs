@@ -17,6 +17,21 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
 
+            modelBuilder.Entity("DoctorServices", b =>
+                {
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DoctorId", "ServiceId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("DoctorServices");
+                });
+
             modelBuilder.Entity("MediClinic.Domain.Appointment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -568,6 +583,21 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
                         });
 
                     b.HasDiscriminator().HasValue("Doctor");
+                });
+
+            modelBuilder.Entity("DoctorServices", b =>
+                {
+                    b.HasOne("MediClinic.Domain.Doctor", null)
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MediClinic.Domain.MedicalService", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MediClinic.Domain.Appointment", b =>
