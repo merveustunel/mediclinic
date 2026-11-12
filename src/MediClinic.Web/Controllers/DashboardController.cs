@@ -21,7 +21,7 @@ public sealed class DashboardController(IAppointmentBooking booking, TimeProvide
         }
         catch (BookingException) { return Forbid(); }
     }
-    [Authorize(Roles = AuthRoles.Staff + "," + AuthRoles.ClinicAdmin)]
+    [Authorize(Policy = AuthRoles.Staff)]
     public async Task<IActionResult> Staff()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -29,5 +29,12 @@ public sealed class DashboardController(IAppointmentBooking booking, TimeProvide
         try { return View("Staff", await booking.Dashboard(userId)); }
         catch (BookingException) { return Forbid(); }
     }
-    [Authorize(Policy = AuthRoles.ClinicAdmin)] public Task<IActionResult> ClinicAdmin() => Staff();
+    [Authorize(Policy = AuthRoles.ClinicAdmin)]
+    public async Task<IActionResult> ClinicAdmin()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) return Forbid();
+        try { return View(await booking.ClinicAdminDashboard(userId)); }
+        catch (BookingException) { return Forbid(); }
+    }
 }

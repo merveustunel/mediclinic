@@ -119,27 +119,105 @@ public sealed class StaffDashboardTests
     }
 
     [Fact]
-    public async Task ClinicAdminReadAccessRequiresLinkedStaffAndPreservesDepartmentScope()
+    public async Task ClinicScopeIncludesOtherBranchesAndDepartmentsButExcludesOtherClinics()
     {
         await using var data = await BookingTests.Database.Create();
-        Guid id;
+        await using var db = data.Context();
+        var f = data.Fixture;
+        db.AttachRange(f.Patient, f.Doctor, f.Service);
+        var branchDepartment = f.Clinic.AddBranch(Guid.NewGuid(), "Admin branch", "Address")
+            .AddDepartment(Guid.NewGuid(), "Admin branch department");
+        var department = f.Department.Branch.AddDepartment(Guid.NewGuid(), "Admin department");
+        var ids = new List<Guid>();
+        foreach (var scope in new[] { branchDepartment, department })
+        {
+            var doctor = new Doctor(Guid.NewGuid(), "Scoped", "Doctor", scope, "Specialty");
+            var service = scope.AddService(Guid.NewGuid(), "Scoped service", TimeSpan.FromMinutes(30));
+            var appointment = new Appointment(Guid.NewGuid(), f.Patient, doctor, service, f.Start);
+            db.Add(appointment); ids.Add(appointment.Id);
+        }
+        db.AttachRange(data.Other.Patient, data.Other.Doctor, data.Other.Service);
+        db.Add(data.Other.Appointment());
+        var role = new IdentityRole(AuthRoles.ClinicAdmin); db.Add(role);
+        db.UserRoles.Add(new() { UserId = data.UnlinkedStaffId, RoleId = role.Id });
+        db.ClinicAdministrators.Add(new() { UserId = data.UnlinkedStaffId, ClinicId = f.Clinic.Id });
+        await db.SaveChangesAsync();
+        data.Time.Now = f.Start;
+        var summary = await data.Service(db).ClinicAdminDashboard(data.UnlinkedStaffId);
+        Assert.Equal(2, summary.TodayCount);
+        Assert.Equal(2, summary.PendingCount);
+        Assert.Equal(ids.Order(), summary.Pending.Select(x => x.Id).Order());
+        Assert.Equal(ids.Order(), summary.Today.Select(x => x.Id).Order());
+        Assert.Empty((await data.Service(db).Dashboard(data.StaffId)).Today);
+    }
+
+    [Fact]
+    public async Task ClinicAdminUsesClinicGrantsWithoutStaffAndNavigationMatchesAccess()
+    {
+        await using var data = await BookingTests.Database.Create();
+        Guid visible, hidden;
         await using (var db = data.Context())
         {
-            id = await data.Service(db).Book(data.PatientId, data.Request());
+            visible = await data.Service(db).Book(data.PatientId, data.Request());
+            db.AttachRange(data.Other.Patient, data.Other.Doctor, data.Other.Service);
+            var other = data.Other.Appointment(); db.Add(other); hidden = other.Id;
             var role = new IdentityRole(AuthRoles.ClinicAdmin); db.Roles.Add(role);
-            var staffRole = await db.UserRoles.SingleAsync(x => x.UserId == data.StaffId); db.UserRoles.Remove(staffRole);
-            db.UserRoles.Add(new() { UserId = data.StaffId, RoleId = role.Id });
+            // An admin with no Staff role or person link, and a role-only admin.
+            var staffRole = await db.UserRoles.SingleAsync(x => x.UserId == data.UnlinkedStaffId);
+            db.UserRoles.Remove(staffRole);
             db.UserRoles.Add(new() { UserId = data.UnlinkedStaffId, RoleId = role.Id });
+            db.UserRoles.Add(new() { UserId = data.StaffId, RoleId = role.Id });
+            db.ClinicAdministrators.Add(new() { UserId = data.UnlinkedStaffId, ClinicId = data.Fixture.Clinic.Id });
+            // A grant alone cannot bypass the role requirement.
+            db.ClinicAdministrators.Add(new() { UserId = data.PatientId, ClinicId = data.Other.Clinic.Id });
             await db.SaveChangesAsync();
+            data.Time.Now = data.Fixture.Start;
+            var summary = await data.Service(db).ClinicAdminDashboard(data.UnlinkedStaffId);
+            Assert.Equal(1, summary.TodayCount);
+            Assert.Equal(1, summary.PendingCount);
+            Assert.Equal(visible, Assert.Single(summary.Pending).Id);
+            Assert.Equal(visible, Assert.Single(summary.Today).Id);
+            await Assert.ThrowsAsync<BookingException>(() => data.Service(db).StaffAppointments(data.UnlinkedStaffId, null, null));
+            await Assert.ThrowsAsync<BookingException>(() => data.Service(db).ClinicAdminDashboard(data.PatientId));
+            await Assert.ThrowsAsync<BookingException>(() => data.Service(db).ClinicAdminDashboard(data.StaffId));
         }
+        data.Time.Now = data.Fixture.Start;
         using var site = new BookingMvcTests.Site(data);
-        using var admin = await site.Login(data.StaffId);
-        foreach (var path in new[] { "/Dashboard/Staff", "/Dashboard/ClinicAdmin" })
-            Assert.Contains(id.ToString(), await admin.GetStringAsync(path));
-        Assert.Equal(HttpStatusCode.OK, (await admin.GetAsync($"/StaffAppointments/Details/{id}")).StatusCode);
-        using var unlinked = await site.Login(data.UnlinkedStaffId);
-        Assert.Contains("/Account/AccessDenied", (await unlinked.GetAsync("/Dashboard/ClinicAdmin")).Headers.Location!.OriginalString);
+        using var admin = await site.Login(data.UnlinkedStaffId);
+        var html = await admin.GetStringAsync($"/Dashboard/ClinicAdmin?clinicId={data.Other.Clinic.Id}&userId={data.OtherStaffId}");
+        Assert.Contains(data.Fixture.Patient.FirstName, html);
+        Assert.DoesNotContain(data.Other.Patient.Id.ToString(), html);
+        Assert.DoesNotContain(hidden.ToString(), html);
+        Assert.Contains("/Dashboard/ClinicAdmin", html);
+        Assert.Contains("/ClinicManagement", html);
+        Assert.Contains("/EmployeeManagement", html);
+        Assert.DoesNotContain("/StaffAppointments", html);
+        Assert.DoesNotContain("/Dashboard/Staff", html);
+        foreach (var path in new[] { "/StaffAppointments", $"/StaffAppointments/Details/{visible}", "/Dashboard/Staff" })
+            Assert.Contains("/Account/AccessDenied", (await admin.GetAsync(path)).Headers.Location!.OriginalString);
+        using var roleOnly = await site.Login(data.StaffId);
+        Assert.Contains("/Account/AccessDenied", (await roleOnly.GetAsync("/Dashboard/ClinicAdmin")).Headers.Location!.OriginalString);
+        var staffHtml = await roleOnly.GetStringAsync("/Dashboard/Staff");
+        Assert.Contains("/StaffAppointments", staffHtml);
+        Assert.DoesNotContain("/Dashboard/ClinicAdmin", staffHtml);
         using var patient = await site.Login(data.PatientId);
         Assert.Contains("/Account/AccessDenied", (await patient.GetAsync("/Dashboard/ClinicAdmin")).Headers.Location!.OriginalString);
+        var patientHtml = await patient.GetStringAsync("/Dashboard/Patient");
+        Assert.Contains("/Dashboard/Patient", patientHtml);
+        Assert.DoesNotContain("/StaffAppointments", patientHtml);
+        Assert.DoesNotContain("/Dashboard/ClinicAdmin", patientHtml);
+        using var anonymous = site.Client();
+        Assert.Contains("/Account/Login", (await anonymous.GetAsync("/Dashboard/ClinicAdmin")).Headers.Location!.OriginalString);
+        await using (var db = data.Context())
+        {
+            // A second grant expands only the admin scope; revoking all grants denies access.
+            db.ClinicAdministrators.Add(new() { UserId = data.UnlinkedStaffId, ClinicId = data.Other.Clinic.Id });
+            await db.SaveChangesAsync();
+            Assert.Equal(2, (await data.Service(db).ClinicAdminDashboard(data.UnlinkedStaffId)).PendingCount);
+            db.ClinicAdministrators.RemoveRange(db.ClinicAdministrators.Where(a => a.UserId == data.UnlinkedStaffId));
+            await db.SaveChangesAsync();
+        }
+        Assert.Contains("/Account/AccessDenied", (await admin.GetAsync("/Dashboard/ClinicAdmin")).Headers.Location!.OriginalString);
+        Assert.DoesNotContain("/Dashboard/ClinicAdmin", await admin.GetStringAsync("/Home"));
     }
 }

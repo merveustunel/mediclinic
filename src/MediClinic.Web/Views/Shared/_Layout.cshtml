@@ -1,8 +1,15 @@
 @using MediClinic.Infrastructure.Identity
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@inject MediClinic.Infrastructure.Persistence.MediClinicDbContext NavigationDb
 @{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString();
     var authenticated = User.Identity?.IsAuthenticated == true;
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var canAdmin = authenticated && User.IsInRole(AuthRoles.ClinicAdmin) && await NavigationDb.ClinicAdministrators.AnyAsync(a => a.UserId == userId);
+    var canStaff = authenticated && User.IsInRole(AuthRoles.Staff) && await NavigationDb.Users.AnyAsync(u => u.Id == userId && u.StaffId != null);
+    var canPatient = authenticated && User.IsInRole(AuthRoles.Patient) && await NavigationDb.Users.AnyAsync(u => u.Id == userId && u.PatientId != null);
     var role = User.IsInRole(AuthRoles.ClinicAdmin) ? "Klinik yöneticisi" : User.IsInRole(AuthRoles.Staff) ? "Personel" : User.IsInRole(AuthRoles.Patient) ? "Hasta" : "Hesap";
     var title = ViewData["Title"]?.ToString() ?? (controller switch
     {
@@ -32,23 +39,23 @@
             <details class="navigation" open>
                 <summary>Gezinme menüsü</summary>
                 <nav aria-label="Ana gezinme">
-                    @if (User.IsInRole(AuthRoles.ClinicAdmin))
+                    @if (canAdmin)
                     {
                         <a asp-controller="EmployeeManagement" asp-action="Index">Çalışan yönetimi</a>
                         <a asp-controller="ClinicManagement" asp-action="Index">Kurum yönetimi</a>
                     }
                     @if (authenticated)
                     {
-                        @foreach (var item in AuthRoles.All.Where(User.IsInRole))
+                        @foreach (var item in AuthRoles.All.Where(r => r == AuthRoles.ClinicAdmin ? canAdmin : r == AuthRoles.Staff ? canStaff : canPatient))
                         {
                             <a asp-controller="Dashboard" asp-action="@item" aria-current="@(controller == "Dashboard" && action == item ? "page" : null)">@(item == AuthRoles.Patient ? "Hasta paneli" : item == AuthRoles.Staff ? "Personel paneli" : "Yönetici paneli")</a>
                         }
-                        @if (User.IsInRole(AuthRoles.Patient))
+                        @if (canPatient)
                         {
                             <a asp-controller="Appointments" asp-action="Index" aria-current="@(controller == "Appointments" && action != "Book" ? "page" : null)">Randevularım</a>
                             <a asp-controller="Appointments" asp-action="Book" aria-current="@(controller == "Appointments" && action == "Book" ? "page" : null)">Randevu oluştur</a>
                         }
-                        @if (User.IsInRole(AuthRoles.Staff) || User.IsInRole(AuthRoles.ClinicAdmin))
+                        @if (canStaff)
                         {
                             <a asp-controller="StaffAppointments" asp-action="Index" aria-current="@(controller == "StaffAppointments" ? "page" : null)">Randevu inceleme</a>
                         }

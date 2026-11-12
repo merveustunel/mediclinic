@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.RegularExpressions;
 using MediClinic.Application;
 using MediClinic.Domain;
@@ -92,7 +92,7 @@ public sealed class StaffAppointmentsTests
     }
 
     [Fact]
-    public async Task AdminRemainsReadOnlyAndPatientAndOtherDepartmentCannotReview()
+    public async Task AdminWithoutStaffRoleAndPatientAndOtherDepartmentCannotReview()
     {
         await using var data = await BookingTests.Database.Create(); Guid id;
         await using (var db = data.Context())
@@ -104,8 +104,8 @@ public sealed class StaffAppointmentsTests
         }
         using var site = new BookingMvcTests.Site(data); using var admin = await site.Login(data.StaffId);
         var path = $"/StaffAppointments/Details/{id}";
-        Assert.DoesNotContain("/StaffAppointments/Review", await admin.GetStringAsync(path));
-        Assert.Contains(id.ToString(), await admin.GetStringAsync("/StaffAppointments"));
+        Assert.Contains("AccessDenied", (await admin.GetAsync(path)).Headers.Location!.OriginalString);
+        Assert.Contains("AccessDenied", (await admin.GetAsync("/StaffAppointments")).Headers.Location!.OriginalString);
         using var patient = await site.Login(data.PatientId);
         Assert.Contains("AccessDenied", (await patient.GetAsync(path)).Headers.Location!.OriginalString);
         foreach (var client in new[] { admin, patient })
