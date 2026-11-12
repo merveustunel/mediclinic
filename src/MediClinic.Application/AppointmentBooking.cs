@@ -4,9 +4,9 @@ namespace MediClinic.Application;
 
 public sealed record BookingRequest(Guid ClinicId, Guid BranchId, Guid DepartmentId, Guid DoctorId, Guid ServiceId, DateTime LocalStart);
 public sealed record BookingOption(Guid ClinicId, Guid BranchId, Guid DepartmentId, Guid DoctorId, Guid ServiceId,
-    string Clinic, string Branch, string Department, string Doctor, string Service, TimeSpan Duration);
+    string Clinic, string Branch, string Department, string Doctor, string Service, TimeSpan Duration, decimal Price = 0m, IReadOnlyList<DayOfWeek>? ClosedDays = null);
 public sealed record AppointmentSummary(Guid Id, string Service, string Doctor, string Branch,
-    DateTimeOffset StartsAt, DateTimeOffset EndsAt, AppointmentStatus Status, string? Reason);
+    DateTimeOffset StartsAt, DateTimeOffset EndsAt, AppointmentStatus Status, string? Reason, decimal? Price = null, string Clinic = "", string Department = "");
 public sealed class BookingException(string message) : Exception(message);
 public sealed record StaffAppointment(AppointmentSummary Appointment, string Patient);
 

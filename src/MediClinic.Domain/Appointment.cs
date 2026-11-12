@@ -19,6 +19,7 @@ public sealed class Appointment : Entity
         Service = service;
         StartsAt = startsAt;
         EndsAt = startsAt.Add(service.Duration);
+        Price = decimal.Round(service.Price, 2);
     }
 
     public Patient Patient { get; } = null!;
@@ -29,6 +30,8 @@ public sealed class Appointment : Entity
     public Guid ServiceId => Service.Id;
     public Branch Branch => Service.Department.Branch;
     public Guid BranchId => Branch.Id;
+    // Null means the historical charge is unknown; never infer it from the catalog.
+    public decimal? Price { get; private set; }
     public DateTimeOffset StartsAt { get; }
     public DateTimeOffset EndsAt { get; }
     public AppointmentStatus Status { get; private set; } = AppointmentStatus.Pending;

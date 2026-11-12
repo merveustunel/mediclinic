@@ -131,3 +131,7 @@ Use **Hasta paneli → Randevu oluştur**, select the demo catalog, then **Tarih
 - Completion is a staff action, not automatic. Pending/Confirmed cancellation and Pending review have no scheduled-start cutoff. Completed appointments still block their intervals.
 - SQLite concurrent writes may require refresh/retry. Trusted provisioning must preserve role/person link semantics.
 - Automated MVC tests do not establish visual accessibility or browser compatibility. Final keyboard, screen-reader, responsive and interactive demo checks remain in the checklist. This milestone did not seed, migrate or modify the existing application database.
+
+## M12 booking integration
+
+Appointment price snapshots, branch working-hours policies, migration order and manual verification are documented in [Booking integration](docs/booking-integration.md). Existing SQLite data is preserved; migration application remains an explicit operator step.

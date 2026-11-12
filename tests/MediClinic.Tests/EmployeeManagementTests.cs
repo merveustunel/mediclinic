@@ -211,6 +211,14 @@ public sealed class EmployeeManagementTests
         form["ServiceIds"] = data.Other.Service.Id.ToString();
         Assert.Equal(HttpStatusCode.OK, (await Post(admin, $"/EmployeeManagement/Edit/{data.Fixture.Doctor.Id}", "Edit", form)).StatusCode);
         form["ServiceIds"] = secondId.ToString();
+        var blocked = await Post(admin, $"/EmployeeManagement/Edit/{data.Fixture.Doctor.Id}", "Edit", form);
+        Assert.Equal(HttpStatusCode.OK, blocked.StatusCode);
+        Assert.Contains("validation-summary-errors", await blocked.Content.ReadAsStringAsync());
+        await using (var release = data.Context())
+        {
+            (await release.Appointments.SingleAsync()).Cancel("Release assignment");
+            await release.SaveChangesAsync();
+        }
         Assert.Equal(HttpStatusCode.Redirect, (await Post(admin, $"/EmployeeManagement/Edit/{data.Fixture.Doctor.Id}", "Edit", form)).StatusCode);
         await using var verify = data.Context();
         var doctor = await verify.Doctors.Include(d => d.Services).SingleAsync(d => d.Id == data.Fixture.Doctor.Id);

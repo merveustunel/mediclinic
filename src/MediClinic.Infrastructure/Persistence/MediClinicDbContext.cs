@@ -118,6 +118,7 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
         availability.ToTable(t => t.HasCheckConstraint("CK_StaffAvailabilities_Interval", "\"EndsAt\" > \"StartsAt\""));
 
         var appointment = Root<Appointment>(modelBuilder, "Appointments");
+        appointment.Property(x => x.Price).HasPrecision(11, 2);
         appointment.Ignore(x => x.PatientId);
         appointment.Ignore(x => x.DoctorId);
         appointment.Ignore(x => x.ServiceId);

@@ -3,6 +3,8 @@
 @{ var staff = ViewContext.RouteData.Values["controller"]?.ToString() == "StaffAppointments"; }
 <h1>Randevu</h1>
 <p class="alert" role="status">@TempData["Message"]</p>
+<p>Klinik: @Model.Clinic - Bölüm: @Model.Department</p>
+<p>Ücret: @(Model.Price.HasValue ? Model.Price.Value.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("tr-TR")) + " TRY" : "Bilinmiyor (eski kayıt)")</p>
 <dl>
     <dt>Hizmet</dt><dd>@Model.Service</dd><dt>Doktor</dt><dd>@Model.Doctor</dd><dt>Şube</dt><dd>@Model.Branch</dd>
     <dt>Saat (Europe/Istanbul)</dt><dd>@MediClinic.Application.Scheduling.Local(Model.StartsAt).ToString("yyyy-MM-dd HH:mm") – @MediClinic.Application.Scheduling.Local(Model.EndsAt).ToString("yyyy-MM-dd HH:mm")</dd>
