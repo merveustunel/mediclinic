@@ -32,6 +32,10 @@
             <details class="navigation" open>
                 <summary>Gezinme menüsü</summary>
                 <nav aria-label="Ana gezinme">
+                    @if (User.IsInRole(AuthRoles.ClinicAdmin))
+                    {
+                        <a asp-controller="ClinicManagement" asp-action="Index">Kurum yönetimi</a>
+                    }
                     @if (authenticated)
                     {
                         @foreach (var item in AuthRoles.All.Where(User.IsInRole))

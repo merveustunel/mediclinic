@@ -16,6 +16,13 @@ public sealed class MedicalService : Entity
 
     public Department Department { get; } = null!;
     public Guid DepartmentId => Department.Id;
-    public string Name { get; } = null!;
-    public TimeSpan Duration { get; }
+    public string Name { get; private set; } = null!;
+    public TimeSpan Duration { get; private set; }
+    public decimal Price { get; private set; }
+    public void Update(string name, int durationMinutes, decimal price)
+    {
+        if (durationMinutes < 1 || durationMinutes > 1440) throw new ArgumentOutOfRangeException(nameof(durationMinutes));
+        if (price < 0 || price > 999999999.99m || decimal.Round(price, 2) != price) throw new ArgumentOutOfRangeException(nameof(price));
+        Name = Guard.Required(name, nameof(name)); Duration = TimeSpan.FromMinutes(durationMinutes); Price = price;
+    }
 }

@@ -16,8 +16,8 @@ public sealed class Branch : Entity
 
     public Clinic Clinic { get; } = null!;
     public Guid ClinicId => Clinic.Id;
-    public string Name { get; } = null!;
-    public string Address { get; } = null!;
+    public string Name { get; private set; } = null!;
+    public string Address { get; private set; } = null!;
     public IReadOnlyList<Department> Departments => _departments.AsReadOnly();
 
     public Department AddDepartment(Guid id, string name)
@@ -28,4 +28,5 @@ public sealed class Branch : Entity
         _departments.Add(department);
         return department;
     }
+    public void Update(string name, string address) { Name = Guard.Required(name, nameof(name)); Address = Guard.Required(address, nameof(address)); }
 }

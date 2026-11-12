@@ -9,7 +9,7 @@ public sealed class Clinic : Entity
         Name = Guard.Required(name, nameof(name));
     }
 
-    public string Name { get; }
+    public string Name { get; private set; }
     public IReadOnlyList<Branch> Branches => _branches.AsReadOnly();
 
     public Branch AddBranch(Guid id, string name, string address)
@@ -20,4 +20,5 @@ public sealed class Clinic : Entity
         _branches.Add(branch);
         return branch;
     }
+    public void Rename(string name) => Name = Guard.Required(name, nameof(name));
 }

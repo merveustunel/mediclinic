@@ -224,7 +224,7 @@ public sealed class BookingTests
         await using var connection = new SqliteConnection("Data Source=:memory:"); await connection.OpenAsync();
         await using var db = new MediClinicDbContext(new DbContextOptionsBuilder<MediClinicDbContext>().UseSqlite(connection).Options);
         var migrator = db.GetService<IMigrator>(); await migrator.MigrateAsync("20261105223217_IdentityAuthentication");
-        var fixture = new DomainFixture(); var appointment = fixture.Appointment(); db.Add(appointment); await db.SaveChangesAsync();
+        var fixture = new DomainFixture(); var appointment = fixture.Appointment(); await fixture.SeedLegacy(db, appointment);
         await migrator.MigrateAsync(); db.ChangeTracker.Clear();
         var restored = await db.Appointments.SingleAsync(); Assert.Equal(appointment.Id, restored.Id); Assert.Equal(appointment.EndsAt, restored.EndsAt);
         Assert.Empty(await db.Database.GetPendingMigrationsAsync());
@@ -260,9 +260,9 @@ public sealed class BookingTests
         await using var connection = new SqliteConnection("Data Source=:memory:"); await connection.OpenAsync();
         await using var db = new MediClinicDbContext(new DbContextOptionsBuilder<MediClinicDbContext>().UseSqlite(connection).Options);
         var migrator = db.GetService<IMigrator>(); await migrator.MigrateAsync("20261105223217_IdentityAuthentication");
-        var fixture = new DomainFixture(); db.Add(fixture.Appointment()); db.Add(fixture.Appointment()); await db.SaveChangesAsync();
+        var fixture = new DomainFixture(); await fixture.SeedLegacy(db, fixture.Appointment(), fixture.Appointment());
         await Assert.ThrowsAsync<SqliteException>(() => migrator.MigrateAsync());
         Assert.Equal(2, await db.Appointments.CountAsync());
-        Assert.Single(await db.Database.GetPendingMigrationsAsync());
+        Assert.Equal(2, (await db.Database.GetPendingMigrationsAsync()).Count());
     }
 }

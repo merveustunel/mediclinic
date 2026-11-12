@@ -151,6 +151,12 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("Price")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(11, 2)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(0m);
+
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentKey");
@@ -225,6 +231,37 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
                     b.ToTable("StaffAvailabilities", null, t =>
                         {
                             t.HasCheckConstraint("CK_StaffAvailabilities_Interval", "\"EndsAt\" > \"StartsAt\"");
+                        });
+                });
+
+            modelBuilder.Entity("MediClinic.Domain.WorkingHours", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Closed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeOnly?>("Closes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeOnly?>("Opens")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId", "Day")
+                        .IsUnique();
+
+                    b.ToTable("WorkingHours", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_WorkingHours_Range", "Day BETWEEN 0 AND 6 AND ((Closed = 1 AND Opens IS NULL AND Closes IS NULL) OR (Closed = 0 AND Opens IS NOT NULL AND Closes IS NOT NULL AND Opens < Closes))");
                         });
                 });
 
@@ -305,6 +342,21 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_User_OnePerson", "\"PatientId\" IS NULL OR \"StaffId\" IS NULL");
                         });
+                });
+
+            modelBuilder.Entity("MediClinic.Infrastructure.Identity.ClinicAdministrator", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ClinicId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "ClinicId");
+
+                    b.HasIndex("ClinicId");
+
+                    b.ToTable("ClinicAdministrators");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -589,6 +641,15 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("MediClinic.Domain.WorkingHours", b =>
+                {
+                    b.HasOne("MediClinic.Domain.Branch", null)
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MediClinic.Infrastructure.Identity.ApplicationUser", b =>
                 {
                     b.HasOne("MediClinic.Domain.Patient", "Patient")
@@ -604,6 +665,25 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
                     b.Navigation("Patient");
 
                     b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("MediClinic.Infrastructure.Identity.ClinicAdministrator", b =>
+                {
+                    b.HasOne("MediClinic.Domain.Clinic", "Clinic")
+                        .WithMany()
+                        .HasForeignKey("ClinicId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MediClinic.Infrastructure.Identity.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Clinic");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

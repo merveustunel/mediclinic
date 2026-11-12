@@ -15,7 +15,7 @@ public sealed class Department : Entity
 
     public Branch Branch { get; } = null!;
     public Guid BranchId => Branch.Id;
-    public string Name { get; } = null!;
+    public string Name { get; private set; } = null!;
     public IReadOnlyList<MedicalService> Services => _services.AsReadOnly();
 
     public MedicalService AddService(Guid id, string name, TimeSpan duration)
@@ -26,4 +26,5 @@ public sealed class Department : Entity
         _services.Add(service);
         return service;
     }
+    public void Rename(string name) => Name = Guard.Required(name, nameof(name));
 }
