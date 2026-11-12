@@ -8,6 +8,7 @@ public sealed record BookingOption(Guid ClinicId, Guid BranchId, Guid Department
 public sealed record AppointmentSummary(Guid Id, string Service, string Doctor, string Branch,
     DateTimeOffset StartsAt, DateTimeOffset EndsAt, AppointmentStatus Status, string? Reason);
 public sealed class BookingException(string message) : Exception(message);
+public sealed record StaffAppointment(AppointmentSummary Appointment, string Patient);
 
 public interface IAppointmentBooking
 {
@@ -17,6 +18,8 @@ public interface IAppointmentBooking
     Task<IReadOnlyList<AppointmentSummary>> List(string userId, bool staff);
     Task<AppointmentSummary?> Find(string userId, Guid id, bool staff);
     Task<StaffDashboardData> Dashboard(string userId);
+    Task<IReadOnlyList<StaffAppointment>> StaffAppointments(string userId, AppointmentStatus? status, DateOnly? date);
+    Task<StaffAppointment?> StaffAppointment(string userId, Guid id);
     Task Act(string userId, Guid id, string action, string? reason);
 }
 
