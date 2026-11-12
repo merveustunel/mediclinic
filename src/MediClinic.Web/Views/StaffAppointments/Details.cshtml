@@ -1,4 +1,4 @@
-﻿@model StaffAppointmentDetailsModel
+@model StaffAppointmentDetailsModel
 @using MediClinic.Application
 @using MediClinic.Domain
 @using MediClinic.Infrastructure.Identity
@@ -7,6 +7,8 @@
 <header class="appointments-heading"><div><p class="eyebrow">RANDEVU YÖNETİMİ</p><h1>Randevu detayı</h1></div><partial name="_StatusBadge" model="item.Status" /></header>
 @if (TempData["Message"] is string message) { <p class="alert" role="status">@message</p> }
 <div asp-validation-summary="All" role="alert"></div>
+<p>Klinik: @item.Clinic - Bölüm: @item.Department</p>
+<p>Ücret: @(item.Price.HasValue ? item.Price.Value.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("tr-TR")) + " TRY" : "Bilinmiyor (eski kayıt)")</p>
 <dl class="booking-summary staff-details">
     <div><dt>Hasta</dt><dd>@Model.Item.Patient</dd></div><div><dt>Doktor</dt><dd>@item.Doctor</dd></div>
     <div><dt>Hizmet</dt><dd>@item.Service</dd></div><div><dt>Şube</dt><dd>@item.Branch</dd></div>

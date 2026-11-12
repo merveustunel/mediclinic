@@ -22,7 +22,7 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
     private IQueryable<Doctor> Doctors => Employees.OfType<Doctor>();
     private static bool Active(Appointment a) => a.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed;
     private async Task<List<Appointment>> Appointments(Guid id) => await db.Appointments
-        .Where(a => EF.Property<Guid>(a, "DoctorKey") == id).ToListAsync();
+        .Include(a => a.Service).Where(a => EF.Property<Guid>(a, "DoctorKey") == id).ToListAsync();
     private async Task Populate(EmployeeEditModel model)
     {
         model.Departments = await Departments.Include(d => d.Branch).ThenInclude(b => b.Clinic).OrderBy(d => d.Name).ToListAsync();
@@ -83,6 +83,8 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
             if ((await Appointments(employee.Id)).Count > 0 || await db.StaffAvailabilities.AnyAsync(a => EF.Property<Guid>(a, "StaffKey") == employee.Id))
                 ModelState.AddModelError(nameof(model.DepartmentId), "Randevusu veya uygunluk kaydı olan çalışan başka bölüme taşınamaz.");
         }
+        if (employee is Doctor && (await Appointments(employee.Id)).Where(Active).Any(a => !model.ServiceIds.Contains(a.Service.Id)))
+            ModelState.AddModelError(nameof(model.ServiceIds), "Aktif randevuların hizmet atamaları kaldırılamaz.");
         var hasAccount = employee is not null && await db.Users.AnyAsync(u => u.StaffId == employee.Id);
         var provision = !hasAccount && !string.IsNullOrWhiteSpace(model.Email);
         if (provision && string.IsNullOrWhiteSpace(model.InitialPassword)) ModelState.AddModelError("", "Hesap oluşturmak için ilk parola zorunludur.");

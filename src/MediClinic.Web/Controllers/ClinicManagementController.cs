@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MediClinic.Infrastructure;
 using MediClinic.Domain;
 using MediClinic.Infrastructure.Identity;
 using MediClinic.Infrastructure.Persistence;
@@ -113,10 +114,16 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
         if (!ModelState.IsValid || !Enum.IsDefined(day)) return BadRequest("Geçersiz gün veya saat.");
         try
         {
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            var proposed = new WorkingHours(Guid.NewGuid(), branchId, day, closed, opens, closes);
+            var active = await db.Appointments.Where(a => EF.Property<Guid>(a.Service.Department, "BranchKey") == branchId &&
+                (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed)).ToListAsync();
+            if (active.Any(a => !AppointmentBooking.BranchOpen(new[] { proposed }, a.StartsAt, a.EndsAt)))
+            { TempData["ManagementError"] = "Bu saatler aktif bir randevuyla uyumlu değil."; return RedirectToAction(nameof(Index), new { branchId }); }
             var hours = await db.WorkingHours.SingleOrDefaultAsync(h => h.BranchId == branchId && h.Day == day);
             if (hours is null) db.WorkingHours.Add(new WorkingHours(Guid.NewGuid(), branchId, day, closed, opens, closes));
             else hours.Update(closed, opens, closes);
-            await db.SaveChangesAsync(); TempData["ManagementSuccess"] = "çalışma saatleri kaydedildi.";
+            await db.SaveChangesAsync(); await transaction.CommitAsync(); TempData["ManagementSuccess"] = "çalışma saatleri kaydedildi.";
         }
         catch (ArgumentException) { TempData["ManagementError"] = "Açılış ve kapanış saatlerini kontrol ediniz; açılış kapanıştan önce olmalıdır."; }
         return RedirectToAction(nameof(Index), new { branchId });

@@ -226,7 +226,7 @@ public sealed class BookingTests
         var migrator = db.GetService<IMigrator>(); await migrator.MigrateAsync("20261105223217_IdentityAuthentication");
         var fixture = new DomainFixture(); var appointment = fixture.Appointment(); await fixture.SeedLegacy(db, appointment);
         await migrator.MigrateAsync(); db.ChangeTracker.Clear();
-        var restored = await db.Appointments.SingleAsync(); Assert.Equal(appointment.Id, restored.Id); Assert.Equal(appointment.EndsAt, restored.EndsAt);
+        var restored = await db.Appointments.SingleAsync(); Assert.Equal(appointment.Id, restored.Id); Assert.Equal(appointment.EndsAt, restored.EndsAt); Assert.Null(restored.Price);
         Assert.Empty(await db.Database.GetPendingMigrationsAsync());
     }
 
@@ -262,7 +262,7 @@ public sealed class BookingTests
         var migrator = db.GetService<IMigrator>(); await migrator.MigrateAsync("20261105223217_IdentityAuthentication");
         var fixture = new DomainFixture(); await fixture.SeedLegacy(db, fixture.Appointment(), fixture.Appointment());
         await Assert.ThrowsAsync<SqliteException>(() => migrator.MigrateAsync());
-        Assert.Equal(2, await db.Appointments.CountAsync());
-        Assert.Equal(3, (await db.Database.GetPendingMigrationsAsync()).Count());
+        Assert.Equal(2, await db.Database.SqlQueryRaw<int>("SELECT COUNT(*) AS Value FROM Appointments").SingleAsync());
+        Assert.Equal(4, (await db.Database.GetPendingMigrationsAsync()).Count());
     }
 }

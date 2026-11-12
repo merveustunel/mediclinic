@@ -20,7 +20,7 @@
 @for (var i = 0; i < fields.Length; i++)
 {
     var field = fields[i];
-    var choices = candidates.Select(x => i switch { 0 => (x.ClinicId, x.Clinic), 1 => (x.BranchId, x.Branch), 2 => (x.DepartmentId, x.Department), 3 => (x.DoctorId, x.Doctor), _ => (x.ServiceId, x.Service) }).Distinct().OrderBy(x => x.Item2, StringComparer.Create(tr, false)).ToArray();
+    var choices = candidates.Select(x => i switch { 0 => (x.ClinicId, x.Clinic), 1 => (x.BranchId, x.Branch), 2 => (x.DepartmentId, x.Department), 3 => (x.DoctorId, x.Doctor), _ => (x.ServiceId, $"{x.Service} - {x.Duration.TotalMinutes} dakika - {x.Price.ToString("N2", tr)} TRY") }).Distinct().OrderBy(x => x.Item2, StringComparer.Create(tr, false)).ToArray();
     <div><label for="@field.Item1">@field.Item2</label><select id="@field.Item1" name="@field.Item1" disabled="@(choices.Length == 0)"><option value="@Guid.Empty">@(choices.Length == 0 ? "Önce üst seçimi tamamlayın" : "Seçin")</option>
     @foreach (var choice in choices) { <option value="@choice.Item1" selected="@(choice.Item1 == field.Item3)">@choice.Item2</option> }
     </select></div>
@@ -35,6 +35,7 @@ else
 {
 var selected = Model.Selection!;
 <section class="card"><h2>@(Model.Stage == 2 ? "2. Tarih ve saat seçin" : "3. Talebinizi kontrol edin")</h2>
+<p>Ücret: @selected.Price.ToString("N2", tr) TRY</p>
 <dl class="booking-summary">
 <div><dt>Klinik</dt><dd>@selected.Clinic</dd></div><div><dt>Şube</dt><dd>@selected.Branch</dd></div><div><dt>Bölüm</dt><dd>@selected.Department</dd></div><div><dt>Doktor</dt><dd>@selected.Doctor</dd></div><div><dt>Hizmet</dt><dd>@selected.Service</dd></div><div><dt>Süre</dt><dd>@selected.Duration.TotalMinutes.ToString(tr) dakika</dd></div>
 @if (Model.Stage == 3) { <div><dt>Tarih</dt><dd>@Model.LocalStart!.Value.ToString("dd MMMM yyyy, dddd", tr)</dd></div><div><dt>Saat</dt><dd>@Model.LocalStart!.Value.ToString("HH:mm", tr)</dd></div> }
@@ -46,7 +47,7 @@ var selected = Model.Selection!;
 <label for="booking-date">Randevu tarihi</label><input id="booking-date" name="Date" type="date" required value="@Model.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"/>
 <button name="Stage" value="2" class="button-secondary">Uygun saatleri göster</button>
 <p>@Model.Date.ToString("dd MMMM yyyy, dddd", tr)</p>
-@if (Model.Slots.Count == 0) { <p class="empty-state" role="status">Bu tarihte uygun saat bulunmuyor. Başka bir tarih seçin.</p> }
+@if (Model.Slots.Count == 0) { <p class="empty-state" role="status">@(selected.ClosedDays?.Contains(Model.Date.DayOfWeek) == true ? "Şube bu tarihte kapalı. Başka bir tarih seçin." : "Bu tarihte uygun saat bulunmuyor. Başka bir tarih seçin.")</p> }
 @if (Model.TimeCards.Count > 0) {
 <fieldset class="booking-times"><legend>Randevu saatleri: uygun bir saat seçin</legend><div class="booking-slot-grid">
 @foreach (var card in Model.TimeCards) {

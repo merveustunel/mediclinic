@@ -51,6 +51,10 @@ namespace MediClinic.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("PatientId");
 
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(11, 2)
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("ServiceKey")
                         .HasColumnType("TEXT")
                         .HasColumnName("ServiceId");

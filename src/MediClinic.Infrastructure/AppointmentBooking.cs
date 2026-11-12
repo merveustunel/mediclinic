@@ -28,6 +28,21 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         var item = await (await Scoped(userId, true, true)).AsNoTracking().Include(x => x.Patient).SingleOrDefaultAsync(x => x.Id == id);
         return item == null ? null : new(Summary(item), item.Patient.FullName);
     }
+    // Missing days remain unrestricted for compatibility with pre-M10 schedules.
+    public static bool BranchOpen(IReadOnlyList<WorkingHours> hours, DateTimeOffset start, DateTimeOffset end)
+    {
+        var localStart = Scheduling.Local(start); var localEnd = Scheduling.Local(end);
+        // Inspect each touched local day; an interval ending at midnight does not touch the next day.
+        for (var date = localStart.Date; date < localEnd; date = date.AddDays(1))
+        {
+            var day = hours.SingleOrDefault(x => x.Day == date.DayOfWeek);
+            if (day is null) continue;
+            if (day.Closed || localStart < date.Add(day.Opens!.Value.ToTimeSpan()) ||
+                localEnd > date.Add(day.Closes!.Value.ToTimeSpan())) return false;
+        }
+        return true;
+    }
+
     private async Task<ApplicationUser> User(string id, string role, bool allowAdmin = false)
     {
         var user = await db.Users.Include(x => x.Patient).Include(x => x.Staff).ThenInclude(x => x!.Department)
@@ -44,10 +59,11 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         await User(userId, AuthRoles.Patient);
         var doctors = await db.Doctors.Include(x => x.Services).Include(x => x.Department).ThenInclude(x => x.Branch).ThenInclude(x => x.Clinic).ToListAsync();
         var services = await db.MedicalServices.Include(x => x.Department).ToListAsync();
+        var closedDays = await db.WorkingHours.AsNoTracking().Where(h => h.Closed).ToListAsync();
         return (from doctor in doctors from service in services where doctor.Offers(service)
             let department = doctor.Department let branch = department.Branch
             select new BookingOption(branch.Clinic.Id, branch.Id, department.Id, doctor.Id, service.Id,
-                branch.Clinic.Name, branch.Name, department.Name, doctor.FullName, service.Name, service.Duration)).ToList();
+                branch.Clinic.Name, branch.Name, department.Name, doctor.FullName, service.Name, service.Duration, service.Price, closedDays.Where(h => h.BranchId == branch.Id).Select(h => h.Day).ToArray())).ToList();
     }
 
     private IQueryable<Appointment> Blocking(Guid doctorId) => db.Appointments.Where(x =>
@@ -57,7 +73,7 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
     public async Task<IReadOnlyList<DateTime>> Slots(string userId, Guid doctorId, Guid serviceId, DateOnly date)
     {
         await User(userId, AuthRoles.Patient);
-        var doctor = await db.Doctors.Include(x => x.Services).Include(x => x.Department).SingleOrDefaultAsync(x => x.Id == doctorId);
+        var doctor = await db.Doctors.Include(x => x.Services).Include(x => x.Department).ThenInclude(x => x.Branch).SingleOrDefaultAsync(x => x.Id == doctorId);
         var service = await db.MedicalServices.Include(x => x.Department).SingleOrDefaultAsync(x => x.Id == serviceId);
         if (doctor == null || service == null || !doctor.Offers(service)) throw new BookingException("Invalid doctor/service selection.");
         if (date < DateOnly.FromDateTime(Scheduling.Local(clock.GetUtcNow())) || date > DateOnly.FromDateTime(Scheduling.Local(clock.GetUtcNow())).AddYears(1))
@@ -70,13 +86,14 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         try { latestEnd = end.Add(service.Duration); }
         catch (ArgumentOutOfRangeException) { latestEnd = DateTimeOffset.MaxValue; }
         var busy = await Blocking(doctorId).Where(x => x.StartsAt < latestEnd && x.EndsAt > start).ToListAsync();
+        var hours = await db.WorkingHours.AsNoTracking().Where(x => x.BranchId == doctor.Department.BranchId).ToListAsync();
         var slots = new List<DateTime>();
         for (var time = start; time < end; time = time.AddMinutes(Scheduling.SlotIntervalMinutes))
         {
             DateTimeOffset finish;
             try { finish = time.Add(service.Duration); }
             catch (ArgumentOutOfRangeException) { continue; }
-            if (time > clock.GetUtcNow() && availability.Any(x => x.Covers(time, finish)) && !busy.Any(x => x.StartsAt < finish && time < x.EndsAt))
+            if (BranchOpen(hours, time, finish) && time > clock.GetUtcNow() && time <= clock.GetUtcNow().AddYears(1) && availability.Any(x => x.Covers(time, finish)) && !busy.Any(x => x.StartsAt < finish && time < x.EndsAt))
                 slots.Add(Scheduling.Local(time));
         }
         return slots;
@@ -95,6 +112,8 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         DateTimeOffset end;
         try { end = start.Add(service.Duration); }
         catch (ArgumentOutOfRangeException) { throw new BookingException("The appointment duration is outside the supported range."); }
+        if (!BranchOpen(await db.WorkingHours.AsNoTracking().Where(x => x.BranchId == request.BranchId).ToListAsync(), start, end))
+            throw new BookingException("The branch is closed or the service extends beyond working hours.");
         if (!await db.StaffAvailabilities.AnyAsync(x => EF.Property<Guid>(x, "StaffKey") == doctor.Id && x.StartsAt <= start && x.EndsAt >= end))
             throw new BookingException("The doctor is unavailable at this time.");
         if (await Blocking(doctor.Id).AnyAsync(x => x.StartsAt < end && start < x.EndsAt)) throw new BookingException("This time is already reserved.");
@@ -110,6 +129,13 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         if (!await db.Doctors.AnyAsync(d => d.Id == doctor.Id && d.Services.Any(s => s.Id == service.Id)) ||
             !await db.StaffAvailabilities.AnyAsync(x => EF.Property<Guid>(x, "StaffKey") == doctor.Id && x.StartsAt <= start && x.EndsAt >= end))
             throw new BookingException("The doctor's services or availability changed. Refresh and try again.");
+        if (start <= clock.GetUtcNow()) throw new BookingException("Choose a future appointment time.");
+        // Re-read after acquiring the SQLite write lock: catalog/hours may have changed since prechecks.
+        if (!BranchOpen(await db.WorkingHours.AsNoTracking().Where(x => x.BranchId == request.BranchId).ToListAsync(), start, end))
+            throw new BookingException("Branch hours changed. Refresh and try again.");
+        var currentService = await db.MedicalServices.AsNoTracking().SingleAsync(x => x.Id == service.Id);
+        if (currentService.Price != service.Price || currentService.Duration != service.Duration)
+            throw new BookingException("Service details changed. Refresh and try again.");
         await transaction!.CommitAsync();
         return appointment.Id;
     }
@@ -117,11 +143,11 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
     private async Task<IQueryable<Appointment>> Scoped(string userId, bool staff, bool allowAdmin = false)
     {
         var user = await User(userId, staff ? AuthRoles.Staff : AuthRoles.Patient, allowAdmin);
-        var query = db.Appointments.Include(x => x.Doctor).Include(x => x.Service).ThenInclude(x => x.Department).ThenInclude(x => x.Branch);
+        var query = db.Appointments.Include(x => x.Doctor).Include(x => x.Service).ThenInclude(x => x.Department).ThenInclude(x => x.Branch).ThenInclude(x => x.Clinic);
         return staff ? query.Where(x => x.Service.Department.Id == user.Staff!.Department.Id)
             : query.Where(x => EF.Property<Guid>(x, "PatientKey") == user.PatientId);
     }
-    private static AppointmentSummary Summary(Appointment x) => new(x.Id, x.Service.Name, x.Doctor.FullName, x.Branch.Name, x.StartsAt, x.EndsAt, x.Status, x.DecisionReason);
+    private static AppointmentSummary Summary(Appointment x) => new(x.Id, x.Service.Name, x.Doctor.FullName, x.Branch.Name, x.StartsAt, x.EndsAt, x.Status, x.DecisionReason, x.Price, x.Branch.Clinic.Name, x.Service.Department.Name);
     public async Task<IReadOnlyList<AppointmentSummary>> List(string userId, bool staff) =>
         (await (await Scoped(userId, staff, true)).OrderByDescending(x => x.StartsAt).ToListAsync()).Select(Summary).ToList();
     public async Task<AppointmentSummary?> Find(string userId, Guid id, bool staff)
