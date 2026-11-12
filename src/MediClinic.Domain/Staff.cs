@@ -13,8 +13,16 @@ public class Staff : Person
         JobTitle = Guard.Required(jobTitle, nameof(jobTitle));
     }
 
-    public Department Department { get; } = null!;
+    public Department Department { get; private set; } = null!;
     public Guid DepartmentId => Department.Id;
-    public string JobTitle { get; } = null!;
+    public string JobTitle { get; private set; } = null!;
     public override string Role => JobTitle;
+
+    public void UpdateEmployment(Department department, string jobTitle)
+    {
+        ArgumentNullException.ThrowIfNull(department);
+        var title = this is Doctor ? "Doctor" : Guard.Required(jobTitle, nameof(jobTitle));
+        Department = department;
+        JobTitle = this is Doctor ? "Doctor" : title;
+    }
 }

@@ -99,6 +99,12 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
             .IsRequired().OnDelete(DeleteBehavior.Restrict);
         staff.Navigation(x => x.Department).UsePropertyAccessMode(PropertyAccessMode.Field);
         modelBuilder.Entity<Doctor>().Property(x => x.Specialty).IsRequired();
+        modelBuilder.Entity<Doctor>().HasMany(x => x.Services).WithMany()
+            .UsingEntity<Dictionary<string, object>>("DoctorServices",
+                right => right.HasOne<MedicalService>().WithMany().HasForeignKey("ServiceId").OnDelete(DeleteBehavior.Restrict),
+                left => left.HasOne<Doctor>().WithMany().HasForeignKey("DoctorId").OnDelete(DeleteBehavior.Restrict),
+                join => join.HasKey("DoctorId", "ServiceId"));
+        modelBuilder.Entity<Doctor>().Navigation(x => x.Services).HasField("_services").UsePropertyAccessMode(PropertyAccessMode.Field);
 
         var availability = Root<StaffAvailability>(modelBuilder, "StaffAvailabilities");
         availability.Ignore(x => x.StaffId);

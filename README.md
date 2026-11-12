@@ -1,5 +1,7 @@
 # MediClinic
 
+M11 adds scoped Turkish **Çalışan yönetimi**, optional Staff account provisioning, explicit doctor-service assignments and appointment-safe availability management. See [M11 migration, authorization, provisioning and M12 notes](docs/staff-management.md). Apply the additive migration explicitly after backup; startup does not update an existing database.
+
 ## M10 institution management
 
 ClinicAdmin users with explicit clinic grants can manage clinics, branches, departments, service duration/decimal TRY prices and branch working hours through **Kurum yönetimi**. The role alone grants no clinic ownership. See [M10 design, safe migration and trusted scope provisioning](docs/clinic-management.md). The additive `ClinicManagement` migration gives existing services a documented 0 TRY default and leaves all administrator grants and working hours unconfigured. Apply it explicitly after backing up the selected database; startup and seeds do not assign access. Working hours will be integrated with booking in M12. Historical M8/M9 audits below describe the earlier submission.

@@ -42,9 +42,9 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
     public async Task<IReadOnlyList<BookingOption>> Options(string userId)
     {
         await User(userId, AuthRoles.Patient);
-        var doctors = await db.Doctors.Include(x => x.Department).ThenInclude(x => x.Branch).ThenInclude(x => x.Clinic).ToListAsync();
+        var doctors = await db.Doctors.Include(x => x.Services).Include(x => x.Department).ThenInclude(x => x.Branch).ThenInclude(x => x.Clinic).ToListAsync();
         var services = await db.MedicalServices.Include(x => x.Department).ToListAsync();
-        return (from doctor in doctors from service in services where doctor.CanProvide(service)
+        return (from doctor in doctors from service in services where doctor.Offers(service)
             let department = doctor.Department let branch = department.Branch
             select new BookingOption(branch.Clinic.Id, branch.Id, department.Id, doctor.Id, service.Id,
                 branch.Clinic.Name, branch.Name, department.Name, doctor.FullName, service.Name, service.Duration)).ToList();
@@ -57,9 +57,9 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
     public async Task<IReadOnlyList<DateTime>> Slots(string userId, Guid doctorId, Guid serviceId, DateOnly date)
     {
         await User(userId, AuthRoles.Patient);
-        var doctor = await db.Doctors.Include(x => x.Department).SingleOrDefaultAsync(x => x.Id == doctorId);
+        var doctor = await db.Doctors.Include(x => x.Services).Include(x => x.Department).SingleOrDefaultAsync(x => x.Id == doctorId);
         var service = await db.MedicalServices.Include(x => x.Department).SingleOrDefaultAsync(x => x.Id == serviceId);
-        if (doctor == null || service == null || !doctor.CanProvide(service)) throw new BookingException("Invalid doctor/service selection.");
+        if (doctor == null || service == null || !doctor.Offers(service)) throw new BookingException("Invalid doctor/service selection.");
         if (date < DateOnly.FromDateTime(Scheduling.Local(clock.GetUtcNow())) || date > DateOnly.FromDateTime(Scheduling.Local(clock.GetUtcNow())).AddYears(1))
             throw new BookingException("Choose a scheduling date within the next year.");
         var start = Scheduling.ToUtc(date.ToDateTime(TimeOnly.MinValue));
@@ -85,9 +85,9 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
     public async Task<Guid> Book(string userId, BookingRequest request)
     {
         var user = await User(userId, AuthRoles.Patient);
-        var doctor = await db.Doctors.Include(x => x.Department).ThenInclude(x => x.Branch).ThenInclude(x => x.Clinic).SingleOrDefaultAsync(x => x.Id == request.DoctorId);
+        var doctor = await db.Doctors.Include(x => x.Services).Include(x => x.Department).ThenInclude(x => x.Branch).ThenInclude(x => x.Clinic).SingleOrDefaultAsync(x => x.Id == request.DoctorId);
         var service = await db.MedicalServices.Include(x => x.Department).ThenInclude(x => x.Branch).SingleOrDefaultAsync(x => x.Id == request.ServiceId);
-        if (doctor == null || service == null || !doctor.CanProvide(service) || service.Department.Id != request.DepartmentId ||
+        if (doctor == null || service == null || !doctor.Offers(service) || service.Department.Id != request.DepartmentId ||
             service.Department.Branch.Id != request.BranchId || doctor.Department.Branch.Clinic.Id != request.ClinicId)
             throw new BookingException("Invalid clinic, branch, department, doctor or service selection.");
         var start = Scheduling.ToUtc(request.LocalStart);
@@ -100,7 +100,17 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         if (await Blocking(doctor.Id).AnyAsync(x => x.StartsAt < end && start < x.EndsAt)) throw new BookingException("This time is already reserved.");
         var appointment = new Appointment(Guid.NewGuid(), user.Patient!, doctor, service, start);
         db.Appointments.Add(appointment);
+        // A deferred transaction lets competing booking INSERTs reach the existing overlap
+        // trigger, while holding the write lock through the final schedule/assignment check.
+        // Management writes use immediate transactions, so they cannot invalidate this check.
+        await db.Database.OpenConnectionAsync();
+        await using var sqliteTransaction = ((SqliteConnection)db.Database.GetDbConnection()).BeginTransaction(deferred: true);
+        await using var transaction = await db.Database.UseTransactionAsync(sqliteTransaction);
         await Save();
+        if (!await db.Doctors.AnyAsync(d => d.Id == doctor.Id && d.Services.Any(s => s.Id == service.Id)) ||
+            !await db.StaffAvailabilities.AnyAsync(x => EF.Property<Guid>(x, "StaffKey") == doctor.Id && x.StartsAt <= start && x.EndsAt >= end))
+            throw new BookingException("The doctor's services or availability changed. Refresh and try again.");
+        await transaction!.CommitAsync();
         return appointment.Id;
     }
 

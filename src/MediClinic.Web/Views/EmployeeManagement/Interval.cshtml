@@ -1,0 +1,11 @@
+@model MediClinic.Web.Models.AvailabilityEditModel
+@{ ViewData["Title"] = "Uygunluk düzenle"; }
+<h1>@Model.DoctorName — Uygunluk</h1>
+<form asp-action="Interval" method="post" class="form-stack">
+    <div asp-validation-summary="All" role="alert"></div>
+    <input asp-for="Id" type="hidden" /><input asp-for="DoctorId" type="hidden" />
+    <label asp-for="StartsAt"></label><input asp-for="StartsAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+    <label asp-for="EndsAt"></label><input asp-for="EndsAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+    <p>Yalnızca gelecek aralıklar düzenlenebilir. Aktif randevuları kapsayan uygunluk korunmalıdır.</p>
+    <button type="submit">Kaydet</button><a asp-action="Availability" asp-route-doctorId="@Model.DoctorId">Uygunluk listesine dön</a>
+</form>

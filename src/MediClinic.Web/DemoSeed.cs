@@ -56,6 +56,7 @@ public static class DemoSeed
                 if (doctor == null)
                 {
                     doctor = new Doctor(Id("doctor/" + name), name, "Demo", department, departmentName);
+                    doctor.AssignServices(department.Services);
                     db.Add(doctor);
                 }
                 doctors.Add(doctor);

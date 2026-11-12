@@ -16,8 +16,15 @@ public sealed class StaffAvailability : Entity
 
     public Staff Staff { get; } = null!;
     public Guid StaffId => Staff.Id;
-    public DateTimeOffset StartsAt { get; }
-    public DateTimeOffset EndsAt { get; }
+    public DateTimeOffset StartsAt { get; private set; }
+    public DateTimeOffset EndsAt { get; private set; }
+
+    public void Reschedule(DateTimeOffset startsAt, DateTimeOffset endsAt)
+    {
+        Guard.TimeRange(startsAt, endsAt);
+        StartsAt = startsAt;
+        EndsAt = endsAt;
+    }
 
     public bool Covers(DateTimeOffset startsAt, DateTimeOffset endsAt)
     {
