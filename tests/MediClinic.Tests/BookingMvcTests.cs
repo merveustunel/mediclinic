@@ -68,7 +68,49 @@ public sealed class BookingMvcTests
         Assert.Equal(data.Fixture.Patient.Id, db.Entry(appointment).Property<Guid>("PatientKey").CurrentValue);
         var cancel = await Post(client, detailsUrl, "/Appointments/Cancel", new() { ["Id"] = appointment.Id.ToString(), ["Reason"] = "Changed plans" });
         Assert.Equal(HttpStatusCode.Redirect, cancel.StatusCode);
-        Assert.Contains("Cancelled", await client.GetStringAsync(detailsUrl));
+        var cancelled = WebUtility.HtmlDecode(await client.GetStringAsync(detailsUrl));
+        Assert.Contains("Cancelled", cancelled);
+        Assert.Contains("Randevu iptal edildi.", cancelled);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    [InlineData(2001)]
+    public async Task CancellationRequiresReasonAndShowsTurkishFeedback(int length)
+    {
+        await using var data = await BookingTests.Database.Create();
+        Guid id;
+        await using (var db = data.Context()) id = await data.Service(db).Book(data.PatientId, data.Request());
+        using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var url = $"/Appointments/Details/{id}";
+        var reason = new string(length > 2000 ? 'x' : ' ', length);
+        var response = await Post(client, url, "/Appointments/Cancel", new() { ["Id"] = id.ToString(), ["Reason"] = reason });
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("İptal gerekçesi zorunludur ve en fazla 2000 karakter olabilir.", WebUtility.HtmlDecode(await client.GetStringAsync(url)));
+        await using var verify = data.Context();
+        Assert.Equal(AppointmentStatus.Pending, (await verify.Appointments.SingleAsync()).Status);
+    }
+
+    [Fact]
+    public async Task RepeatedCancellationShowsTurkishFailureAndPreservesOriginalReason()
+    {
+        await using var data = await BookingTests.Database.Create();
+        Guid id;
+        await using (var db = data.Context())
+        {
+            var service = data.Service(db);
+            id = await service.Book(data.PatientId, data.Request());
+            await service.Act(data.PatientId, id, "Cancel", "İlk gerekçe");
+        }
+        using var site = new Site(data); using var client = await site.Login(data.PatientId);
+        var url = $"/Appointments/Details/{id}";
+        await Post(client, url, "/Appointments/Cancel", new() { ["Id"] = id.ToString(), ["Reason"] = "İkinci gerekçe" });
+        Assert.Contains("Randevu iptal edilemedi. Güncel randevu durumunu kontrol edin.", WebUtility.HtmlDecode(await client.GetStringAsync(url)));
+        await using var verify = data.Context();
+        var item = await verify.Appointments.SingleAsync();
+        Assert.Equal(AppointmentStatus.Cancelled, item.Status);
+        Assert.Equal("İlk gerekçe", item.DecisionReason);
     }
 
     [Fact]
