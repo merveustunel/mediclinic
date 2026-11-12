@@ -120,9 +120,9 @@ public sealed class AppointmentsController(IAppointmentBooking booking, TimeProv
     {
         // Action comes from the endpoint, never from the submitted form.
         ModelState.Remove(nameof(model.Action));
-        if (!ModelState.IsValid) { TempData["Message"] = "A reason of at most 2000 characters is required."; return RedirectToAction(nameof(Details), new { model.Id }); }
-        try { await booking.Act(UserId, model.Id, "Cancel", model.Reason); TempData["Message"] = "Appointment cancelled."; }
-        catch (BookingException ex) { TempData["Message"] = ex.Message; }
+        if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Reason)) { TempData["Message"] = "İptal gerekçesi zorunludur ve en fazla 2000 karakter olabilir."; return RedirectToAction(nameof(Details), new { model.Id }); }
+        try { await booking.Act(UserId, model.Id, "Cancel", model.Reason); TempData["Message"] = "Randevu iptal edildi."; }
+        catch (BookingException) { TempData["Message"] = "Randevu iptal edilemedi. Güncel randevu durumunu kontrol edin."; }
         return RedirectToAction(nameof(Details), new { model.Id });
     }
 }
