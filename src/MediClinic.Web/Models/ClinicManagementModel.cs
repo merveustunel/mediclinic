@@ -44,3 +44,16 @@ public sealed class TryPriceBinder : Microsoft.AspNetCore.Mvc.ModelBinding.IMode
         return Task.CompletedTask;
     }
 }
+
+public sealed class WeeklyHoursModel
+{
+    public Guid BranchId { get; set; }
+    public List<WorkingDayModel> Days { get; set; } = [];
+}
+public sealed class WorkingDayModel
+{
+    public DayOfWeek Day { get; set; }
+    public bool Closed { get; set; }
+    public TimeOnly? Opens { get; set; }
+    public TimeOnly? Closes { get; set; }
+}

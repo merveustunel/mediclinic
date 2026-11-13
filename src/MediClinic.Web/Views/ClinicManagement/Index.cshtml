@@ -25,18 +25,32 @@ else { <a asp-action="Edit" asp-route-kind="Clinic">Klinik oluştur</a> }
 @if (department.Services.Count == 0) { <p>Henüz hizmet yok.</p> }
 <ul>@foreach(var service in department.Services) { <li>@service.Name &middot; @service.Duration.TotalMinutes dakika &middot; @service.Price.ToString("N2") TRY <a asp-action="Edit" asp-route-kind="Service" asp-route-id="@service.Id">Hizmeti düzenle</a></li> }</ul>
 }
-<details><summary>Şube çalışma saatleri</summary><p>Türkiye yerel saati. Tanımlanmamış günler için henüz çalışma saati kaydı yoktur. Randevu uygunluğuna bağlantı M12 kapsamında tamamlanacaktır.</p>
-@for(var day = 0; day < 7; day++) {
+<details open><summary>Şube çalışma saatleri</summary>
+<p>Türkiye yerel saati. Kaydedilen program hasta randevu ekranındaki uygun saatlere uygulanır. Kayıt bulunmayan günler mevcut randevu kurallarında sınırsızdır; haftayı kaydederken her günün durumunu kontrol ediniz.</p>
+<form asp-action="WeeklyHours" method="post" class="weekly-hours">
+<input type="hidden" name="BranchId" value="@branch.Id" />
+<div class="hours-actions"><button type="button" data-weekdays>Hafta içini doldur (09:00–17:00)</button>
+<label>Saat kaynağı <select data-source>@for(var i = 0; i < 7; i++) { var d = (i + 1) % 7; <option value="@d">@days[d]</option> }</select></label>
+<button type="button" data-copy>Açık günlere uygula</button></div>
+<p class="hours-hint">Uygulama yalnızca saatleri kopyalar; kapalı günler kapalı kalır.</p>
+@for(var i = 0; i < 7; i++) {
+var day = (i + 1) % 7;
 var hours = Model.Hours.SingleOrDefault(h => h.BranchId == branch.Id && (int)h.Day == day);
-<form asp-action="Hours" method="post" class="hours-form">
-<input type="hidden" name="branchId" value="@branch.Id" /><input type="hidden" name="day" value="@day" />
-<strong>@days[day]</strong><span>@(hours is null ? "Tanımlanmadı" : hours.Closed ? "Kapalı" : "Açık")</span>
-<label>Kapalı <input type="checkbox" name="closed" value="true" checked="@(hours?.Closed == true)" /></label>
-<label>Açılış <input type="time" name="opens" value="@(hours?.Opens?.ToString("HH:mm"))" /></label>
-<label>Kapanış <input type="time" name="closes" value="@(hours?.Closes?.ToString("HH:mm"))" /></label><button type="submit">Kaydet</button>
-</form>
+var closed = hours?.Closed ?? true;
+<div class="hours-row" data-day="@day">
+<input type="hidden" name="Days[@i].Day" value="@day" />
+<strong>@days[day]</strong>
+<label>Durum <select name="Days[@i].Closed" data-closed><option value="false" selected="@(!closed)">Açık</option><option value="true" selected="@closed">Kapalı</option></select></label>
+<label>Açılış <input type="time" name="Days[@i].Opens" value="@(hours?.Opens?.ToString("HH:mm"))" disabled="@closed" required="@(!closed)" /></label>
+<label>Kapanış <input type="time" name="Days[@i].Closes" value="@(hours?.Closes?.ToString("HH:mm"))" disabled="@closed" required="@(!closed)" /></label>
+</div>
 }
+<p data-status role="status" aria-live="polite"></p>
+<button type="submit">Tüm haftayı kaydet</button>
+</form>
 </details></section>
 }
 </section>
 }
+
+@section Scripts { <script src="~/js/weekly-hours.js" asp-append-version="true"></script> }

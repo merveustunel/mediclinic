@@ -184,3 +184,11 @@ dd { margin-left: 0; font-weight: 500; }
 .form-stack input[type="checkbox"] { width: 1.2rem; min-height: 1.2rem; accent-color: var(--primary); }
 .table-scroll { max-width: 100%; overflow-x: auto; margin-block: 1.5rem; }
 .table-scroll th, .table-scroll td { vertical-align: top; overflow-wrap: anywhere; }
+
+.weekly-hours { max-width: 52rem; margin-block: 1rem; }
+.hours-actions { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; }
+.hours-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: .75rem; align-items: center; padding: .5rem 0; border-bottom: 1px solid #ddd; }
+.hours-row label, .hours-actions label { display: flex; flex-direction: column; gap: .15rem; margin: 0; }
+.hours-row input, .hours-row select { width: 100%; min-width: 0; margin: 0; }
+.hours-hint { font-size: .9rem; }
+@media (max-width: 540px) { .hours-row { grid-template-columns: 1fr 1fr; } }
