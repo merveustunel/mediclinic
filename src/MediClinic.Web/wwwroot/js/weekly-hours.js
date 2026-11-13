@@ -1,0 +1,62 @@
+﻿(() => {
+    document.querySelectorAll('.weekly-hours').forEach(form => {
+        const rows = [...form.querySelectorAll('[data-day]')];
+        const status = form.querySelector('[data-status]');
+        const controls = [...form.querySelectorAll('button, select, input')];
+        const fields = row => [...row.querySelectorAll('input[type="time"]')];
+        const closed = row => row.querySelector('[data-closed]').value === 'true';
+        const sync = row => fields(row).forEach(input => {
+            input.disabled = closed(row);
+            input.required = !closed(row);
+            input.setCustomValidity('');
+        });
+        rows.forEach(row => {
+            row.querySelector('[data-closed]').addEventListener('change', () => sync(row));
+            fields(row).forEach(input => input.addEventListener('input', () => fields(row).forEach(f => f.setCustomValidity(''))));
+            sync(row);
+        });
+        form.querySelector('[data-weekdays]').addEventListener('click', () => {
+            rows.filter(row => +row.dataset.day >= 1 && +row.dataset.day <= 5).forEach(row => {
+                row.querySelector('[data-closed]').value = 'false';
+                fields(row).forEach((input, i) => input.value = i ? '17:00' : '09:00');
+                sync(row);
+            });
+            status.textContent = 'Hafta içi dolduruldu. Değişiklikleri kaydediniz.';
+        });
+        form.querySelector('[data-copy]').addEventListener('click', () => {
+            const source = rows.find(row => row.dataset.day === form.querySelector('[data-source]').value);
+            const times = fields(source).map(input => input.value);
+            if (closed(source) || !times[0] || !times[1] || times[0] >= times[1]) {
+                status.textContent = 'Geçerli saatleri olan açık bir kaynak gün seçiniz.';
+                return;
+            }
+            rows.filter(row => !closed(row)).forEach(row => {
+                fields(row).forEach((input, i) => input.value = times[i]);
+                sync(row);
+            });
+            status.textContent = 'Saatler açık günlere uygulandı. Değişiklikleri kaydediniz.';
+        });
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            rows.forEach(row => {
+                const [opens, closes] = fields(row);
+                closes.setCustomValidity(!closed(row) && opens.value >= closes.value ? 'Kapanış saati açılıştan sonra olmalıdır.' : '');
+            });
+            if (!form.reportValidity()) return;
+            const body = new FormData(form);
+            controls.forEach(control => control.disabled = true);
+            status.textContent = 'Kaydediliyor…';
+            try {
+                const response = await fetch(form.action, { method: 'POST', body, headers: { Accept: 'application/json' } });
+                const result = (response.headers.get('content-type') || '').includes('application/json') ? await response.json() : null;
+                if (!response.ok || !result) throw new Error(result?.message || 'Kayıt yapılamadı. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyiniz.');
+                status.textContent = result.message;
+            } catch (error) {
+                status.textContent = error.message || 'Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz.';
+            } finally {
+                controls.forEach(control => control.disabled = false);
+                rows.forEach(sync);
+            }
+        });
+    });
+})();

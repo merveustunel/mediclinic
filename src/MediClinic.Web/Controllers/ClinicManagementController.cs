@@ -108,6 +108,44 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
         return RedirectToAction(nameof(Index));
     }
     [HttpPost]
+    public async Task<IActionResult> WeeklyHours(WeeklyHoursModel model)
+    {
+        if (!await db.Branches.AnyAsync(b => b.Id == model.BranchId && Scope.Any(c => c.Id == EF.Property<Guid>(b, "ClinicKey")))) return NotFound();
+        if (!ModelState.IsValid || model.Days.Count != 7 || model.Days.Select(d => d.Day).Distinct().Count() != 7 || model.Days.Any(d => !Enum.IsDefined(d.Day)))
+            return BadRequest(new { message = "Haftanın yedi gününü geçerli saatlerle gönderiniz." });
+        List<WorkingHours> proposed;
+        try
+        {
+            proposed = model.Days.Select(d => new WorkingHours(Guid.NewGuid(), model.BranchId, d.Day, d.Closed, d.Opens, d.Closes)).ToList();
+        }
+        catch (ArgumentException)
+        {
+            return BadRequest(new { message = "Açık günlerde açılış ve kapanış saatlerini giriniz; açılış kapanıştan önce olmalıdır." });
+        }
+        try
+        {
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            var active = await db.Appointments.Where(a => EF.Property<Guid>(a.Service.Department, "BranchKey") == model.BranchId &&
+                (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed)).ToListAsync();
+            if (active.Any(a => !AppointmentBooking.BranchOpen(proposed, a.StartsAt, a.EndsAt)))
+                return Conflict(new { message = "Bu program aktif bir randevuyla çakışıyor. Saatleri kontrol ediniz." });
+            var existing = await db.WorkingHours.Where(h => h.BranchId == model.BranchId).ToListAsync();
+            foreach (var day in proposed)
+            {
+                var hours = existing.SingleOrDefault(h => h.Day == day.Day);
+                if (hours is null) db.WorkingHours.Add(day);
+                else hours.Update(day.Closed, day.Opens, day.Closes);
+            }
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return Ok(new { message = "Haftalık çalışma saatleri kaydedildi." });
+        }
+        catch (Exception error) when (error is DbUpdateException or Microsoft.Data.Sqlite.SqliteException)
+        {
+            return StatusCode(500, new { message = "Çalışma saatleri kaydedilemedi. Değerleriniz korunuyor; lütfen tekrar deneyiniz." });
+        }
+    }
+    [HttpPost]
     public async Task<IActionResult> Hours(Guid branchId, DayOfWeek day, bool closed, TimeOnly? opens, TimeOnly? closes)
     {
         if (!await db.Branches.AnyAsync(b => b.Id == branchId && Scope.Any(c => c.Id == EF.Property<Guid>(b, "ClinicKey")))) return NotFound();
