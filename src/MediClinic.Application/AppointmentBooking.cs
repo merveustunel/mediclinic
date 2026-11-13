@@ -21,6 +21,9 @@ public interface IAppointmentBooking
     Task<StaffDashboardData> ClinicAdminDashboard(string userId);
     Task<IReadOnlyList<StaffAppointment>> StaffAppointments(string userId, AppointmentStatus? status, DateOnly? date);
     Task<StaffAppointment?> StaffAppointment(string userId, Guid id);
+    Task<IReadOnlyList<StaffAppointment>> AdminAppointments(string userId, AppointmentStatus? status, DateOnly? from, DateOnly? to);
+    Task<StaffAppointment?> AdminAppointment(string userId, Guid id);
+    Task AdminAct(string userId, Guid id, string action, string? reason);
     Task Act(string userId, Guid id, string action, string? reason);
 }
 

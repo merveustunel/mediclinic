@@ -178,7 +178,7 @@ public sealed class DemoVerificationTests
         var db = scope.ServiceProvider.GetRequiredService<MediClinicDbContext>();
         var booking = scope.ServiceProvider.GetRequiredService<IAppointmentBooking>();
         var patientId = DemoSeed.Id("user/patient").ToString();
-        var option = (await booking.Options(patientId)).First(x => x.Branch == "Central");
+        var option = (await booking.Options(patientId)).First(x => x.Branch == "Merkez");
         var start = await db.StaffAvailabilities.MinAsync(x => x.StartsAt);
         var date = DateOnly.FromDateTime(Scheduling.Local(start));
         var slot = (await booking.Slots(patientId, option.DoctorId, option.ServiceId, date)).First();

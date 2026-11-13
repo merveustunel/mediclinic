@@ -18,7 +18,7 @@ public sealed class AccountController(UserManager<ApplicationUser> users, SignIn
         // Reject privilege/link injection explicitly; the binding model exposes neither.
         if (Request.Form.Keys.Any(k => new[] { "role", "roles", "patientid", "staffid" }.Contains(k.ToLowerInvariant())))
             return BadRequest();
-        if (model.DateOfBirth > DateOnly.FromDateTime(DateTime.UtcNow)) ModelState.AddModelError("DateOfBirth", "Birth date cannot be in the future.");
+        if (model.DateOfBirth > DateOnly.FromDateTime(DateTime.UtcNow)) ModelState.AddModelError("DateOfBirth", "Doğum tarihi gelecekte olamaz.");
         if (!ModelState.IsValid) return View(model);
         await using var transaction = await db.Database.BeginTransactionAsync();
         var patient = new Patient(Guid.NewGuid(), model.FirstName, model.LastName, model.DateOfBirth!.Value);
@@ -40,7 +40,7 @@ public sealed class AccountController(UserManager<ApplicationUser> users, SignIn
         else if (result.Errors.Any(e => e.Code is not ("DuplicateUserName" or "DuplicateEmail")))
         {
             foreach (var error in result.Errors.Where(e => e.Code is not ("DuplicateUserName" or "DuplicateEmail")))
-                ModelState.AddModelError("", error.Description);
+                ModelState.AddModelError("", TurkishIdentityErrors.Message(error.Code));
             return View(model);
         }
         return View("RegistrationComplete");

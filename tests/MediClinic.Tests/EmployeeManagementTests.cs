@@ -106,7 +106,7 @@ public sealed class EmployeeManagementTests
         Assert.Equal(data.Fixture.Department.Id, (await verify.Doctors.Include(d => d.Department).SingleAsync(d => d.Id == data.Fixture.Doctor.Id)).DepartmentId);
         Assert.Equal(data.Fixture.Doctor.Id, (await verify.Appointments.Include(a => a.Doctor).SingleAsync()).DoctorId);
     }
-    private static async Task<HttpClient> Admin(BookingMvcTests.Site site, BookingTests.Database data, bool grant = true)
+    internal static async Task<HttpClient> Admin(BookingMvcTests.Site site, BookingTests.Database data, bool grant = true)
     {
         using var scope = site.Services.CreateScope();
         var roles = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();

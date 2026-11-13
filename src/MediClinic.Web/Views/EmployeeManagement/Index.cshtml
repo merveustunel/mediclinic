@@ -10,7 +10,7 @@
     <tr><td>@employee.FullName</td><td>@(employee is MediClinic.Domain.Doctor d ? "Doktor / " + d.Specialty : "Personel / " + employee.JobTitle)</td>
     <td>@employee.Department.Branch.Clinic.Name / @employee.Department.Branch.Name / @employee.Department.Name</td>
     <td>@(Model.Emails.GetValueOrDefault(employee.Id) ?? "Hesap yok")</td>
-    <td><a asp-action="Edit" asp-route-id="@employee.Id">Düzenle</a>
-    @if (employee is MediClinic.Domain.Doctor) { <a asp-action="Availability" asp-route-doctorId="@employee.Id">Uygunluk</a> }</td></tr>
+    <td><a class="button button-secondary employee-action" aria-label="@(employee.FullName + " bilgilerini düzenle")" asp-action="Edit" asp-route-id="@employee.Id"><span aria-hidden="true">✎</span> Düzenle</a>
+    @if (employee is MediClinic.Domain.Doctor) { <a class="button button-secondary employee-action" aria-label="@(employee.FullName + " uygunluğunu yönet")" asp-action="Availability" asp-route-doctorId="@employee.Id"><span aria-hidden="true">▦</span> Uygunluk</a> }</td></tr>
 }
 </tbody></table></div>

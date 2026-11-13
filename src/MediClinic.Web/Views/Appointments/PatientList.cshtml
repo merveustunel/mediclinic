@@ -17,7 +17,7 @@
            aria-current="@((Model.Status ?? "") == filter.Value ? "page" : null)">@filter.Label</a>
     }
 </nav>
-<p class="field-hint">@Model.Appointments.Count randevu gösteriliyor. Saatler İstanbul saatine (Europe/Istanbul) göre gösterilir.</p>
+<p class="field-hint">@Model.Appointments.Count randevu gösteriliyor. Saatler İstanbul saatine göre gösterilir.</p>
 @if (Model.Appointments.Count == 0)
 {
     <section class="empty-state" aria-labelledby="appointments-empty-title">

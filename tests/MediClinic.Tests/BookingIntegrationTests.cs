@@ -38,7 +38,7 @@ public sealed class BookingIntegrationTests
         foreach (var pair in new[] { (patient, $"/Appointments/Details/{id}"), (staff, $"/StaffAppointments/Details/{id}") })
         {
             var html = await pair.Item1.GetStringAsync(pair.Item2);
-            Assert.Contains("123,45 TRY", html); Assert.Contains(data.Fixture.Clinic.Name, html);
+            Assert.Contains("123,45 TL", html); Assert.Contains(data.Fixture.Clinic.Name, html);
             Assert.Contains(data.Fixture.Department.Name, html); Assert.DoesNotContain("999", html);
         }
     }
