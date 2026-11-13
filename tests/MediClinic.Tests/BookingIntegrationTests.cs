@@ -39,7 +39,9 @@ public sealed class BookingIntegrationTests
         {
             var html = await pair.Item1.GetStringAsync(pair.Item2);
             Assert.Contains("123,45 TL", html); Assert.Contains(data.Fixture.Clinic.Name, html);
-            Assert.Contains(data.Fixture.Department.Name, html); Assert.DoesNotContain("999", html);
+            Assert.Contains(data.Fixture.Department.Name, html);
+            Assert.Contains("data-money=\"123.45\"", html);
+            Assert.DoesNotContain("data-money=\"999\"", html);
         }
     }
 
