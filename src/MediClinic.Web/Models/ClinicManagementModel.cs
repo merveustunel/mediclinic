@@ -40,7 +40,7 @@ public sealed class TryPriceBinder : Microsoft.AspNetCore.Mvc.ModelBinding.IMode
         if (decimal.TryParse(value.FirstValue, System.Globalization.NumberStyles.AllowDecimalPoint | System.Globalization.NumberStyles.AllowLeadingSign,
             System.Globalization.CultureInfo.InvariantCulture, out var price))
             context.Result = Microsoft.AspNetCore.Mvc.ModelBinding.ModelBindingResult.Success(price);
-        else context.ModelState.TryAddModelError(context.ModelName, "Geçerli bir TRY tutarı giriniz.");
+        else context.ModelState.TryAddModelError(context.ModelName, MediClinic.Web.Localization.Ui.Text("Geçerli bir TRY tutarı giriniz."));
         return Task.CompletedTask;
     }
 }

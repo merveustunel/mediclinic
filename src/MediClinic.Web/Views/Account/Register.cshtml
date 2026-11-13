@@ -1,43 +1,43 @@
 @model MediClinic.Web.Models.RegisterModel
-@{ ViewData["Title"] = "Hasta kaydı"; }
+@{ ViewData["Title"] = Ui.Text("Hasta kaydı"); }
 <section class="auth-panel" aria-labelledby="auth-title">
-    <p class="eyebrow">MEDICLINIC’E KATILIN</p>
-    <h1 id="auth-title">Hasta kaydı</h1>
-    <p class="auth-intro">Hasta hesabınızı oluşturmak için bilgilerinizi girin. Tüm alanlar zorunludur.</p>
+    <p class="eyebrow">@Ui.Text("MEDICLINIC’E KATILIN")</p>
+    <h1 id="auth-title">@Ui.Text("Hasta kaydı")</h1>
+    <p class="auth-intro">@Ui.Text("Hasta hesabınızı oluşturmak için bilgilerinizi girin. Tüm alanlar zorunludur.")</p>
     <form asp-action="Register" method="post" class="auth-form">
-        <div asp-validation-summary="All" role="alert" aria-label="Kayıt hataları"><p>İşlem tamamlanamadı. Aşağıdaki bilgileri kontrol edin.</p></div>
+        <div asp-validation-summary="All" role="alert" aria-label="@Ui.Text("Kayıt hataları")"><p>@Ui.Text("İşlem tamamlanamadı. Aşağıdaki bilgileri kontrol edin.")</p></div>
         <div class="auth-name-grid">
             <div class="auth-field">
-                <label asp-for="FirstName">Ad</label>
+                <label asp-for="FirstName">@Ui.Text("Ad")</label>
                 <input asp-for="FirstName" autocomplete="given-name" aria-describedby="FirstName-error" aria-invalid="@(ViewData.ModelState["FirstName"]?.Errors.Count > 0 ? "true" : null)" />
                 <span asp-validation-for="FirstName" id="FirstName-error" class="field-error"></span>
             </div>
             <div class="auth-field">
-                <label asp-for="LastName">Soyad</label>
+                <label asp-for="LastName">@Ui.Text("Soyad")</label>
                 <input asp-for="LastName" autocomplete="family-name" aria-describedby="LastName-error" aria-invalid="@(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "true" : null)" />
                 <span asp-validation-for="LastName" id="LastName-error" class="field-error"></span>
             </div>
         </div>
         <div class="auth-field">
-            <label asp-for="Email">E-posta</label>
+            <label asp-for="Email">@Ui.Text("E-posta")</label>
             <input asp-for="Email" autocomplete="email" aria-describedby="Email-error" aria-invalid="@(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "true" : null)" />
             <span asp-validation-for="Email" id="Email-error" class="field-error"></span>
         </div>
         <div class="auth-field">
-            <label asp-for="Password">Parola</label>
+            <label asp-for="Password">@Ui.Text("Parola")</label>
             <div class="password-control">
                 <input asp-for="Password" autocomplete="new-password" aria-describedby="Password-error Password-hint" aria-invalid="@(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "true" : null)" />
-                <button type="button" class="button-secondary password-toggle" data-password-toggle="Password" aria-controls="Password" aria-pressed="false" hidden>Parolayı göster</button>
+                <button type="button" class="button-secondary password-toggle" data-password-toggle="Password" aria-controls="Password" aria-pressed="false" hidden>@Ui.Text("Parolayı göster")</button>
             </div>
-            <p id="Password-hint" class="field-hint">Büyük harf, küçük harf, rakam ve simge içeren en az 12 karakter kullanın.</p>
+            <p id="Password-hint" class="field-hint">@Ui.Text("Büyük harf, küçük harf, rakam ve simge içeren en az 12 karakter kullanın.")</p>
             <span asp-validation-for="Password" id="Password-error" class="field-error"></span>
         </div>
         <div class="auth-field">
-            <label asp-for="DateOfBirth">Doğum tarihi</label>
+            <label asp-for="DateOfBirth">@Ui.Text("Doğum tarihi")</label>
             <input asp-for="DateOfBirth" autocomplete="bday" aria-describedby="DateOfBirth-error" aria-invalid="@(ViewData.ModelState["DateOfBirth"]?.Errors.Count > 0 ? "true" : null)" />
             <span asp-validation-for="DateOfBirth" id="DateOfBirth-error" class="field-error"></span>
         </div>
-        <button type="submit" class="auth-submit">Kayıt ol</button>
+        <button type="submit" class="auth-submit">@Ui.Text("Kayıt ol")</button>
     </form>
-    <p class="auth-footer">Zaten hesabınız var mı? <a asp-action="Login">Giriş yapın</a></p>
+    <p class="auth-footer">@Ui.Text("Zaten hesabınız var mı?") <a asp-action="Login">@Ui.Text("Giriş yapın")</a></p>
 </section>

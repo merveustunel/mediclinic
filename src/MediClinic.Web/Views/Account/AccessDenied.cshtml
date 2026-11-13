@@ -1,17 +1,17 @@
-@{ ViewData["Title"] = "Erişim engellendi"; }
+@{ ViewData["Title"] = Ui.Text("Erişim engellendi"); }
 <section class="auth-panel auth-result" aria-labelledby="auth-title">
     <span class="auth-mark" aria-hidden="true">!</span>
-    <p class="eyebrow">ERİŞİM YETKİSİ GEREKİYOR</p>
-    <h1 id="auth-title">Erişim engellendi</h1>
-    <p class="auth-intro">Hesabınızın bu sayfaya erişim yetkisi bulunmuyor.</p>
-    <p>Menüden hesabınıza açık sayfalara ulaşabilirsiniz.</p>
+    <p class="eyebrow">@Ui.Text("ERİŞİM YETKİSİ GEREKİYOR")</p>
+    <h1 id="auth-title">@Ui.Text("Erişim engellendi")</h1>
+    <p class="auth-intro">@Ui.Text("Hesabınızın bu sayfaya erişim yetkisi bulunmuyor.")</p>
+    <p>@Ui.Text("Menüden hesabınıza açık sayfalara ulaşabilirsiniz.")</p>
     @if (User.Identity?.IsAuthenticated == true)
     {
-        <a class="button" asp-controller="Dashboard" asp-action="Index">Panelime dön</a>
+        <a class="button" asp-controller="Dashboard" asp-action="Index">@Ui.Text("Panelime dön")</a>
     }
     else
     {
-        <a class="button" asp-action="Login">Giriş yap</a>
+        <a class="button" asp-action="Login">@Ui.Text("Giriş yap")</a>
     }
-    <a class="auth-home" asp-controller="Home" asp-action="Index">Ana sayfaya dön</a>
+    <a class="auth-home" asp-controller="Home" asp-action="Index">@Ui.Text("Ana sayfaya dön")</a>
 </section>

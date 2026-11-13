@@ -6,7 +6,7 @@ namespace MediClinic.Web.Models;
 public sealed record PatientAppointmentsModel(
     IReadOnlyList<AppointmentSummary> Appointments, int TotalCount, string? Status)
 {
-    public static IReadOnlyList<(string Value, string Label)> Filters { get; } = Array.AsReadOnly(new[]
+    public static IReadOnlyList<(string Value, string Label)> Filters => Array.AsReadOnly(new[]
     {
         ("", "Tümü"), ("Pending", "Beklemede"), ("Confirmed", "Onaylandı"),
         ("Completed", "Tamamlandı"), ("Cancelled", "İptal edildi"), ("Rejected", "Reddedildi")

@@ -35,7 +35,7 @@ test('success, validation and network failures preserve input and restore contro
     const submit = () => a.form.submit({ preventDefault() { prevented++; } });
     await submit(); assert.equal(a.status.textContent, 'Saved'); assert.equal(a.requests[0].options.body.token, 'antiforgery');
     a.requests.invalid = true; await submit(); assert.equal(a.status.textContent, 'Invalid hours');
-    a.requests.fail = true; await submit(); assert.equal(a.status.textContent, 'Network error');
+    a.requests.fail = true; await submit(); assert.equal(a.status.textContent, 'Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz.');
     assert.equal(a.rows[1].inputs[0].value, '09:00'); assert.equal(a.rows[1].inputs[0].disabled, false); assert.equal(a.rows[0].inputs[0].disabled, true);
     assert.equal(prevented, 3);
 });

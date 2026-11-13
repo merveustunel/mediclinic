@@ -1,21 +1,21 @@
 @model WeeklyAvailabilityModel
-@{ ViewData["Title"] = "Haftalık doktor uygunluğu"; }
-<h1>@Model.DoctorName — Haftalık uygunluk oluştur</h1>
-<p>Seçtiğiniz günler için ayrı tarih aralıkları oluşturulur. Bu işlem şubenin çalışma saatlerini değiştirmez. Randevu alınabilmesi için hem doktorun uygun hem şubenin açık olması gerekir.</p>
+@{ ViewData["Title"] = Ui.Text("Haftalık doktor uygunluğu"); }
+<h1>@Ui.Format("{0} — Haftalık uygunluk oluştur", Model.DoctorName)</h1>
+<p>@Ui.Text("Seçtiğiniz günler için ayrı tarih aralıkları oluşturulur. Bu işlem şubenin çalışma saatlerini değiştirmez. Randevu alınabilmesi için hem doktorun uygun hem şubenin açık olması gerekir.")</p>
 <form asp-action="Weekly" method="post" class="form-stack">
     <div asp-validation-summary="All" role="alert"></div>
     <input asp-for="DoctorId" type="hidden" />
-    <label asp-for="From">İlk tarih (dahil)</label><input asp-for="From" type="date" />
-    <label asp-for="To">Son tarih (dahil, en fazla 91 gün)</label><input asp-for="To" type="date" />
-    <fieldset><legend>Tekrarlanacak günler</legend>
+    <label asp-for="From">@Ui.Text("İlk tarih (dahil)")</label><input asp-for="From" type="date" />
+    <label asp-for="To">@Ui.Text("Son tarih (dahil, en fazla 91 gün)")</label><input asp-for="To" type="date" />
+    <fieldset><legend>@Ui.Text("Tekrarlanacak günler")</legend>
     @foreach (var day in new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday })
     {
-        <label><input type="checkbox" name="Days" value="@day" checked="@(Model.Days.Contains(day))" /> @System.Globalization.CultureInfo.GetCultureInfo("tr-TR").DateTimeFormat.GetDayName(day)</label>
+        <label><input type="checkbox" name="Days" value="@day" checked="@(Model.Days.Contains(day))" /> @Ui.Text(day.ToString() switch { "Monday" => "Pazartesi", "Tuesday" => "Salı", "Wednesday" => "Çarşamba", "Thursday" => "Perşembe", "Friday" => "Cuma", "Saturday" => "Cumartesi", _ => "Pazar" })</label>
     }
     </fieldset>
-    <label asp-for="Opens">Her gün başlangıç saati (İstanbul)</label><input asp-for="Opens" type="time" />
-    <label asp-for="Closes">Her gün bitiş saati (İstanbul)</label><input asp-for="Closes" type="time" />
-    <p>Öğle arası için sabah ve öğleden sonra aralıklarını ayrı ayrı oluşturabilirsiniz. Çakışma varsa işlemin tamamı iptal edilir; mevcut uygunluk ve randevular korunur.</p>
-    <button type="submit">Günlük aralıkları oluştur</button>
-    <a asp-action="Availability" asp-route-doctorId="@Model.DoctorId">Uygunluk listesine dön</a>
+    <label asp-for="Opens">@Ui.Text("Her gün başlangıç saati (İstanbul)")</label><input asp-for="Opens" type="time" />
+    <label asp-for="Closes">@Ui.Text("Her gün bitiş saati (İstanbul)")</label><input asp-for="Closes" type="time" />
+    <p>@Ui.Text("Öğle arası için sabah ve öğleden sonra aralıklarını ayrı ayrı oluşturabilirsiniz. Çakışma varsa işlemin tamamı iptal edilir; mevcut uygunluk ve randevular korunur.")</p>
+    <button type="submit">@Ui.Text("Günlük aralıkları oluştur")</button>
+    <a asp-action="Availability" asp-route-doctorId="@Model.DoctorId">@Ui.Text("Uygunluk listesine dön")</a>
 </form>

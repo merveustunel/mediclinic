@@ -1,10 +1,10 @@
-@{ ViewData["Title"] = "Kayıt talebiniz alındı"; }
+@{ ViewData["Title"] = Ui.Text("Kayıt talebiniz alındı"); }
 <section class="auth-panel auth-result" aria-labelledby="auth-title">
     <span class="auth-mark" aria-hidden="true">✓</span>
-    <p class="eyebrow">SONRAKİ ADIM</p>
-    <h1 id="auth-title">Kayıt talebiniz alındı</h1>
-    <p class="auth-intro">Bilgileriniz uygunsa hesabınız hazırdır. Giriş yapmayı deneyebilirsiniz.</p>
-    <p>Devam etmek için e-posta adresinizi ve parolanızı kullanarak giriş yapın.</p>
-    <a class="button" asp-action="Login">Giriş yap</a>
-    <a class="auth-home" asp-controller="Home" asp-action="Index">Ana sayfaya dön</a>
+    <p class="eyebrow">@Ui.Text("SONRAKİ ADIM")</p>
+    <h1 id="auth-title">@Ui.Text("Kayıt talebiniz alındı")</h1>
+    <p class="auth-intro">@Ui.Text("Bilgileriniz uygunsa hesabınız hazırdır. Giriş yapmayı deneyebilirsiniz.")</p>
+    <p>@Ui.Text("Devam etmek için e-posta adresinizi ve parolanızı kullanarak giriş yapın.")</p>
+    <a class="button" asp-action="Login">@Ui.Text("Giriş yap")</a>
+    <a class="auth-home" asp-controller="Home" asp-action="Index">@Ui.Text("Ana sayfaya dön")</a>
 </section>

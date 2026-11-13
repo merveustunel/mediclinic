@@ -213,7 +213,7 @@ public sealed class AuthenticationTests
         foreach (var target in AuthRoles.All)
             Assert.Equal(target == role ? HttpStatusCode.OK : HttpStatusCode.Redirect, (await client.GetAsync("/Dashboard/" + target)).StatusCode);
         var shell = WebUtility.HtmlDecode(await client.GetStringAsync("/Dashboard/" + role));
-        Assert.Contains("<html lang=\"tr\">", shell);
+        Assert.Contains("<html lang=\"tr\" ", shell);
         Assert.Contains("href=\"#main-content\"", shell);
         Assert.Contains("aria-current=\"page\"", shell);
         Assert.Contains("action=\"/Account/Logout\"", shell);

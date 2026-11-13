@@ -1,46 +1,46 @@
 @model MediClinic.Web.Models.ClinicManagementModel
-@{ ViewData["Title"] = "Kurum yönetimi"; string[] days = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"]; }
+@{ ViewData["Title"] = Ui.Text("Kurum yönetimi"); string[] days = [Ui.Text("Pazar"), Ui.Text("Pazartesi"), Ui.Text("Salı"), Ui.Text("Çarşamba"), Ui.Text("Perşembe"), Ui.Text("Cuma"), Ui.Text("Cumartesi")]; }
 <div class="clinic-management">
-<h1>Kurum yönetimi</h1>
-<p>Klinik, şube, bölüm ve hizmetlerinizi yönetin.</p>
+<h1>@Ui.Text("Kurum yönetimi")</h1>
+<p>@Ui.Text("Klinik, şube, bölüm ve hizmetlerinizi yönetin.")</p>
 @if (TempData["ManagementSuccess"] is string success) { <p class="alert" role="status">@success</p> }
 @if (TempData["ManagementError"] is string error) { <p class="alert alert-danger" role="alert">@error</p> }
-@if (Model.Clinics.Count == 0) { <p>Yetkili olduğunuz klinik bulunmuyor. Klinik yetkisi için sistem sorumlusuna başvurunuz.</p> }
-else { <a class="button button-secondary" asp-action="Edit" asp-route-kind="Clinic">Klinik oluştur</a> }
-<form method="get" class="filter-form catalog-filters" aria-label="Kurum filtreleri">
-<label for="clinicId">Klinik</label><select id="clinicId" name="clinicId"><option value="">Tüm klinikler</option>@foreach(var c in Model.Clinics) { <option value="@c.Id" selected="@(c.Id == Model.ClinicId)">@c.Name</option> }</select>
-<label for="branchId">Şube</label><select id="branchId" name="branchId"><option value="">Tüm şubeler</option>@foreach(var b in Model.Clinics.SelectMany(c => c.Branches).Where(b => !Model.ClinicId.HasValue || b.ClinicId == Model.ClinicId)) { <option value="@b.Id" selected="@(b.Id == Model.BranchId)">@b.Name</option> }</select>
-<label for="departmentId">Bölüm</label><select id="departmentId" name="departmentId"><option value="">Tüm bölümler</option>@foreach(var d in Model.Clinics.SelectMany(c => c.Branches).Where(b => (!Model.ClinicId.HasValue || b.ClinicId == Model.ClinicId) && (!Model.BranchId.HasValue || b.Id == Model.BranchId)).SelectMany(b => b.Departments)) { <option value="@d.Id" selected="@(d.Id == Model.DepartmentId)">@d.Name</option> }</select>
-<button type="submit">Filtrele</button><a class="button button-secondary" asp-action="Index">Temizle</a>
+@if (Model.Clinics.Count == 0) { <p>@Ui.Text("Yetkili olduğunuz klinik bulunmuyor. Klinik yetkisi için sistem sorumlusuna başvurunuz.")</p> }
+else { <a class="button button-secondary" asp-action="Edit" asp-route-kind="Clinic">@Ui.Text("Klinik oluştur")</a> }
+<form method="get" class="filter-form catalog-filters" aria-label="@Ui.Text("Kurum filtreleri")">
+<label for="clinicId">@Ui.Text("Klinik")</label><select id="clinicId" name="clinicId"><option value="">@Ui.Text("Tüm klinikler")</option>@foreach(var c in Model.Clinics) { <option data-user-content value="@c.Id" selected="@(c.Id == Model.ClinicId)">@c.Name</option> }</select>
+<label for="branchId">@Ui.Text("Şube")</label><select id="branchId" name="branchId"><option value="">@Ui.Text("Tüm şubeler")</option>@foreach(var b in Model.Clinics.SelectMany(c => c.Branches).Where(b => !Model.ClinicId.HasValue || b.ClinicId == Model.ClinicId)) { <option data-user-content value="@b.Id" selected="@(b.Id == Model.BranchId)">@b.Name</option> }</select>
+<label for="departmentId">@Ui.Text("Bölüm")</label><select id="departmentId" name="departmentId"><option value="">@Ui.Text("Tüm bölümler")</option>@foreach(var d in Model.Clinics.SelectMany(c => c.Branches).Where(b => (!Model.ClinicId.HasValue || b.ClinicId == Model.ClinicId) && (!Model.BranchId.HasValue || b.Id == Model.BranchId)).SelectMany(b => b.Departments)) { <option data-user-content value="@d.Id" selected="@(d.Id == Model.DepartmentId)">@d.Name</option> }</select>
+<button type="submit">@Ui.Text("Filtrele")</button><a class="button button-secondary" asp-action="Index">@Ui.Text("Temizle")</a>
 </form>
 @foreach (var clinic in Model.Clinics.Where(c => !Model.ClinicId.HasValue || c.Id == Model.ClinicId)) {
-<section class="card clinic-card" aria-labelledby="clinic-@clinic.Id"><header class="catalog-heading"><div><p class="eyebrow">Klinik</p><h2 id="clinic-@clinic.Id">@clinic.Name</h2></div><div class="catalog-actions">
-<a class="button button-secondary" asp-action="Edit" asp-route-kind="Clinic" asp-route-id="@clinic.Id">Kliniği düzenle</a> <a class="button button-secondary" asp-action="Edit" asp-route-kind="Branch" asp-route-parentId="@clinic.Id">Şube oluştur</a></div></header>
-@if (clinic.Branches.Count == 0) { <p>Henüz Şube yok.</p> }
+<section class="card clinic-card" aria-labelledby="clinic-@clinic.Id"><header class="catalog-heading"><div><p class="eyebrow">@Ui.Text("Klinik")</p><h2 data-user-content id="clinic-@clinic.Id">@clinic.Name</h2></div><div class="catalog-actions">
+<a class="button button-secondary" asp-action="Edit" asp-route-kind="Clinic" asp-route-id="@clinic.Id">@Ui.Text("Kliniği düzenle")</a> <a class="button button-secondary" asp-action="Edit" asp-route-kind="Branch" asp-route-parentId="@clinic.Id">@Ui.Text("Şube oluştur")</a></div></header>
+@if (clinic.Branches.Count == 0) { <p>@Ui.Text("Henüz Şube yok.")</p> }
 @foreach (var branch in clinic.Branches.Where(b => !Model.BranchId.HasValue || b.Id == Model.BranchId)) {
     var savedHours = Model.Hours.Where(h => h.BranchId == branch.Id).OrderBy(h => ((int)h.Day + 6) % 7).ToList();
-    var scheduleSummary = savedHours.Count == 0 ? "Henüz haftalık program kaydedilmedi." : string.Join(" · ", savedHours.Select(h => $"{days[(int)h.Day]}: {(h.Closed ? "Kapalı" : $"{h.Opens:HH:mm}–{h.Closes:HH:mm}")}"));
-<section class="branch-card" aria-labelledby="branch-@branch.Id"><header class="catalog-heading"><div><p class="eyebrow">Şube</p><h3 id="branch-@branch.Id">@branch.Name</h3><p class="branch-address">@branch.Address</p></div><div class="catalog-actions">
-<a class="button button-secondary" asp-action="Edit" asp-route-kind="Branch" asp-route-id="@branch.Id">Şubeyi düzenle</a> <a class="button button-secondary" asp-action="Edit" asp-route-kind="Department" asp-route-parentId="@branch.Id">Bölüm oluştur</a></div></header>
-@if (branch.Departments.Count == 0) { <p>Henüz bölüm yok.</p> }
+    var scheduleSummary = savedHours.Count == 0 ? Ui.Text("Henüz haftalık program kaydedilmedi.") : string.Join(" · ", savedHours.Select(h => $"{days[(int)h.Day]}: {(h.Closed ? "Kapalı" : $"{h.Opens:HH:mm}–{h.Closes:HH:mm}")}"));
+<section class="branch-card" aria-labelledby="branch-@branch.Id"><header class="catalog-heading"><div><p class="eyebrow">@Ui.Text("Şube")</p><h3 data-user-content id="branch-@branch.Id">@branch.Name</h3><p data-user-content class="branch-address">@branch.Address</p></div><div class="catalog-actions">
+<a class="button button-secondary" asp-action="Edit" asp-route-kind="Branch" asp-route-id="@branch.Id">@Ui.Text("Şubeyi düzenle")</a> <a class="button button-secondary" asp-action="Edit" asp-route-kind="Department" asp-route-parentId="@branch.Id">@Ui.Text("Bölüm oluştur")</a></div></header>
+@if (branch.Departments.Count == 0) { <p>@Ui.Text("Henüz bölüm yok.")</p> }
 @foreach(var department in branch.Departments.Where(d => !Model.DepartmentId.HasValue || d.Id == Model.DepartmentId)) {
-<section class="department-card" aria-labelledby="department-@department.Id"><header class="catalog-heading"><div><p class="eyebrow">Bölüm</p><h4 id="department-@department.Id">@department.Name</h4></div>
-<div class="catalog-actions"><a class="button button-secondary" asp-action="Edit" asp-route-kind="Department" asp-route-id="@department.Id">Bölümü düzenle</a> <a class="button button-secondary" asp-action="Edit" asp-route-kind="Service" asp-route-parentId="@department.Id">Hizmet oluştur</a></div></header>
-@if (department.Services.Count == 0) { <p>Henüz hizmet yok.</p> }
+<section class="department-card" aria-labelledby="department-@department.Id"><header class="catalog-heading"><div><p class="eyebrow">@Ui.Text("Bölüm")</p><h4 data-user-content id="department-@department.Id">@department.Name</h4></div>
+<div class="catalog-actions"><a class="button button-secondary" asp-action="Edit" asp-route-kind="Department" asp-route-id="@department.Id">@Ui.Text("Bölümü düzenle")</a> <a class="button button-secondary" asp-action="Edit" asp-route-kind="Service" asp-route-parentId="@department.Id">@Ui.Text("Hizmet oluştur")</a></div></header>
+@if (department.Services.Count == 0) { <p>@Ui.Text("Henüz hizmet yok.")</p> }
 <ul class="service-list">@foreach(var service in department.Services) {
-<li><div class="service-info"><h5>@service.Name</h5><dl><div><dt>Süre</dt><dd>@service.Duration.TotalMinutes dakika</dd></div><div><dt>Fiyat</dt><dd>@service.Price.ToString("N2") TL</dd></div></dl></div>
-<a class="button button-secondary" asp-action="Edit" asp-route-kind="Service" asp-route-id="@service.Id" aria-label="@("Hizmeti düzenle: " + service.Name)">Hizmeti düzenle</a></li>
+<li><div class="service-info"><h5 data-user-content>@service.Name</h5><dl><div><dt>@Ui.Text("Süre")</dt><dd>@service.Duration.TotalMinutes @Ui.Text("dakika")</dd></div><div><dt>@Ui.Text("Fiyat")</dt><dd><span data-money="@service.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Ui.Money(service.Price)</span></dd></div></dl></div>
+<a class="button button-secondary" asp-action="Edit" asp-route-kind="Service" asp-route-id="@service.Id" aria-label="@(Ui.Format("Hizmeti düzenle: {0}", service.Name))">@Ui.Text("Hizmeti düzenle")</a></li>
 }</ul>
 </section>
 }
-<details class="branch-hours"><summary><span class="hours-title"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Çalışma saatlerini düzenle<span class="visually-hidden"> — @branch.Name</span></span><span class="hours-summary" data-hours-summary>@scheduleSummary</span></summary>
-<p>Türkiye yerel saati. Kaydedilen program hasta randevu ekranındaki uygun saatlere uygulanır. Henüz kaydedilmemiş günlerde şube saat kısıtlaması uygulanmaz. İlk kayıtta yedi günün tamamı kaydedilir; kaydetmeden önce açık ve kapalı günleri kontrol edin.</p>
+<details class="branch-hours"><summary><span class="hours-title"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>@Ui.Text("Çalışma saatlerini düzenle")<span class="visually-hidden"> — @branch.Name</span></span><span class="hours-summary" data-hours-summary>@scheduleSummary</span></summary>
+<p>@Ui.Text("Türkiye yerel saati. Kaydedilen program hasta randevu ekranındaki uygun saatlere uygulanır. Henüz kaydedilmemiş günlerde şube saat kısıtlaması uygulanmaz. İlk kayıtta yedi günün tamamı kaydedilir; kaydetmeden önce açık ve kapalı günleri kontrol edin.")</p>
 <form asp-action="WeeklyHours" method="post" class="weekly-hours">
 <input type="hidden" name="BranchId" value="@branch.Id" />
-<div class="hours-actions"><button type="button" data-weekdays>Hafta içini doldur (09:00–17:00)</button>
-<label>Saat kaynağı <select data-source>@for(var i = 0; i < 7; i++) { var d = (i + 1) % 7; <option value="@d">@days[d]</option> }</select></label>
-<button type="button" data-copy>Açık günlere uygula</button></div>
-<p class="hours-hint">Uygulama yalnızca saatleri kopyalar; kapalı günler kapalı kalır.</p>
+<div class="hours-actions"><button type="button" data-weekdays>@Ui.Text("Hafta içini doldur (09:00–17:00)")</button>
+<label>@Ui.Text("Saat kaynağı") <select data-source>@for(var i = 0; i < 7; i++) { var d = (i + 1) % 7; <option value="@d">@days[d]</option> }</select></label>
+<button type="button" data-copy>@Ui.Text("Açık günlere uygula")</button></div>
+<p class="hours-hint">@Ui.Text("Uygulama yalnızca saatleri kopyalar; kapalı günler kapalı kalır.")</p>
 @for(var i = 0; i < 7; i++) {
 var day = (i + 1) % 7;
 var hours = Model.Hours.SingleOrDefault(h => h.BranchId == branch.Id && (int)h.Day == day);
@@ -48,13 +48,13 @@ var closed = hours?.Closed ?? true;
 <div class="hours-row" data-day="@day" data-day-name="@days[day]">
 <input type="hidden" name="Days[@i].Day" value="@day" />
 <strong>@days[day]</strong>
-<label>Durum <select name="Days[@i].Closed" data-closed><option value="false" selected="@(!closed)">Açık</option><option value="true" selected="@closed">Kapalı</option></select></label>
-<label>Açılış <input type="time" name="Days[@i].Opens" value="@(hours?.Opens?.ToString("HH:mm"))" disabled="@closed" required="@(!closed)" /></label>
-<label>Kapanış <input type="time" name="Days[@i].Closes" value="@(hours?.Closes?.ToString("HH:mm"))" disabled="@closed" required="@(!closed)" /></label>
+<label>@Ui.Text("Durum") <select name="Days[@i].Closed" data-closed><option value="false" selected="@(!closed)">@Ui.Text("Açık")</option><option value="true" selected="@closed">@Ui.Text("Kapalı")</option></select></label>
+<label>@Ui.Text("Açılış") <input type="time" name="Days[@i].Opens" value="@(hours?.Opens?.ToString("HH:mm"))" disabled="@closed" required="@(!closed)" /></label>
+<label>@Ui.Text("Kapanış") <input type="time" name="Days[@i].Closes" value="@(hours?.Closes?.ToString("HH:mm"))" disabled="@closed" required="@(!closed)" /></label>
 </div>
 }
 <p data-status role="status" aria-live="polite"></p>
-<button type="submit">Tüm haftayı kaydet</button>
+<button type="submit">@Ui.Text("Tüm haftayı kaydet")</button>
 </form>
 </details></section>
 }

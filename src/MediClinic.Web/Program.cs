@@ -1,3 +1,5 @@
+using MediClinic.Web.Localization;
+using Microsoft.AspNetCore.Localization;
 using MediClinic.Infrastructure.Identity;
 using MediClinic.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -6,25 +8,27 @@ using MediClinic.Infrastructure;
 using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddControllersWithViews(options =>
 {
     var messages = options.ModelBindingMessageProvider;
-    messages.SetAttemptedValueIsInvalidAccessor((value, field) => "Geçerli bir değer giriniz.");
-    messages.SetNonPropertyAttemptedValueIsInvalidAccessor(value => "Geçerli bir değer giriniz.");
-    messages.SetValueIsInvalidAccessor(value => "Geçerli bir değer giriniz.");
-    messages.SetValueMustNotBeNullAccessor(value => "Bu alan zorunludur.");
-    messages.SetMissingBindRequiredValueAccessor(field => "Bu alan zorunludur.");
-    messages.SetValueMustBeANumberAccessor(field => "Geçerli bir sayı giriniz.");
-    messages.SetNonPropertyValueMustBeANumberAccessor(() => "Geçerli bir sayı giriniz.");
-    messages.SetUnknownValueIsInvalidAccessor(field => "Geçerli bir değer giriniz.");
-    messages.SetNonPropertyUnknownValueIsInvalidAccessor(() => "Geçerli bir değer giriniz.");
-    messages.SetMissingKeyOrValueAccessor(() => "Bu alan zorunludur.");
-    messages.SetMissingRequestBodyRequiredValueAccessor(() => "Form bilgileri zorunludur.");
-});
+    messages.SetAttemptedValueIsInvalidAccessor((value, field) => Ui.Text("Geçerli bir değer giriniz."));
+    messages.SetNonPropertyAttemptedValueIsInvalidAccessor(value => Ui.Text("Geçerli bir değer giriniz."));
+    messages.SetValueIsInvalidAccessor(value => Ui.Text("Geçerli bir değer giriniz."));
+    messages.SetValueMustNotBeNullAccessor(value => Ui.Text("Bu alan zorunludur."));
+    messages.SetMissingBindRequiredValueAccessor(field => Ui.Text("Bu alan zorunludur."));
+    messages.SetValueMustBeANumberAccessor(field => Ui.Text("Geçerli bir sayı giriniz."));
+    messages.SetNonPropertyValueMustBeANumberAccessor(() => Ui.Text("Geçerli bir sayı giriniz."));
+    messages.SetUnknownValueIsInvalidAccessor(field => Ui.Text("Geçerli bir değer giriniz."));
+    messages.SetNonPropertyUnknownValueIsInvalidAccessor(() => Ui.Text("Geçerli bir değer giriniz."));
+    messages.SetMissingKeyOrValueAccessor(() => Ui.Text("Bu alan zorunludur."));
+    messages.SetMissingRequestBodyRequiredValueAccessor(() => Ui.Text("Form bilgileri zorunludur."));
+}).AddViewLocalization().AddDataAnnotationsLocalization(options =>
+    options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(MediClinic.Web.SharedResource)));
 builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
 {
-    options.SetDefaultCulture("tr-TR").AddSupportedCultures("tr-TR").AddSupportedUICultures("tr-TR");
-    options.RequestCultureProviders.Clear();
+    options.SetDefaultCulture("tr-TR").AddSupportedCultures("tr-TR", "en-GB").AddSupportedUICultures("tr-TR", "en-GB");
+    options.RequestCultureProviders = [new CookieRequestCultureProvider()];
 });
 builder.Services.AddApplication();
 var connection = new SqliteConnectionStringBuilder(
@@ -40,7 +44,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequiredLength = 12;
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
-}).AddEntityFrameworkStores<MediClinicDbContext>().AddDefaultTokenProviders();
+}).AddEntityFrameworkStores<MediClinicDbContext>().AddDefaultTokenProviders().AddErrorDescriber<LocalizedIdentityErrors>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "__Host-MediClinic";

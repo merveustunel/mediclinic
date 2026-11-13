@@ -1,3 +1,4 @@
+using MediClinic.Web.Localization;
 ﻿using System.Security.Claims;
 using MediClinic.Application;
 using MediClinic.Domain;
@@ -14,7 +15,7 @@ public sealed class StaffAppointmentsController(IAppointmentBooking booking, Tim
     public async Task<IActionResult> Index(string? status, DateOnly? date)
     {
         if (!ModelState.IsValid || !PatientAppointmentsModel.IsValidFilter(status) || date == DateOnly.MaxValue)
-            return BadRequest("Durum veya tarih filtresi geçersiz.");
+            return BadRequest(Ui.Text("Durum veya tarih filtresi geçersiz."));
         try
         {
             var items = await booking.StaffAppointments(UserId, string.IsNullOrEmpty(status) ? null : Enum.Parse<AppointmentStatus>(status), date);
@@ -42,21 +43,21 @@ public sealed class StaffAppointmentsController(IAppointmentBooking booking, Tim
         if (!ModelState.IsValid || model.Action is not ("Confirm" or "Reject" or "Complete"))
         {
             ModelState.Clear();
-            ModelState.AddModelError("", "Geçerli bir işlem seçin. Gerekçe en fazla 2000 karakter olabilir.");
+            ModelState.AddModelError("", Ui.Text("Geçerli bir işlem seçin. Gerekçe en fazla 2000 karakter olabilir."));
         }
         if (model.Action == "Reject" && string.IsNullOrWhiteSpace(model.Reason))
-            ModelState.AddModelError("Reason", "Ret gerekçesi zorunludur.");
+            ModelState.AddModelError("Reason", Ui.Text("Ret gerekçesi zorunludur."));
         if (ModelState.IsValid)
         {
             try
             {
                 await booking.Act(UserId, model.Id, model.Action, model.Reason);
-                TempData["Message"] = model.Action switch { "Confirm" => "Randevu onaylandı.", "Reject" => "Randevu reddedildi.", _ => "Randevu tamamlandı." };
+                TempData["Message"] = model.Action switch { "Confirm" => Ui.Text("Randevu onaylandı."), "Reject" => Ui.Text("Randevu reddedildi."), _ => Ui.Text("Randevu tamamlandı.") };
                 return RedirectToAction(nameof(Details), new { model.Id });
             }
             catch (BookingException)
             {
-                ModelState.AddModelError("", "İşlem gerçekleştirilemedi. Randevunun durumu değişmiş veya bitiş saati henüz gelmemiş olabilir. Güncel bilgileri kontrol edin.");
+                ModelState.AddModelError("", Ui.Text("İşlem gerçekleştirilemedi. Randevunun durumu değişmiş veya bitiş saati henüz gelmemiş olabilir. Güncel bilgileri kontrol edin."));
                 item = await booking.StaffAppointment(UserId, model.Id);
                 if (item == null) return NotFound();
             }

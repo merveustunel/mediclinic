@@ -23,19 +23,19 @@
         request?.abort();
         // Retain ancestors and the changed control. Never choose a descendant for the patient.
         selects.slice(index + 1).forEach(select => {
-            select.replaceChildren(new Option('Önce üst seçimi tamamlayın', empty));
+            select.replaceChildren(new Option((globalThis.mediClinicText?.('Önce üst seçimi tamamlayın') || 'Önce üst seçimi tamamlayın'), empty));
             select.disabled = true;
         });
         if (index === selects.length - 1) {
             loading = false;
             status.textContent = ready()
-                ? 'Hizmet seçiminiz kaydedildi. Tarih ve saat seçimine devam edebilirsiniz.'
-                : 'Lütfen bir hizmet seçin.';
+                ? (globalThis.mediClinicText?.('Hizmet seçiminiz kaydedildi. Tarih ve saat seçimine devam edebilirsiniz.') || 'Hizmet seçiminiz kaydedildi. Tarih ve saat seçimine devam edebilirsiniz.')
+                : (globalThis.mediClinicText?.('Lütfen bir hizmet seçin.') || 'Lütfen bir hizmet seçin.');
             updateState();
             return;
         }
         loading = true;
-        status.textContent = 'Seçenekler yükleniyor…';
+        status.textContent = (globalThis.mediClinicText?.('Seçenekler yükleniyor…') || 'Seçenekler yükleniyor…');
         updateState();
         request = new AbortController();
         const url = new URL(form.action, window.location.href);
@@ -56,15 +56,19 @@
                 // implicitly select its next option while nodes are being removed.
                 select.replaceChildren(...Array.from(refreshed[position].options, option => option.cloneNode(true)));
                 select.disabled = refreshed[position].disabled;
+                const placeholder = select.options[0];
+                if (placeholder?.value === empty && globalThis.mediClinicText)
+                    placeholder.textContent = globalThis.mediClinicText(select.disabled ? 'Önce üst seçimi tamamlayın' : 'Seçin');
             });
-            status.textContent = 'Seçenekler güncellendi. Sıradaki seçiminizi yapabilirsiniz.';
+            globalThis.mediClinicRefresh?.();
+            status.textContent = (globalThis.mediClinicText?.('Seçenekler güncellendi. Sıradaki seçiminizi yapabilirsiniz.') || 'Seçenekler güncellendi. Sıradaki seçiminizi yapabilirsiniz.');
         } catch (error) {
             if (current !== revision) return;
             // Restore the fully functional native form if enhancement cannot continue.
             active = false;
             manual.hidden = false;
-            help.textContent = originalHelp;
-            status.textContent = 'Seçenekler otomatik yüklenemedi. Seçenekleri güncelle düğmesiyle devam edin.';
+            help.textContent = globalThis.mediClinicLocalize?.(originalHelp) || originalHelp;
+            status.textContent = (globalThis.mediClinicText?.('Seçenekler otomatik yüklenemedi. Seçenekleri güncelle düğmesiyle devam edin.') || 'Seçenekler otomatik yüklenemedi. Seçenekleri güncelle düğmesiyle devam edin.');
         } finally {
             if (current === revision) { loading = false; updateState(); }
         }
@@ -75,7 +79,7 @@
         // Disabling the submitter here would remove its Stage value from the native GET.
     });
     window.addEventListener('pageshow', () => { submitting = false; updateState(); });
-    help.textContent = 'Klinik, şube, bölüm, doktor ve hizmeti sırayla seçin. Seçenekler otomatik güncellenir.';
+    help.textContent = (globalThis.mediClinicText?.('Klinik, şube, bölüm, doktor ve hizmeti sırayla seçin. Seçenekler otomatik güncellenir.') || 'Klinik, şube, bölüm, doktor ve hizmeti sırayla seçin. Seçenekler otomatik güncellenir.');
     manual.hidden = true;
     updateState();
 })();

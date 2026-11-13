@@ -1,3 +1,4 @@
+using MediClinic.Web.Localization;
 using System.Security.Claims;
 using MediClinic.Infrastructure;
 using MediClinic.Domain;
@@ -69,8 +70,8 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
         var parent = model.Kind == "Clinic" ? null : Records(clinics, model.Kind == "Branch" ? "Clinic" : model.Kind == "Department" ? "Branch" : "Department").SingleOrDefault(e => e.Id == parentId);
         if (model.Kind != "Clinic" && parent is null) return NotFound();
         model.ParentId = parentId;
-        if (model.Kind == "Branch" && string.IsNullOrWhiteSpace(model.Address)) ModelState.AddModelError("Address", "Adres zorunludur.");
-        if (model.Kind == "Service" && decimal.Round(model.Price, 2) != model.Price) ModelState.AddModelError("Price", "Ücret en fazla iki ondalık basamak içermelidir.");
+        if (model.Kind == "Branch" && string.IsNullOrWhiteSpace(model.Address)) ModelState.AddModelError("Address", Ui.Text("Adres zorunludur."));
+        if (model.Kind == "Service" && decimal.Round(model.Price, 2) != model.Price) ModelState.AddModelError("Price", Ui.Text("Ücret en fazla iki ondalık basamak içermelidir."));
         if (!ModelState.IsValid) return View(model);
         await using var transaction = await db.Database.BeginTransactionAsync();
         // Include all names only for uniqueness; never expose out-of-scope records.
@@ -82,7 +83,7 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
             _ => await db.MedicalServices.Where(x => EF.Property<Guid>(x, "DepartmentKey") == parentId && x.Id != model.Id).Select(x => x.Name).ToListAsync()
         };
         if (names.Any(n => string.Equals(n.Trim(), model.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
-        { ModelState.AddModelError("Name", "Bu ad zaten kullanılıyor."); return View(model); }
+        { ModelState.AddModelError("Name", Ui.Text("Bu ad zaten kullanılıyor.")); return View(model); }
         switch (model.Kind)
         {
             case "Clinic":
@@ -104,7 +105,7 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
                 break;
         }
         await db.SaveChangesAsync(); await transaction.CommitAsync();
-        TempData["ManagementSuccess"] = "Bilgiler kaydedildi.";
+        TempData["ManagementSuccess"] = Ui.Text("Bilgiler kaydedildi.");
         return RedirectToAction(nameof(Index));
     }
     [HttpPost]
@@ -112,7 +113,7 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
     {
         if (!await db.Branches.AnyAsync(b => b.Id == model.BranchId && Scope.Any(c => c.Id == EF.Property<Guid>(b, "ClinicKey")))) return NotFound();
         if (!ModelState.IsValid || model.Days.Count != 7 || model.Days.Select(d => d.Day).Distinct().Count() != 7 || model.Days.Any(d => !Enum.IsDefined(d.Day)))
-            return BadRequest(new { message = "Haftanın yedi gününü geçerli saatlerle gönderiniz." });
+            return BadRequest(new { message = Ui.Text("Haftanın yedi gününü geçerli saatlerle gönderiniz.") });
         List<WorkingHours> proposed;
         try
         {
@@ -120,7 +121,7 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
         }
         catch (ArgumentException)
         {
-            return BadRequest(new { message = "Açık günlerde açılış ve kapanış saatlerini giriniz; açılış kapanıştan önce olmalıdır." });
+            return BadRequest(new { message = Ui.Text("Açık günlerde açılış ve kapanış saatlerini giriniz; açılış kapanıştan önce olmalıdır.") });
         }
         try
         {
@@ -128,7 +129,7 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
             var active = await db.Appointments.Where(a => EF.Property<Guid>(a.Service.Department, "BranchKey") == model.BranchId &&
                 (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed)).ToListAsync();
             if (active.Any(a => !AppointmentBooking.BranchOpen(proposed, a.StartsAt, a.EndsAt)))
-                return Conflict(new { message = "Bu program aktif bir randevuyla çakışıyor. Saatleri kontrol ediniz." });
+                return Conflict(new { message = Ui.Text("Bu program aktif bir randevuyla çakışıyor. Saatleri kontrol ediniz.") });
             var existing = await db.WorkingHours.Where(h => h.BranchId == model.BranchId).ToListAsync();
             foreach (var day in proposed)
             {
@@ -138,18 +139,18 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
             }
             await db.SaveChangesAsync();
             await transaction.CommitAsync();
-            return Ok(new { message = "Haftalık çalışma saatleri kaydedildi." });
+            return Ok(new { message = Ui.Text("Haftalık çalışma saatleri kaydedildi.") });
         }
         catch (Exception error) when (error is DbUpdateException or Microsoft.Data.Sqlite.SqliteException)
         {
-            return StatusCode(500, new { message = "Çalışma saatleri kaydedilemedi. Değerleriniz korunuyor; lütfen tekrar deneyiniz." });
+            return StatusCode(500, new { message = Ui.Text("Çalışma saatleri kaydedilemedi. Değerleriniz korunuyor; lütfen tekrar deneyiniz.") });
         }
     }
     [HttpPost]
     public async Task<IActionResult> Hours(Guid branchId, DayOfWeek day, bool closed, TimeOnly? opens, TimeOnly? closes)
     {
         if (!await db.Branches.AnyAsync(b => b.Id == branchId && Scope.Any(c => c.Id == EF.Property<Guid>(b, "ClinicKey")))) return NotFound();
-        if (!ModelState.IsValid || !Enum.IsDefined(day)) return BadRequest("Geçersiz gün veya saat.");
+        if (!ModelState.IsValid || !Enum.IsDefined(day)) return BadRequest(Ui.Text("Geçersiz gün veya saat."));
         try
         {
             await using var transaction = await db.Database.BeginTransactionAsync();
@@ -157,13 +158,13 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
             var active = await db.Appointments.Where(a => EF.Property<Guid>(a.Service.Department, "BranchKey") == branchId &&
                 (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed)).ToListAsync();
             if (active.Any(a => !AppointmentBooking.BranchOpen(new[] { proposed }, a.StartsAt, a.EndsAt)))
-            { TempData["ManagementError"] = "Bu saatler aktif bir randevuyla uyumlu değil."; return RedirectToAction(nameof(Index), new { branchId }); }
+            { TempData["ManagementError"] = Ui.Text("Bu saatler aktif bir randevuyla uyumlu değil."); return RedirectToAction(nameof(Index), new { branchId }); }
             var hours = await db.WorkingHours.SingleOrDefaultAsync(h => h.BranchId == branchId && h.Day == day);
             if (hours is null) db.WorkingHours.Add(new WorkingHours(Guid.NewGuid(), branchId, day, closed, opens, closes));
             else hours.Update(closed, opens, closes);
-            await db.SaveChangesAsync(); await transaction.CommitAsync(); TempData["ManagementSuccess"] = "çalışma saatleri kaydedildi.";
+            await db.SaveChangesAsync(); await transaction.CommitAsync(); TempData["ManagementSuccess"] = Ui.Text("çalışma saatleri kaydedildi.");
         }
-        catch (ArgumentException) { TempData["ManagementError"] = "Açılış ve kapanış saatlerini kontrol ediniz; açılış kapanıştan önce olmalıdır."; }
+        catch (ArgumentException) { TempData["ManagementError"] = Ui.Text("Açılış ve kapanış saatlerini kontrol ediniz; açılış kapanıştan önce olmalıdır."); }
         return RedirectToAction(nameof(Index), new { branchId });
     }
 }

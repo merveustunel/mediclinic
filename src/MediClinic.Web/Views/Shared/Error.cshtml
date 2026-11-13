@@ -1,10 +1,10 @@
 @model ErrorViewModel
 @{
-    ViewData["Title"] = "Hata";
+    ViewData["Title"] = Ui.Text("Hata");
 }
-<h1>Bir hata oluştu.</h1>
-<p>Lütfen daha sonra tekrar deneyin.</p>
+<h1>@Ui.Text("Bir hata oluştu.")</h1>
+<p>@Ui.Text("Lütfen daha sonra tekrar deneyin.")</p>
 @if (Model.ShowRequestId)
 {
-    <p>İstek kimliği: <code>@Model.RequestId</code></p>
+    <p>@Ui.Text("İstek kimliği:") <code>@Model.RequestId</code></p>
 }
