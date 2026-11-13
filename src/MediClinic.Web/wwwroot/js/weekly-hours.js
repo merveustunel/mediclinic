@@ -44,6 +44,7 @@
             });
             if (!form.reportValidity()) return;
             const body = new FormData(form);
+            const savedSummary = rows.map(row => `${row.dataset.dayName}: ${closed(row) ? 'Kapalı' : fields(row).map(input => input.value).join('–')}`).join(' · ');
             controls.forEach(control => control.disabled = true);
             status.textContent = 'Kaydediliyor…';
             try {
@@ -51,6 +52,8 @@
                 const result = (response.headers.get('content-type') || '').includes('application/json') ? await response.json() : null;
                 if (!response.ok || !result) throw new Error(result?.message || 'Kayıt yapılamadı. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyiniz.');
                 status.textContent = result.message;
+                const summary = form.closest('.branch-hours')?.querySelector('[data-hours-summary]');
+                if (summary) summary.textContent = savedSummary;
             } catch (error) {
                 status.textContent = error.message || 'Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz.';
             } finally {

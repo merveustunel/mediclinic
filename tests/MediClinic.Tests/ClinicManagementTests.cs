@@ -46,6 +46,21 @@ public sealed class ClinicManagementTests
         var html = WebUtility.HtmlDecode(await admin.GetStringAsync("/ClinicManagement"));
         Assert.Contains(data.Fixture.Service.Name, html);
         Assert.Contains("Çalışma", html, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("class=\"card clinic-card\"", html);
+        Assert.Contains("class=\"branch-card\"", html);
+        Assert.Contains("class=\"department-card\"", html);
+        Assert.Contains("class=\"service-list\"", html);
+        Assert.Contains("Henüz haftalık program kaydedilmedi.", html);
+        Assert.DoesNotContain("<details open>", html);
+        using (var db = data.Context())
+        {
+            db.WorkingHours.Add(new WorkingHours(Guid.NewGuid(), data.Request().BranchId, DayOfWeek.Monday, false, new(8, 15), new(16, 45)));
+            db.WorkingHours.Add(new WorkingHours(Guid.NewGuid(), data.Request().BranchId, DayOfWeek.Sunday, true, null, null));
+            await db.SaveChangesAsync();
+        }
+        var savedHtml = WebUtility.HtmlDecode(await admin.GetStringAsync("/ClinicManagement"));
+        var summary = Regex.Match(savedHtml, "data-hours-summary>([^<]+)</span>").Groups[1].Value;
+        Assert.Equal("Pazartesi: 08:15–16:45 · Pazar: Kapalı", summary);
         Assert.DoesNotContain(data.Other.Clinic.Id.ToString(), html);
         Assert.Equal(HttpStatusCode.NotFound, (await admin.GetAsync($"/ClinicManagement/Edit?kind=Clinic&id={data.Other.Clinic.Id}")).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsync("/ClinicManagement/Edit", new FormUrlEncodedContent(new Dictionary<string, string> { ["Name"] = "Forged" }))).StatusCode);

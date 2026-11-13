@@ -192,3 +192,49 @@ dd { margin-left: 0; font-weight: 500; }
 .hours-row input, .hours-row select { width: 100%; min-width: 0; margin: 0; }
 .hours-hint { font-size: .9rem; }
 @media (max-width: 540px) { .hours-row { grid-template-columns: 1fr 1fr; } }
+/* Clinic catalog styles stay scoped to the management page. */
+.clinic-management { container-type: inline-size; }
+.clinic-management .catalog-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
+.clinic-management .catalog-heading > div { min-width: 0; }
+.clinic-management :is(h2, h3, h4, h5) { margin: .25rem 0; overflow-wrap: anywhere; }
+.clinic-management h2 { font-size: 1.4rem; color: var(--primary); }
+.clinic-management h3 { font-size: 1.15rem; }
+.clinic-management h4 { font-size: 1rem; }
+.clinic-management h5 { font-size: 1rem; font-weight: 600; }
+.clinic-management .catalog-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.clinic-management .button { font-size: .875rem; }
+.clinic-management .clinic-card { margin-top: 1rem; padding: 1rem; border-top: 4px solid var(--primary); }
+.clinic-management .branch-card { min-width: 0; margin-top: 1rem; padding: 1rem; background: var(--background); border: 1px solid var(--border); border-radius: 12px; }
+.clinic-management .branch-address { margin: .25rem 0 0; color: var(--muted); }
+.clinic-management .department-card { margin-top: .75rem; padding: .75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.clinic-management .service-list { list-style: none; padding: 0; margin: .75rem 0 0; }
+.clinic-management .service-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem 0; border-top: 1px solid var(--border); }
+.clinic-management .service-info { flex: 1 1 14rem; min-width: 0; }
+.clinic-management .service-info dl { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: .25rem 0 0; }
+.clinic-management .service-info dt { margin: 0; font-size: .75rem; }
+.clinic-management .service-info dd { margin: 0; font-variant-numeric: tabular-nums; }
+.clinic-management form { max-width: none; }
+.clinic-management .catalog-filters { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: .75rem; padding: 1rem; background: var(--soft); border-radius: 12px; }
+.clinic-management .catalog-filters :is(label, button) { margin: 0; }
+.clinic-management .branch-hours { margin-top: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.clinic-management .branch-hours summary { min-height: 44px; padding: 1rem; cursor: pointer; color: var(--primary); border-radius: 10px; }
+.clinic-management .branch-hours summary:hover { background: var(--soft); }
+.clinic-management .hours-title { display: inline-flex; align-items: center; gap: .5rem; font-weight: 650; vertical-align: middle; }
+.clinic-management .hours-title svg { flex-shrink: 0; }
+.clinic-management .hours-summary { display: block; margin-top: .5rem; color: var(--muted); font-size: .85rem; overflow-wrap: anywhere; }
+.clinic-management .branch-hours[open] .hours-summary { display: none; }
+.clinic-management .branch-hours > :not(summary) { margin: 1rem; }
+.clinic-management .hours-row { grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr)); border-color: var(--border); }
+.clinic-management .hours-row > * { min-width: 0; }
+.clinic-management :is(button, input, select):disabled { background: var(--background); color: var(--muted); cursor: not-allowed; }
+.clinic-management button:disabled:hover { background: var(--background); }
+@container (max-width: 640px) {
+    .clinic-management .catalog-heading { align-items: stretch; flex-direction: column; }
+    .clinic-management .hours-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .clinic-management .clinic-card, .clinic-management .branch-card { padding: .75rem; }
+    .clinic-management .catalog-actions .button { flex: 1 1 10rem; }
+}
+@container (max-width: 360px) {
+    .clinic-management .catalog-filters, .clinic-management .hours-row { grid-template-columns: minmax(0, 1fr); }
+    .clinic-management .hours-title { font-size: .9rem; }
+}
