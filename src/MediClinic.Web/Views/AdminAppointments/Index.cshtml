@@ -1,24 +1,24 @@
 ﻿@model StaffAppointmentsModel
 @using MediClinic.Application
 @using System.Globalization
-@{ ViewData["Title"] = "Yönetici randevuları"; }
-<header class="appointments-heading"><div><p class="eyebrow">RANDEVU YÖNETİMİ</p><h1>Klinik randevuları</h1><p class="field-hint">Klinikünüzdeki talepleri inceleyin ve randevuları yönetin.</p></div><a class="button button-secondary" asp-controller="Dashboard" asp-action="ClinicAdmin">Yönetici paneline dön</a></header>
-<nav class="appointment-filters" aria-label="Randevu durumu filtreleri">
+@{ ViewData["Title"] = Ui.Text("Yönetici randevuları"); }
+<header class="appointments-heading"><div><p class="eyebrow">@Ui.Text("RANDEVU YÖNETİMİ")</p><h1>@Ui.Text("Klinik randevuları")</h1><p class="field-hint">@Ui.Text("Kliniğinizdeki talepleri inceleyin ve randevuları yönetin.")</p></div><a class="button button-secondary" asp-controller="Dashboard" asp-action="ClinicAdmin">@Ui.Text("Yönetici paneline dön")</a></header>
+<nav class="appointment-filters" aria-label="@Ui.Text("Randevu durumu filtreleri")">
 @foreach (var filter in PatientAppointmentsModel.Filters)
 {
-    <a class="button button-secondary" asp-action="Index" asp-route-status="@filter.Value" asp-route-from="@ViewData["From"]" asp-route-to="@ViewData["To"]" aria-current="@((Model.Status ?? "") == filter.Value ? "page" : null)">@filter.Label</a>
+    <a class="button button-secondary" asp-action="Index" asp-route-status="@filter.Value" asp-route-from="@ViewData["From"]" asp-route-to="@ViewData["To"]" aria-current="@((Model.Status ?? "") == filter.Value ? "page" : null)">@Ui.Text(filter.Label)</a>
 }
 </nav>
 <form method="get" class="staff-date-filter">
     <input type="hidden" name="status" value="@Model.Status" />
-    <div><label for="from">Başlangıç tarihi</label><input id="from" type="date" name="from" value="@ViewData["From"]" /></div>
-    <div><label for="to">Bitiş tarihi (dahil)</label><input id="to" type="date" name="to" value="@ViewData["To"]" /></div>
-    <button type="submit">Tarihe göre filtrele</button><a asp-action="Index">Filtreleri temizle</a>
+    <div><label for="from">@Ui.Text("Başlangıç tarihi")</label><input id="from" type="date" name="from" value="@ViewData["From"]" /></div>
+    <div><label for="to">@Ui.Text("Bitiş tarihi (dahil)")</label><input id="to" type="date" name="to" value="@ViewData["To"]" /></div>
+    <button type="submit">@Ui.Text("Tarihe göre filtrele")</button><a asp-action="Index">@Ui.Text("Filtreleri temizle")</a>
 </form>
-<p class="field-hint">@Model.Appointments.Count randevu gösteriliyor. Saatler İstanbul saatine göredir.</p>
+<p class="field-hint">@Ui.Format("{0} randevu gösteriliyor. Saatler İstanbul saatine göredir.", Model.Appointments.Count)</p>
 @if (Model.Appointments.Count == 0)
 {
-    <section class="empty-state"><h2>Randevu bulunamadı</h2><p>Klinikünüzde seçilen filtrelere uygun randevu bulunmuyor. Diğer durumları veya tarihleri kontrol edebilirsiniz.</p><a class="button button-secondary" asp-action="Index">Tüm randevuları görüntüle</a></section>
+    <section class="empty-state"><h2>@Ui.Text("Randevu bulunamadı")</h2><p>@Ui.Text("Kliniğinizde seçilen filtrelere uygun randevu bulunmuyor. Diğer durumları veya tarihleri kontrol edebilirsiniz.")</p><a class="button button-secondary" asp-action="Index">@Ui.Text("Tüm randevuları görüntüle")</a></section>
 }
 else
 {
@@ -26,7 +26,7 @@ else
     @foreach (var entry in Model.Appointments)
     {
         var item = entry.Appointment;
-        <li><div><h2>@entry.Patient</h2><p>@item.Doctor · @item.Service</p><p>@item.Branch</p><time datetime="@item.StartsAt.ToString("O")">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.GetCultureInfo("tr-TR"))</time></div><partial name="_StatusBadge" model="item.Status" /><a class="button button-secondary" asp-action="Details" asp-route-id="@item.Id">Detayları incele<span class="visually-hidden">: @entry.Patient</span></a></li>
+        <li><div><h2 data-user-content>@entry.Patient</h2><p>@item.Doctor · @item.Service</p><p data-user-content>@item.Branch</p><time datetime="@item.StartsAt.ToString("O")">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.CurrentCulture)</time></div><partial name="_StatusBadge" model="item.Status" /><a class="button button-secondary" asp-action="Details" asp-route-id="@item.Id">@Ui.Text("Detayları incele")<span class="visually-hidden">: @entry.Patient</span></a></li>
     }
     </ul>
 }

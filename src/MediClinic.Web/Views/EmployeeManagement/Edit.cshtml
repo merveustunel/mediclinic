@@ -1,20 +1,20 @@
 @model MediClinic.Web.Models.EmployeeEditModel
-@{ ViewData["Title"] = Model.Id.HasValue ? "Çalışanı düzenle" : "Yeni çalışan"; }
+@{ ViewData["Title"] = Model.Id.HasValue ? Ui.Text("Çalışanı düzenle") : Ui.Text("Yeni çalışan"); }
 <h1>@ViewData["Title"]</h1>
 <form asp-action="Edit" method="post" class="form-stack">
     <div asp-validation-summary="All" role="alert"></div>
     <input asp-for="Id" type="hidden" />
-    @if (Model.Id.HasValue) { <input asp-for="IsDoctor" type="hidden" /><p>@(Model.IsDoctor ? "Doktor" : "Sağlık personeli")</p> }
+    @if (Model.Id.HasValue) { <input asp-for="IsDoctor" type="hidden" /><p>@(Model.IsDoctor ? Ui.Text("Doktor") : Ui.Text("Sağlık personeli"))</p> }
     else { <label asp-for="IsDoctor"></label><input asp-for="IsDoctor" /> }
     <label asp-for="FirstName"></label><input asp-for="FirstName" autocomplete="given-name" />
     <label asp-for="LastName"></label><input asp-for="LastName" autocomplete="family-name" />
     <label asp-for="DepartmentId"></label><select asp-for="DepartmentId">
-        <option value="">Bölüm seçiniz</option>
+        <option value="">@Ui.Text("Bölüm seçiniz")</option>
         @foreach (var department in Model.Departments) { <option value="@department.Id">@department.Branch.Clinic.Name / @department.Branch.Name / @department.Name</option> }
     </select>
-    <label asp-for="JobTitle"></label><input asp-for="JobTitle" /><small>Sağlık personeli için görev giriniz. Doktor rolü otomatik belirlenir.</small>
-    <label asp-for="Specialty"></label><input asp-for="Specialty" /><small>Doktorlar için uzmanlık zorunludur.</small>
-    <fieldset><legend>Doktorun sunacağı hizmetler</legend><p>Seçilen bölümün hizmetlerini işaretleyiniz. İşaretlenmeyen hizmetler için yeni randevu alınamaz; mevcut randevular korunur.</p>
+    <label asp-for="JobTitle"></label><input asp-for="JobTitle" /><small>@Ui.Text("Sağlık personeli için görev giriniz. Doktor rolü otomatik belirlenir.")</small>
+    <label asp-for="Specialty"></label><input asp-for="Specialty" /><small>@Ui.Text("Doktorlar için uzmanlık zorunludur.")</small>
+    <fieldset><legend>@Ui.Text("Doktorun sunacağı hizmetler")</legend><p>@Ui.Text("Seçilen bölümün hizmetlerini işaretleyiniz. İşaretlenmeyen hizmetler için yeni randevu alınamaz; mevcut randevular korunur.")</p>
     @foreach (var service in Model.Services)
     {
         <label for="service-@service.Id"><input id="service-@service.Id" type="checkbox" name="ServiceIds" value="@service.Id" checked="@Model.ServiceIds.Contains(service.Id)" /> @service.Department.Branch.Name / @service.Department.Name / @service.Name</label>
@@ -22,11 +22,11 @@
     </fieldset>
     @if (!Model.HasAccount)
     {
-        <fieldset><legend>Personel hesabı (isteğe bağlı)</legend><p>Hesap yalnızca Personel yetkisi alır. İlk parolayı çalışanla güvenli bir kanaldan paylaşınız. Parola tekrar gösterilmez.</p>
+        <fieldset><legend>@Ui.Text("Personel hesabı (isteğe bağlı)")</legend><p>@Ui.Text("Hesap yalnızca Personel yetkisi alır. İlk parolayı çalışanla güvenli bir kanaldan paylaşınız. Parola tekrar gösterilmez.")</p>
         <label asp-for="Email"></label><input asp-for="Email" autocomplete="off" />
         <label asp-for="InitialPassword"></label><input id="InitialPassword" name="InitialPassword" type="password" autocomplete="new-password" value="" />
         </fieldset>
     }
-    else { <p>Mevcut giriş hesabı korunur.</p> }
-    <button type="submit">Kaydet</button><a asp-action="Index">Listeye dön</a>
+    else { <p>@Ui.Text("Mevcut giriş hesabı korunur.")</p> }
+    <button type="submit">@Ui.Text("Kaydet")</button><a asp-action="Index">@Ui.Text("Listeye dön")</a>
 </form>

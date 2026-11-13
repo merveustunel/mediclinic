@@ -1,3 +1,4 @@
+using MediClinic.Web.Localization;
 using MediClinic.Domain;
 using MediClinic.Infrastructure.Identity;
 using MediClinic.Infrastructure.Persistence;
@@ -18,7 +19,7 @@ public sealed class AccountController(UserManager<ApplicationUser> users, SignIn
         // Reject privilege/link injection explicitly; the binding model exposes neither.
         if (Request.Form.Keys.Any(k => new[] { "role", "roles", "patientid", "staffid" }.Contains(k.ToLowerInvariant())))
             return BadRequest();
-        if (model.DateOfBirth > DateOnly.FromDateTime(DateTime.UtcNow)) ModelState.AddModelError("DateOfBirth", "Doğum tarihi gelecekte olamaz.");
+        if (model.DateOfBirth > DateOnly.FromDateTime(DateTime.UtcNow)) ModelState.AddModelError("DateOfBirth", Ui.Text("Doğum tarihi gelecekte olamaz."));
         if (!ModelState.IsValid) return View(model);
         await using var transaction = await db.Database.BeginTransactionAsync();
         var patient = new Patient(Guid.NewGuid(), model.FirstName, model.LastName, model.DateOfBirth!.Value);
@@ -52,12 +53,12 @@ public sealed class AccountController(UserManager<ApplicationUser> users, SignIn
         var user = await users.FindByEmailAsync(model.Email.Trim());
         if (!environment.IsDevelopment() && user != null && DemoSeed.IsDemoUser(user.Id))
         {
-            ModelState.AddModelError("", "E-posta veya parola hatalı.");
+            ModelState.AddModelError("", Ui.Text("E-posta veya parola hatalı."));
             return View(model);
         }
         var result = await signIn.PasswordSignInAsync(model.Email.Trim(), model.Password, false, lockoutOnFailure: true);
         if (result.Succeeded) return RedirectToAction("Index", "Dashboard");
-        ModelState.AddModelError("", "E-posta veya parola hatalı.");
+        ModelState.AddModelError("", Ui.Text("E-posta veya parola hatalı."));
         return View(model);
     }
     [Authorize, HttpPost] public async Task<IActionResult> Logout()

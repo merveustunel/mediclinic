@@ -1,23 +1,23 @@
 @model MediClinic.Application.StaffDashboardData
-@{ ViewData["Title"] = "Yönetici paneli"; ViewData["ClinicAdminDashboard"] = true; }
+@{ ViewData["Title"] = Ui.Text("Yönetici paneli"); ViewData["ClinicAdminDashboard"] = true; }
 <header class="appointments-heading">
-    <div><p class="eyebrow">YÖNETİCİ PANELİ</p><h1>Randevulara genel bakış</h1><p>Yetkili olduğunuz kliniklerin randevu akışını takip edin.</p></div>
-<a class="button" asp-controller="AdminAppointments" asp-action="Index">Tüm randevular</a></header>
-<dl class="dashboard-metrics" aria-label="Randevu özeti">
-    <div class="card"><dt>Bugünkü randevular</dt><dd>@Model.TodayCount</dd></div>
-    <div class="card"><dt>Bekleyen talepler</dt><dd>@Model.PendingCount</dd></div>
-    <div class="card"><dt>Bugün onaylı</dt><dd>@Model.ConfirmedCount</dd></div>
-    <div class="card"><dt>Bugün tamamlanan</dt><dd>@Model.CompletedCount</dd></div>
+    <div><p class="eyebrow">@Ui.Text("YÖNETİCİ PANELİ")</p><h1>@Ui.Text("Randevulara genel bakış")</h1><p>@Ui.Text("Yetkili olduğunuz kliniklerin randevu akışını takip edin.")</p></div>
+<a class="button" asp-controller="AdminAppointments" asp-action="Index">@Ui.Text("Tüm randevular")</a></header>
+<dl class="dashboard-metrics" aria-label="@Ui.Text("Randevu özeti")">
+    <div class="card"><dt>@Ui.Text("Bugünkü randevular")</dt><dd>@Model.TodayCount</dd></div>
+    <div class="card"><dt>@Ui.Text("Bekleyen talepler")</dt><dd>@Model.PendingCount</dd></div>
+    <div class="card"><dt>@Ui.Text("Bugün onaylı")</dt><dd>@Model.ConfirmedCount</dd></div>
+    <div class="card"><dt>@Ui.Text("Bugün tamamlanan")</dt><dd>@Model.CompletedCount</dd></div>
 </dl>
-<p class="field-hint">Saatler İstanbul saatine göredir. Bugünkü sayılar randevunun başlangıç tarihine göre hesaplanır; bekleyen talepler tüm tarihleri kapsar.</p>
+<p class="field-hint">@Ui.Text("Saatler İstanbul saatine göredir. Bugünkü sayılar randevunun başlangıç tarihine göre hesaplanır; bekleyen talepler tüm tarihleri kapsar.")</p>
 <section class="card" aria-labelledby="pending-title">
-    <h2 id="pending-title">Bekleyen randevu talepleri</h2>
-    <p class="field-hint">Talepler tarih sırasıyla gösterilir. İlk 6 talep listelenir.</p>
-    @if (Model.Pending.Count == 0) { <p class="empty-state">Bekleyen randevu talebi bulunmuyor.</p> }
+    <h2 id="pending-title">@Ui.Text("Bekleyen randevu talepleri")</h2>
+    <p class="field-hint">@Ui.Text("Talepler tarih sırasıyla gösterilir. İlk 6 talep listelenir.")</p>
+    @if (Model.Pending.Count == 0) { <p class="empty-state">@Ui.Text("Bekleyen randevu talebi bulunmuyor.")</p> }
     else { <partial name="_StaffAppointments" model="Model.Pending" /> }
 </section>
 <section class="card" aria-labelledby="today-title">
-    <h2 id="today-title">Bugünün randevuları</h2>
-    @if (Model.Today.Count == 0) { <p class="empty-state">Bugün için randevu bulunmuyor.</p> }
+    <h2 id="today-title">@Ui.Text("Bugünün randevuları")</h2>
+    @if (Model.Today.Count == 0) { <p class="empty-state">@Ui.Text("Bugün için randevu bulunmuyor.")</p> }
     else { <partial name="_StaffAppointments" model="Model.Today" /> }
 </section>

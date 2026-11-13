@@ -1,3 +1,4 @@
+using MediClinic.Web.Localization;
 using System.Security.Claims;
 using MediClinic.Application;
 using MediClinic.Domain;
@@ -68,27 +69,27 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         var department = await Departments.Include(d => d.Branch).SingleOrDefaultAsync(d => d.Id == model.DepartmentId);
         if (department is null) return NotFound();
         if (employee is not null) model.IsDoctor = employee is Doctor;
-        if (model.IsDoctor && string.IsNullOrWhiteSpace(model.Specialty)) ModelState.AddModelError(nameof(model.Specialty), "Uzmanlık zorunludur.");
+        if (model.IsDoctor && string.IsNullOrWhiteSpace(model.Specialty)) ModelState.AddModelError(nameof(model.Specialty), Ui.Text("Uzmanlık zorunludur."));
         if (!model.IsDoctor && (string.IsNullOrWhiteSpace(model.JobTitle) || model.JobTitle.Trim() is "Doctor" or "ClinicAdmin" or "Patient"))
-            ModelState.AddModelError(nameof(model.JobTitle), "Geçerli bir personel görevi giriniz.");
+            ModelState.AddModelError(nameof(model.JobTitle), Ui.Text("Geçerli bir personel görevi giriniz."));
         var services = await db.MedicalServices.Where(s => model.ServiceIds.Contains(s.Id)).Include(s => s.Department).ToListAsync();
         if ((!model.IsDoctor && model.ServiceIds.Count > 0) || services.Count != model.ServiceIds.Distinct().Count() || services.Any(s => s.DepartmentId != department.Id))
-            ModelState.AddModelError(nameof(model.ServiceIds), "Yalnızca seçilen bölüme ait hizmetler atanabilir.");
+            ModelState.AddModelError(nameof(model.ServiceIds), Ui.Text("Yalnızca seçilen bölüme ait hizmetler atanabilir."));
         var names = await Employees.Where(s => s.Id != model.Id && EF.Property<Guid>(s, "DepartmentKey") == department.Id).ToListAsync();
         if (names.Any(s => string.Equals(s.FirstName, model.FirstName?.Trim(), StringComparison.OrdinalIgnoreCase) && string.Equals(s.LastName, model.LastName?.Trim(), StringComparison.OrdinalIgnoreCase)))
-            ModelState.AddModelError("", "Bu bölümde aynı ad ve soyad ile bir çalışan kayıtlı.");
+            ModelState.AddModelError("", Ui.Text("Bu bölümde aynı ad ve soyad ile bir çalışan kayıtlı."));
         if (employee is not null && employee.DepartmentId != department.Id)
         {
             // Historical appointments and staff dashboard access depend on department membership.
             if ((await Appointments(employee.Id)).Count > 0 || await db.StaffAvailabilities.AnyAsync(a => EF.Property<Guid>(a, "StaffKey") == employee.Id))
-                ModelState.AddModelError(nameof(model.DepartmentId), "Randevusu veya uygunluk kaydı olan çalışan başka bölüme taşınamaz.");
+                ModelState.AddModelError(nameof(model.DepartmentId), Ui.Text("Randevusu veya uygunluk kaydı olan çalışan başka bölüme taşınamaz."));
         }
         if (employee is Doctor && (await Appointments(employee.Id)).Where(Active).Any(a => !model.ServiceIds.Contains(a.Service.Id)))
-            ModelState.AddModelError(nameof(model.ServiceIds), "Aktif randevuların hizmet atamaları kaldırılamaz.");
+            ModelState.AddModelError(nameof(model.ServiceIds), Ui.Text("Aktif randevuların hizmet atamaları kaldırılamaz."));
         var hasAccount = employee is not null && await db.Users.AnyAsync(u => u.StaffId == employee.Id);
         var provision = !hasAccount && !string.IsNullOrWhiteSpace(model.Email);
-        if (provision && string.IsNullOrWhiteSpace(model.InitialPassword)) ModelState.AddModelError("", "Hesap oluşturmak için ilk parola zorunludur.");
-        if (!provision && !string.IsNullOrEmpty(model.InitialPassword)) ModelState.AddModelError("", "Parola yalnızca yeni hesap oluştururken kullanılabilir.");
+        if (provision && string.IsNullOrWhiteSpace(model.InitialPassword)) ModelState.AddModelError("", Ui.Text("Hesap oluşturmak için ilk parola zorunludur."));
+        if (!provision && !string.IsNullOrEmpty(model.InitialPassword)) ModelState.AddModelError("", Ui.Text("Parola yalnızca yeni hesap oluştururken kullanılabilir."));
         if (!ModelState.IsValid) return await InvalidEmployee(model);
         if (employee is null)
         {
@@ -130,12 +131,12 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
             {
                 await transaction.RollbackAsync();
                 db.ChangeTracker.Clear();
-                ModelState.AddModelError("", "Hesap oluşturulamadı. E-posta benzersiz olmalı; parola en az 12 karakter, büyük/küçük harf, rakam ve özel karakter içermelidir.");
+                ModelState.AddModelError("", Ui.Text("Hesap oluşturulamadı. E-posta benzersiz olmalı; parola en az 12 karakter, büyük/küçük harf, rakam ve özel karakter içermelidir."));
                 return await InvalidEmployee(model);
             }
         }
         await db.SaveChangesAsync(); await transaction.CommitAsync();
-        TempData["EmployeeSuccess"] = "Çalışan bilgileri kaydedildi.";
+        TempData["EmployeeSuccess"] = Ui.Text("Çalışan bilgileri kaydedildi.");
         return RedirectToAction(nameof(Index));
     }
     private async Task<IActionResult> InvalidEmployee(EmployeeEditModel model)
@@ -147,7 +148,7 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         var doctor = await Doctors.SingleOrDefaultAsync(d => d.Id == doctorId);
         if (doctor is null) return NotFound();
         if (!ModelState.IsValid || date == DateOnly.MaxValue)
-            return BadRequest("Geçerli bir tarih seçin.");
+            return BadRequest(Ui.Text("Geçerli bir tarih seçin."));
         var query = db.StaffAvailabilities.Where(a => EF.Property<Guid>(a, "StaffKey") == doctorId);
         if (date.HasValue)
         {
@@ -166,7 +167,7 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         {
             var interval = await db.StaffAvailabilities.SingleOrDefaultAsync(a => a.Id == id && EF.Property<Guid>(a, "StaffKey") == doctorId);
             if (interval is null) return NotFound();
-            if (interval.StartsAt <= clock.GetUtcNow()) return BadRequest("Yalnızca gelecek uygunluklar düzenlenebilir.");
+            if (interval.StartsAt <= clock.GetUtcNow()) return BadRequest(Ui.Text("Yalnızca gelecek uygunluklar düzenlenebilir."));
             model.Id = id; model.StartsAt = Scheduling.Local(interval.StartsAt); model.EndsAt = Scheduling.Local(interval.EndsAt);
         }
         return View(model);
@@ -180,21 +181,21 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         model.DoctorName = doctor.FullName;
         var interval = model.Id.HasValue ? await db.StaffAvailabilities.SingleOrDefaultAsync(a => a.Id == model.Id && EF.Property<Guid>(a, "StaffKey") == doctor.Id) : null;
         if (model.Id.HasValue && interval is null) return NotFound();
-        if (interval is not null && interval.StartsAt <= clock.GetUtcNow()) return BadRequest("Yalnızca gelecek uygunluklar düzenlenebilir.");
+        if (interval is not null && interval.StartsAt <= clock.GetUtcNow()) return BadRequest(Ui.Text("Yalnızca gelecek uygunluklar düzenlenebilir."));
         if (!ModelState.IsValid) return View(model);
         DateTimeOffset start, end;
         try { start = Scheduling.ToUtc(model.StartsAt!.Value); end = Scheduling.ToUtc(model.EndsAt!.Value); }
-        catch (BookingException) { ModelState.AddModelError("", "Geçerli İstanbul saatleri giriniz."); return View(model); }
-        if (start <= clock.GetUtcNow() || end <= start) ModelState.AddModelError("", "Başlangıç gelecekte, bitiş başlangıçtan sonra olmalıdır.");
+        catch (BookingException) { ModelState.AddModelError("", Ui.Text("Geçerli İstanbul saatleri giriniz.")); return View(model); }
+        if (start <= clock.GetUtcNow() || end <= start) ModelState.AddModelError("", Ui.Text("Başlangıç gelecekte, bitiş başlangıçtan sonra olmalıdır."));
         if (await db.StaffAvailabilities.AnyAsync(a => EF.Property<Guid>(a, "StaffKey") == doctor.Id && a.Id != model.Id && a.StartsAt < end && a.EndsAt > start))
-            ModelState.AddModelError("", "Uygunluk aralığı mevcut bir kayıtla çakışıyor.");
+            ModelState.AddModelError("", Ui.Text("Uygunluk aralığı mevcut bir kayıtla çakışıyor."));
         if (interval is not null && !await PreservesAppointments(doctor.Id, interval.Id, start, end))
-            ModelState.AddModelError("", "Bu değişiklik mevcut aktif randevuların uygunluğunu bozuyor.");
+            ModelState.AddModelError("", Ui.Text("Bu değişiklik mevcut aktif randevuların uygunluğunu bozuyor."));
         if (!ModelState.IsValid) return View(model);
         if (interval is null) db.StaffAvailabilities.Add(new StaffAvailability(Guid.NewGuid(), doctor, start, end));
         else interval.Reschedule(start, end);
         await db.SaveChangesAsync(); await transaction.CommitAsync();
-        TempData["EmployeeSuccess"] = "Uygunluk kaydedildi.";
+        TempData["EmployeeSuccess"] = Ui.Text("Uygunluk kaydedildi.");
         return RedirectToAction(nameof(Availability), new { doctorId = doctor.Id });
     }
     public async Task<IActionResult> Weekly(Guid doctorId)
@@ -213,7 +214,7 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         if (model.From > model.To || model.To!.Value.DayNumber - model.From!.Value.DayNumber > 90 ||
             model.To == DateOnly.MaxValue || model.Opens >= model.Closes || model.Days.Count == 0 || model.Days.Any(d => !Enum.IsDefined(d)))
         {
-            ModelState.AddModelError("", "En fazla 91 günlük bir tarih aralığı ve en az bir gün seçin. Bitiş saati başlangıçtan sonra olmalıdır.");
+            ModelState.AddModelError("", Ui.Text("En fazla 91 günlük bir tarih aralığı ve en az bir gün seçin. Bitiş saati başlangıçtan sonra olmalıdır."));
             return View(model);
         }
         var intervals = new List<StaffAvailability>();
@@ -225,15 +226,15 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
             var end = Scheduling.ToUtc(date.ToDateTime(model.Closes!.Value));
             if (start <= clock.GetUtcNow() || existing.Any(a => a.StartsAt < end && a.EndsAt > start))
             {
-                ModelState.AddModelError("", "Seçilen günlerden biri geçmişte veya mevcut uygunlukla çakışıyor. Hiçbir kayıt oluşturulmadı.");
+                ModelState.AddModelError("", Ui.Text("Seçilen günlerden biri geçmişte veya mevcut uygunlukla çakışıyor. Hiçbir kayıt oluşturulmadı."));
                 return View(model);
             }
             intervals.Add(new StaffAvailability(Guid.NewGuid(), doctor, start, end));
         }
-        if (intervals.Count == 0) { ModelState.AddModelError("", "Tarih aralığında seçilen gün bulunmuyor."); return View(model); }
+        if (intervals.Count == 0) { ModelState.AddModelError("", Ui.Text("Tarih aralığında seçilen gün bulunmuyor.")); return View(model); }
         db.StaffAvailabilities.AddRange(intervals);
         await db.SaveChangesAsync(); await transaction.CommitAsync();
-        TempData["EmployeeSuccess"] = $"{intervals.Count} günlük uygunluk oluşturuldu.";
+        TempData["EmployeeSuccess"] = Ui.Format("Uygunluk oluşturuldu: {0} gün.", intervals.Count);
         return RedirectToAction(nameof(Availability), new { doctorId = doctor.Id });
     }
     private async Task<bool> PreservesAppointments(Guid doctorId, Guid excluded, DateTimeOffset? start, DateTimeOffset? end)
@@ -250,8 +251,8 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         var interval = await db.StaffAvailabilities.SingleOrDefaultAsync(a => a.Id == id && EF.Property<Guid>(a, "StaffKey") == doctorId);
         if (interval is null) return NotFound();
         if (interval.StartsAt <= clock.GetUtcNow() || !await PreservesAppointments(doctorId, id, null, null))
-        { TempData["EmployeeError"] = "Geçmiş uygunluklar ve aktif randevuları koruyan aralıklar silinemez."; }
-        else { db.Remove(interval); await db.SaveChangesAsync(); await transaction.CommitAsync(); TempData["EmployeeSuccess"] = "Uygunluk silindi."; }
+        { TempData["EmployeeError"] = Ui.Text("Geçmiş uygunluklar ve aktif randevuları koruyan aralıklar silinemez."); }
+        else { db.Remove(interval); await db.SaveChangesAsync(); await transaction.CommitAsync(); TempData["EmployeeSuccess"] = Ui.Text("Uygunluk silindi."); }
         return RedirectToAction(nameof(Availability), new { doctorId });
     }
 }

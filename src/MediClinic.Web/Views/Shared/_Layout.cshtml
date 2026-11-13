@@ -10,81 +10,93 @@
     var canAdmin = authenticated && User.IsInRole(AuthRoles.ClinicAdmin) && await NavigationDb.ClinicAdministrators.AnyAsync(a => a.UserId == userId);
     var canStaff = authenticated && User.IsInRole(AuthRoles.Staff) && await NavigationDb.Users.AnyAsync(u => u.Id == userId && u.StaffId != null);
     var canPatient = authenticated && User.IsInRole(AuthRoles.Patient) && await NavigationDb.Users.AnyAsync(u => u.Id == userId && u.PatientId != null);
-    var role = User.IsInRole(AuthRoles.ClinicAdmin) ? "Klinik yöneticisi" : User.IsInRole(AuthRoles.Staff) ? "Personel" : User.IsInRole(AuthRoles.Patient) ? "Hasta" : "Hesap";
+    var role = User.IsInRole(AuthRoles.ClinicAdmin) ? Ui.Text("Klinik yöneticisi") : User.IsInRole(AuthRoles.Staff) ? Ui.Text("Personel") : User.IsInRole(AuthRoles.Patient) ? Ui.Text("Hasta") : Ui.Text("Hesap");
     var title = ViewData["Title"]?.ToString() ?? (controller switch
     {
-        "Appointments" => action == "Book" ? "Randevu oluştur" : action == "Details" ? "Randevu detayı" : "Randevularım",
-        "StaffAppointments" => action == "Details" ? "Randevu detayı" : "Randevu inceleme",
-        "Dashboard" => "Genel bakış",
-        "Account" => action switch { "Login" => "Giriş yap", "Register" => "Hasta kaydı", "AccessDenied" => "Erişim engellendi", _ => "Hesap" },
-        _ => "Hoş geldiniz"
+        "Appointments" => action == "Book" ? Ui.Text("Randevu oluştur") : action == "Details" ? Ui.Text("Randevu detayı") : Ui.Text("Randevularım"),
+        "StaffAppointments" => action == "Details" ? Ui.Text("Randevu detayı") : Ui.Text("Randevu inceleme"),
+        "Dashboard" => Ui.Text("Genel bakış"),
+        "Account" => action switch { "Login" => Ui.Text("Giriş yap"), "Register" => Ui.Text("Hasta kaydı"), "AccessDenied" => Ui.Text("Erişim engellendi"), _ => Ui.Text("Hesap") },
+        _ => Ui.Text("Hoş geldiniz")
     });
 }
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-culture="@System.Globalization.CultureInfo.CurrentCulture.Name" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#6953C8" />
     <title>@title - MediClinic</title>
+    <script src="~/js/theme-init.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script id="ui-messages" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Ui.Catalog(System.Globalization.CultureInfo.CurrentUICulture.Name)))</script>
+    <script src="~/js/preferences.js" asp-append-version="true" defer></script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
 <body>
-    <a class="skip-link" href="#main-content">İçeriğe geç</a>
+    <a class="skip-link" href="#main-content">@Ui.Text("İçeriğe geç")</a>
     <div class="app-shell">
-        <aside class="sidebar" aria-label="Uygulama menüsü">
-            <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark" aria-hidden="true">+</span> MediClinic</a>
-            <p class="sidebar-caption">SAĞLIK YÖNETİMİ</p>
+        <aside class="sidebar" aria-label="@Ui.Text("Uygulama menüsü")">
+            <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark" aria-hidden="true">+</span> @Ui.Text("MediClinic")</a>
+            <p class="sidebar-caption">@Ui.Text("SAĞLIK YÖNETİMİ")</p>
             <details class="navigation" open>
-                <summary>Gezinme menüsü</summary>
-                <nav aria-label="Ana gezinme">
+                <summary>@Ui.Text("Gezinme menüsü")</summary>
+                <nav aria-label="@Ui.Text("Ana gezinme")">
                     @if (canAdmin)
                     {
-                        <a asp-controller="AdminAppointments" asp-action="Index">Tüm randevular</a>
-                        <a asp-controller="EmployeeManagement" asp-action="Index">Çalışan yönetimi</a>
-                        <a asp-controller="ClinicManagement" asp-action="Index">Kurum yönetimi</a>
+                        <a asp-controller="AdminAppointments" asp-action="Index">@Ui.Text("Tüm randevular")</a>
+                        <a asp-controller="EmployeeManagement" asp-action="Index">@Ui.Text("Çalışan yönetimi")</a>
+                        <a asp-controller="ClinicManagement" asp-action="Index">@Ui.Text("Kurum yönetimi")</a>
                     }
                     @if (authenticated)
                     {
                         @foreach (var item in AuthRoles.All.Where(r => r == AuthRoles.ClinicAdmin ? canAdmin : r == AuthRoles.Staff ? canStaff : canPatient))
                         {
-                            <a asp-controller="Dashboard" asp-action="@item" aria-current="@(controller == "Dashboard" && action == item ? "page" : null)">@(item == AuthRoles.Patient ? "Hasta paneli" : item == AuthRoles.Staff ? "Personel paneli" : "Yönetici paneli")</a>
+                            <a asp-controller="Dashboard" asp-action="@item" aria-current="@(controller == "Dashboard" && action == item ? "page" : null)">@(item == AuthRoles.Patient ? Ui.Text("Hasta paneli") : item == AuthRoles.Staff ? Ui.Text("Personel paneli") : Ui.Text("Yönetici paneli"))</a>
                         }
                         @if (canPatient)
                         {
-                            <a asp-controller="Appointments" asp-action="Index" aria-current="@(controller == "Appointments" && action != "Book" ? "page" : null)">Randevularım</a>
-                            <a asp-controller="Appointments" asp-action="Book" aria-current="@(controller == "Appointments" && action == "Book" ? "page" : null)">Randevu oluştur</a>
+                            <a asp-controller="Appointments" asp-action="Index" aria-current="@(controller == "Appointments" && action != "Book" ? "page" : null)">@Ui.Text("Randevularım")</a>
+                            <a asp-controller="Appointments" asp-action="Book" aria-current="@(controller == "Appointments" && action == "Book" ? "page" : null)">@Ui.Text("Randevu oluştur")</a>
                         }
                         @if (canStaff)
                         {
-                            <a asp-controller="StaffAppointments" asp-action="Index" aria-current="@(controller == "StaffAppointments" ? "page" : null)">Randevu inceleme</a>
+                            <a asp-controller="StaffAppointments" asp-action="Index" aria-current="@(controller == "StaffAppointments" ? "page" : null)">@Ui.Text("Randevu inceleme")</a>
                         }
                     }
                     else
                     {
-                        <a asp-controller="Home" asp-action="Index" aria-current="@(controller == "Home" ? "page" : null)">Ana sayfa</a>
-                        <a asp-controller="Account" asp-action="Login" aria-current="@(action == "Login" ? "page" : null)">Giriş yap</a>
-                        <a asp-controller="Account" asp-action="Register" aria-current="@(action == "Register" ? "page" : null)">Hasta kaydı</a>
+                        <a asp-controller="Home" asp-action="Index" aria-current="@(controller == "Home" ? "page" : null)">@Ui.Text("Ana sayfa")</a>
+                        <a asp-controller="Account" asp-action="Login" aria-current="@(action == "Login" ? "page" : null)">@Ui.Text("Giriş yap")</a>
+                        <a asp-controller="Account" asp-action="Register" aria-current="@(action == "Register" ? "page" : null)">@Ui.Text("Hasta kaydı")</a>
                     }
                 </nav>
             </details>
-            <p class="sidebar-note">Sağlığınız için, birlikte.<br /><small>MediClinic · Hasta ve klinik portalı</small></p>
+            <p class="sidebar-note">@Ui.Text("Sağlığınız için, birlikte.")<br /><small>@Ui.Text("MediClinic · Hasta ve klinik portalı")</small></p>
         </aside>
         <div class="workspace">
             <header class="topbar">
-                <div><p class="eyebrow">MediClinic</p><p class="page-title">@title</p></div>
+                <div><p class="eyebrow">@Ui.Text("MediClinic")</p><p class="page-title">@title</p></div>
                 <div class="user-context">
+                    <div class="preferences">
+                        <form asp-controller="Preferences" asp-action="Language" method="post" data-language-form aria-label="@Ui.Text("Dil")">
+                            <input type="hidden" name="returnUrl" value="@(Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString)" />
+                            <button type="submit" name="culture" value="tr-TR" lang="tr" class="button-secondary" aria-pressed="@(System.Globalization.CultureInfo.CurrentCulture.Name == "tr-TR" ? "true" : "false")">TR</button>
+                            <button type="submit" name="culture" value="en-GB" lang="en" class="button-secondary" aria-pressed="@(System.Globalization.CultureInfo.CurrentCulture.Name == "en-GB" ? "true" : "false")">EN</button>
+                        </form>
+                        <button type="button" class="button-secondary theme-toggle" data-theme-toggle aria-pressed="false" aria-label="@Ui.Text("Koyu temaya geç")"><span class="sun-icon" aria-hidden="true">☀</span><span class="moon-icon" aria-hidden="true">☾</span></button>
+                        <span data-preferences-status class="visually-hidden" role="status" aria-live="polite"></span>
+                    </div>
                     @if (authenticated)
                     {
                         <div class="user-info"><span class="user-name">@User.Identity!.Name</span><small>@role</small></div>
-                        <form asp-controller="Account" asp-action="Logout" method="post"><button class="button-secondary" type="submit">Çıkış yap</button></form>
+                        <form asp-controller="Account" asp-action="Logout" method="post"><button class="button-secondary" type="submit">@Ui.Text("Çıkış yap")</button></form>
                     }
-                    else { <a class="button button-secondary" asp-controller="Account" asp-action="Login">Giriş yap</a> }
+                    else { <a class="button button-secondary" asp-controller="Account" asp-action="Login">@Ui.Text("Giriş yap")</a> }
                 </div>
             </header>
             <main id="main-content" tabindex="-1"><div class="content-card">@RenderBody()</div></main>
-            <footer class="app-footer">MediClinic · Sağlık hizmetlerine kolay erişim</footer>
+            <footer class="app-footer">@Ui.Text("MediClinic · Sağlık hizmetlerine kolay erişim")</footer>
         </div>
     </div>
     @await RenderSectionAsync("Scripts", required: false)

@@ -1,0 +1,1302 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms</value>
+  </resheader>
+  <data name="1. Hizmetinizi seçin" xml:space="preserve">
+    <value>1. Hizmetinizi seçin</value>
+  </data>
+  <data name="2. Tarih ve saat seçin" xml:space="preserve">
+    <value>2. Tarih ve saat seçin</value>
+  </data>
+  <data name="3. Talebinizi kontrol edin" xml:space="preserve">
+    <value>3. Talebinizi kontrol edin</value>
+  </data>
+  <data name="Ad" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="Ad alanı zorunludur." xml:space="preserve">
+    <value>Ad alanı zorunludur.</value>
+  </data>
+  <data name="Ad en fazla 100 karakter olabilir." xml:space="preserve">
+    <value>Ad en fazla 100 karakter olabilir.</value>
+  </data>
+  <data name="Ad en fazla 200 karakter olabilir." xml:space="preserve">
+    <value>Ad en fazla 200 karakter olabilir.</value>
+  </data>
+  <data name="Ad soyad" xml:space="preserve">
+    <value>Ad soyad</value>
+  </data>
+  <data name="Ad zorunludur." xml:space="preserve">
+    <value>Ad zorunludur.</value>
+  </data>
+  <data name="Adres" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="Adres en fazla 500 karakter olabilir." xml:space="preserve">
+    <value>Adres en fazla 500 karakter olabilir.</value>
+  </data>
+  <data name="Adres zorunludur." xml:space="preserve">
+    <value>Adres zorunludur.</value>
+  </data>
+  <data name="Aktif randevuların hizmet atamaları kaldırılamaz." xml:space="preserve">
+    <value>Aktif randevuların hizmet atamaları kaldırılamaz.</value>
+  </data>
+  <data name="Ana gezinme" xml:space="preserve">
+    <value>Ana gezinme</value>
+  </data>
+  <data name="Ana sayfa" xml:space="preserve">
+    <value>Ana sayfa</value>
+  </data>
+  <data name="Ana sayfaya dön" xml:space="preserve">
+    <value>Ana sayfaya dön</value>
+  </data>
+  <data name="Açık" xml:space="preserve">
+    <value>Açık</value>
+  </data>
+  <data name="Açık günlerde açılış ve kapanış saatlerini giriniz; açılış kapanıştan önce olmalıdır." xml:space="preserve">
+    <value>Açık günlerde açılış ve kapanış saatlerini giriniz; açılış kapanıştan önce olmalıdır.</value>
+  </data>
+  <data name="Açık günlere uygula" xml:space="preserve">
+    <value>Açık günlere uygula</value>
+  </data>
+  <data name="Açık temaya geç" xml:space="preserve">
+    <value>Açık temaya geç</value>
+  </data>
+  <data name="Açılış" xml:space="preserve">
+    <value>Açılış</value>
+  </data>
+  <data name="Açılış ve kapanış saatlerini kontrol ediniz; açılış kapanıştan önce olmalıdır." xml:space="preserve">
+    <value>Açılış ve kapanış saatlerini kontrol ediniz; açılış kapanıştan önce olmalıdır.</value>
+  </data>
+  <data name="Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz." xml:space="preserve">
+    <value>Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz.</value>
+  </data>
+  <data name="Başlangıç" xml:space="preserve">
+    <value>Başlangıç</value>
+  </data>
+  <data name="Başlangıç (İstanbul)" xml:space="preserve">
+    <value>Başlangıç (İstanbul)</value>
+  </data>
+  <data name="Başlangıç gelecekte, bitiş başlangıçtan sonra olmalıdır." xml:space="preserve">
+    <value>Başlangıç gelecekte, bitiş başlangıçtan sonra olmalıdır.</value>
+  </data>
+  <data name="Başlangıç saati zorunludur." xml:space="preserve">
+    <value>Başlangıç saati zorunludur.</value>
+  </data>
+  <data name="Başlangıç tarihi" xml:space="preserve">
+    <value>Başlangıç tarihi</value>
+  </data>
+  <data name="Başlangıç tarihi ve saati (İstanbul)" xml:space="preserve">
+    <value>Başlangıç tarihi ve saati (İstanbul)</value>
+  </data>
+  <data name="Başlangıç tarihi zorunludur." xml:space="preserve">
+    <value>Başlangıç tarihi zorunludur.</value>
+  </data>
+  <data name="Başlangıç zorunludur." xml:space="preserve">
+    <value>Başlangıç zorunludur.</value>
+  </data>
+  <data name="Beklemede" xml:space="preserve">
+    <value>Beklemede</value>
+  </data>
+  <data name="Bekleyen randevu" xml:space="preserve">
+    <value>Bekleyen randevu</value>
+  </data>
+  <data name="Bekleyen randevu talebi bulunmuyor." xml:space="preserve">
+    <value>Bekleyen randevu talebi bulunmuyor.</value>
+  </data>
+  <data name="Bekleyen randevu talepleri" xml:space="preserve">
+    <value>Bekleyen randevu talepleri</value>
+  </data>
+  <data name="Bekleyen talepler" xml:space="preserve">
+    <value>Bekleyen talepler</value>
+  </data>
+  <data name="Bilgiler kaydedildi." xml:space="preserve">
+    <value>Bilgiler kaydedildi.</value>
+  </data>
+  <data name="Bilgileriniz uygunsa hesabınız hazırdır. Giriş yapmayı deneyebilirsiniz." xml:space="preserve">
+    <value>Bilgileriniz uygunsa hesabınız hazırdır. Giriş yapmayı deneyebilirsiniz.</value>
+  </data>
+  <data name="Bilinmiyor (eski kayıt)" xml:space="preserve">
+    <value>Bilinmiyor (eski kayıt)</value>
+  </data>
+  <data name="Bir hata oluştu." xml:space="preserve">
+    <value>Bir hata oluştu.</value>
+  </data>
+  <data name="Bitiş" xml:space="preserve">
+    <value>Bitiş</value>
+  </data>
+  <data name="Bitiş (İstanbul)" xml:space="preserve">
+    <value>Bitiş (İstanbul)</value>
+  </data>
+  <data name="Bitiş saati" xml:space="preserve">
+    <value>Bitiş saati</value>
+  </data>
+  <data name="Bitiş saati zorunludur." xml:space="preserve">
+    <value>Bitiş saati zorunludur.</value>
+  </data>
+  <data name="Bitiş tarihi (dahil)" xml:space="preserve">
+    <value>Bitiş tarihi (dahil)</value>
+  </data>
+  <data name="Bitiş tarihi ve saati (İstanbul)" xml:space="preserve">
+    <value>Bitiş tarihi ve saati (İstanbul)</value>
+  </data>
+  <data name="Bitiş tarihi zorunludur." xml:space="preserve">
+    <value>Bitiş tarihi zorunludur.</value>
+  </data>
+  <data name="Bitiş zorunludur." xml:space="preserve">
+    <value>Bitiş zorunludur.</value>
+  </data>
+  <data name="Bu ad zaten kullanılıyor." xml:space="preserve">
+    <value>Bu ad zaten kullanılıyor.</value>
+  </data>
+  <data name="Bu alan zorunludur." xml:space="preserve">
+    <value>Bu alan zorunludur.</value>
+  </data>
+  <data name="Bu alana geçerli bir değer giriniz." xml:space="preserve">
+    <value>Bu alana geçerli bir değer giriniz.</value>
+  </data>
+  <data name="Bu bölümde aynı ad ve soyad ile bir çalışan kayıtlı." xml:space="preserve">
+    <value>Bu bölümde aynı ad ve soyad ile bir çalışan kayıtlı.</value>
+  </data>
+  <data name="Bu değişiklik mevcut aktif randevuların uygunluğunu bozuyor." xml:space="preserve">
+    <value>Bu değişiklik mevcut aktif randevuların uygunluğunu bozuyor.</value>
+  </data>
+  <data name="Bu durumda randevunuz bulunmuyor" xml:space="preserve">
+    <value>Bu durumda randevunuz bulunmuyor</value>
+  </data>
+  <data name="Bu program aktif bir randevuyla çakışıyor. Saatleri kontrol ediniz." xml:space="preserve">
+    <value>Bu program aktif bir randevuyla çakışıyor. Saatleri kontrol ediniz.</value>
+  </data>
+  <data name="Bu saatler aktif bir randevuyla uyumlu değil." xml:space="preserve">
+    <value>Bu saatler aktif bir randevuyla uyumlu değil.</value>
+  </data>
+  <data name="Bu sayfaya yalnızca görüntüleme erişiminiz bulunmaktadır." xml:space="preserve">
+    <value>Bu sayfaya yalnızca görüntüleme erişiminiz bulunmaktadır.</value>
+  </data>
+  <data name="Bu tarihte uygun saat bulunmuyor. Başka bir tarih seçin." xml:space="preserve">
+    <value>Bu tarihte uygun saat bulunmuyor. Başka bir tarih seçin.</value>
+  </data>
+  <data name="Bugün için randevu bulunmuyor." xml:space="preserve">
+    <value>Bugün için randevu bulunmuyor.</value>
+  </data>
+  <data name="Bugün onaylı" xml:space="preserve">
+    <value>Bugün onaylı</value>
+  </data>
+  <data name="Bugün tamamlanan" xml:space="preserve">
+    <value>Bugün tamamlanan</value>
+  </data>
+  <data name="Bugünkü randevular" xml:space="preserve">
+    <value>Bugünkü randevular</value>
+  </data>
+  <data name="Bugünün randevuları" xml:space="preserve">
+    <value>Bugünün randevuları</value>
+  </data>
+  <data name="Bölüm" xml:space="preserve">
+    <value>Bölüm</value>
+  </data>
+  <data name="Bölüm oluştur" xml:space="preserve">
+    <value>Bölüm oluştur</value>
+  </data>
+  <data name="Bölüm randevuları" xml:space="preserve">
+    <value>Bölüm randevuları</value>
+  </data>
+  <data name="Bölüm seçiniz" xml:space="preserve">
+    <value>Bölüm seçiniz</value>
+  </data>
+  <data name="Bölüm:" xml:space="preserve">
+    <value>Bölüm:</value>
+  </data>
+  <data name="Bölümü düzenle" xml:space="preserve">
+    <value>Bölümü düzenle</value>
+  </data>
+  <data name="Bölümünüzde seçilen filtrelere uygun randevu bulunmuyor. Diğer durumları veya tarihleri kontrol edebilirsiniz." xml:space="preserve">
+    <value>Bölümünüzde seçilen filtrelere uygun randevu bulunmuyor. Diğer durumları veya tarihleri kontrol edebilirsiniz.</value>
+  </data>
+  <data name="Bölümünüzdeki talepleri inceleyin ve randevuları yönetin." xml:space="preserve">
+    <value>Bölümünüzdeki talepleri inceleyin ve randevuları yönetin.</value>
+  </data>
+  <data name="Bölümünüzün randevu akışını takip edin ve bekleyen talepleri inceleyin." xml:space="preserve">
+    <value>Bölümünüzün randevu akışını takip edin ve bekleyen talepleri inceleyin.</value>
+  </data>
+  <data name="Büyük harf, küçük harf, rakam ve simge içeren en az 12 karakter kullanın." xml:space="preserve">
+    <value>Büyük harf, küçük harf, rakam ve simge içeren en az 12 karakter kullanın.</value>
+  </data>
+  <data name="Cuma" xml:space="preserve">
+    <value>Cuma</value>
+  </data>
+  <data name="Cumartesi" xml:space="preserve">
+    <value>Cumartesi</value>
+  </data>
+  <data name="Detaylar" xml:space="preserve">
+    <value>Detaylar</value>
+  </data>
+  <data name="Detayları görüntüle" xml:space="preserve">
+    <value>Detayları görüntüle</value>
+  </data>
+  <data name="Detayları incele" xml:space="preserve">
+    <value>Detayları incele</value>
+  </data>
+  <data name="Devam etmek için e-posta adresinizi ve parolanızı kullanarak giriş yapın." xml:space="preserve">
+    <value>Devam etmek için e-posta adresinizi ve parolanızı kullanarak giriş yapın.</value>
+  </data>
+  <data name="Dil" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="Dil değiştirildi." xml:space="preserve">
+    <value>Dil değiştirildi.</value>
+  </data>
+  <data name="Dil değiştirilemedi. Lütfen tekrar deneyiniz." xml:space="preserve">
+    <value>Dil değiştirilemedi. Lütfen tekrar deneyiniz.</value>
+  </data>
+  <data name="Diğer durumları seçebilir veya tüm randevularınızı görüntüleyebilirsiniz." xml:space="preserve">
+    <value>Diğer durumları seçebilir veya tüm randevularınızı görüntüleyebilirsiniz.</value>
+  </data>
+  <data name="Doktor" xml:space="preserve">
+    <value>Doktor</value>
+  </data>
+  <data name="Doktor / " xml:space="preserve">
+    <value>Doktor / </value>
+  </data>
+  <data name="Doktor uygunluğu" xml:space="preserve">
+    <value>Doktor uygunluğu</value>
+  </data>
+  <data name="Doktor uygunluğu şubenin çalışma saatlerinden ayrıdır. Randevu için her iki koşul da sağlanmalıdır." xml:space="preserve">
+    <value>Doktor uygunluğu şubenin çalışma saatlerinden ayrıdır. Randevu için her iki koşul da sağlanmalıdır.</value>
+  </data>
+  <data name="Doktorlar için uzmanlık zorunludur." xml:space="preserve">
+    <value>Doktorlar için uzmanlık zorunludur.</value>
+  </data>
+  <data name="Doktorlar ve sağlık personeli" xml:space="preserve">
+    <value>Doktorlar ve sağlık personeli</value>
+  </data>
+  <data name="Doktorun sunacağı hizmetler" xml:space="preserve">
+    <value>Doktorun sunacağı hizmetler</value>
+  </data>
+  <data name="Doğum tarihi" xml:space="preserve">
+    <value>Doğum tarihi</value>
+  </data>
+  <data name="Doğum tarihi gelecekte olamaz." xml:space="preserve">
+    <value>Doğum tarihi gelecekte olamaz.</value>
+  </data>
+  <data name="Doğum tarihi zorunludur." xml:space="preserve">
+    <value>Doğum tarihi zorunludur.</value>
+  </data>
+  <data name="Durum" xml:space="preserve">
+    <value>Durum</value>
+  </data>
+  <data name="Durum veya tarih filtresi geçersiz." xml:space="preserve">
+    <value>Durum veya tarih filtresi geçersiz.</value>
+  </data>
+  <data name="Düzenle" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="E-posta" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="E-posta alanı zorunludur." xml:space="preserve">
+    <value>E-posta alanı zorunludur.</value>
+  </data>
+  <data name="E-posta veya parola hatalı." xml:space="preserve">
+    <value>E-posta veya parola hatalı.</value>
+  </data>
+  <data name="ERİŞİM YETKİSİ GEREKİYOR" xml:space="preserve">
+    <value>ERİŞİM YETKİSİ GEREKİYOR</value>
+  </data>
+  <data name="En fazla 2000 karakter. Gerekçe hasta tarafından da görüntülenebilir." xml:space="preserve">
+    <value>En fazla 2000 karakter. Gerekçe hasta tarafından da görüntülenebilir.</value>
+  </data>
+  <data name="En fazla 91 günlük bir tarih aralığı ve en az bir gün seçin. Bitiş saati başlangıçtan sonra olmalıdır." xml:space="preserve">
+    <value>En fazla 91 günlük bir tarih aralığı ve en az bir gün seçin. Bitiş saati başlangıçtan sonra olmalıdır.</value>
+  </data>
+  <data name="Erişim engellendi" xml:space="preserve">
+    <value>Erişim engellendi</value>
+  </data>
+  <data name="Filtrele" xml:space="preserve">
+    <value>Filtrele</value>
+  </data>
+  <data name="Filtreleri temizle" xml:space="preserve">
+    <value>Filtreleri temizle</value>
+  </data>
+  <data name="Fiyat" xml:space="preserve">
+    <value>Fiyat</value>
+  </data>
+  <data name="Form bilgileri zorunludur." xml:space="preserve">
+    <value>Form bilgileri zorunludur.</value>
+  </data>
+  <data name="Genel bakış" xml:space="preserve">
+    <value>Genel bakış</value>
+  </data>
+  <data name="Gerekçe (ret için zorunlu)" xml:space="preserve">
+    <value>Gerekçe (ret için zorunlu)</value>
+  </data>
+  <data name="Gerekçe en fazla 2000 karakter olabilir." xml:space="preserve">
+    <value>Gerekçe en fazla 2000 karakter olabilir.</value>
+  </data>
+  <data name="Gezinme menüsü" xml:space="preserve">
+    <value>Gezinme menüsü</value>
+  </data>
+  <data name="Geçerli bir TRY tutarı giriniz." xml:space="preserve">
+    <value>Geçerli bir TRY tutarı giriniz.</value>
+  </data>
+  <data name="Geçerli bir değer giriniz." xml:space="preserve">
+    <value>Geçerli bir değer giriniz.</value>
+  </data>
+  <data name="Geçerli bir e-posta adresi giriniz." xml:space="preserve">
+    <value>Geçerli bir e-posta adresi giriniz.</value>
+  </data>
+  <data name="Geçerli bir e-posta giriniz." xml:space="preserve">
+    <value>Geçerli bir e-posta giriniz.</value>
+  </data>
+  <data name="Geçerli bir işlem seçin." xml:space="preserve">
+    <value>Geçerli bir işlem seçin.</value>
+  </data>
+  <data name="Geçerli bir işlem seçin. Gerekçe en fazla 2000 karakter olabilir." xml:space="preserve">
+    <value>Geçerli bir işlem seçin. Gerekçe en fazla 2000 karakter olabilir.</value>
+  </data>
+  <data name="Geçerli bir personel görevi giriniz." xml:space="preserve">
+    <value>Geçerli bir personel görevi giriniz.</value>
+  </data>
+  <data name="Geçerli bir sayı giriniz." xml:space="preserve">
+    <value>Geçerli bir sayı giriniz.</value>
+  </data>
+  <data name="Geçerli bir tarih seçin." xml:space="preserve">
+    <value>Geçerli bir tarih seçin.</value>
+  </data>
+  <data name="Geçerli saatleri olan açık bir kaynak gün seçiniz." xml:space="preserve">
+    <value>Geçerli saatleri olan açık bir kaynak gün seçiniz.</value>
+  </data>
+  <data name="Geçerli İstanbul saatleri giriniz." xml:space="preserve">
+    <value>Geçerli İstanbul saatleri giriniz.</value>
+  </data>
+  <data name="Geçersiz gün veya saat." xml:space="preserve">
+    <value>Geçersiz gün veya saat.</value>
+  </data>
+  <data name="Geçersiz randevu durumu." xml:space="preserve">
+    <value>Geçersiz randevu durumu.</value>
+  </data>
+  <data name="Geçmiş / başlamış kayıt" xml:space="preserve">
+    <value>Geçmiş / başlamış kayıt</value>
+  </data>
+  <data name="Geçmiş bir tarihe randevu alınamaz. Lütfen bugün veya ileri bir tarih seçin." xml:space="preserve">
+    <value>Geçmiş bir tarihe randevu alınamaz. Lütfen bugün veya ileri bir tarih seçin.</value>
+  </data>
+  <data name="Geçmiş saat" xml:space="preserve">
+    <value>Geçmiş saat</value>
+  </data>
+  <data name="Geçmiş uygunluklar ve aktif randevuları koruyan aralıklar silinemez." xml:space="preserve">
+    <value>Geçmiş uygunluklar ve aktif randevuları koruyan aralıklar silinemez.</value>
+  </data>
+  <data name="Geçmiş ve yaklaşan randevularınızı inceleyin, durumlarını kolayca takip edin." xml:space="preserve">
+    <value>Geçmiş ve yaklaşan randevularınızı inceleyin, durumlarını kolayca takip edin.</value>
+  </data>
+  <data name="Giriş hataları" xml:space="preserve">
+    <value>Giriş hataları</value>
+  </data>
+  <data name="Giriş yap" xml:space="preserve">
+    <value>Giriş yap</value>
+  </data>
+  <data name="Giriş yapın" xml:space="preserve">
+    <value>Giriş yapın</value>
+  </data>
+  <data name="Görev" xml:space="preserve">
+    <value>Görev</value>
+  </data>
+  <data name="Görev en fazla 100 karakter olabilir." xml:space="preserve">
+    <value>Görev en fazla 100 karakter olabilir.</value>
+  </data>
+  <data name="Görüntülenecek randevu bulunmuyor." xml:space="preserve">
+    <value>Görüntülenecek randevu bulunmuyor.</value>
+  </data>
+  <data name="Günlük aralıkları oluştur" xml:space="preserve">
+    <value>Günlük aralıkları oluştur</value>
+  </data>
+  <data name="Güvenliyse sil" xml:space="preserve">
+    <value>Güvenliyse sil</value>
+  </data>
+  <data name="HASTA PANELİ" xml:space="preserve">
+    <value>HASTA PANELİ</value>
+  </data>
+  <data name="HESABINIZA ERİŞİN" xml:space="preserve">
+    <value>HESABINIZA ERİŞİN</value>
+  </data>
+  <data name="Hafta içi dolduruldu. Değişiklikleri kaydediniz." xml:space="preserve">
+    <value>Hafta içi dolduruldu. Değişiklikleri kaydediniz.</value>
+  </data>
+  <data name="Hafta içini doldur (09:00–17:00)" xml:space="preserve">
+    <value>Hafta içini doldur (09:00–17:00)</value>
+  </data>
+  <data name="Haftalık doktor uygunluğu" xml:space="preserve">
+    <value>Haftalık doktor uygunluğu</value>
+  </data>
+  <data name="Haftalık uygunluk oluştur" xml:space="preserve">
+    <value>Haftalık uygunluk oluştur</value>
+  </data>
+  <data name="Haftalık çalışma saatleri kaydedildi." xml:space="preserve">
+    <value>Haftalık çalışma saatleri kaydedildi.</value>
+  </data>
+  <data name="Haftanın yedi gününü geçerli saatlerle gönderiniz." xml:space="preserve">
+    <value>Haftanın yedi gününü geçerli saatlerle gönderiniz.</value>
+  </data>
+  <data name="Hasta" xml:space="preserve">
+    <value>Hasta</value>
+  </data>
+  <data name="Hasta hesabınızı oluşturmak için bilgilerinizi girin. Tüm alanlar zorunludur." xml:space="preserve">
+    <value>Hasta hesabınızı oluşturmak için bilgilerinizi girin. Tüm alanlar zorunludur.</value>
+  </data>
+  <data name="Hasta kaydı" xml:space="preserve">
+    <value>Hasta kaydı</value>
+  </data>
+  <data name="Hasta kaydı oluşturun" xml:space="preserve">
+    <value>Hasta kaydı oluşturun</value>
+  </data>
+  <data name="Hasta paneli" xml:space="preserve">
+    <value>Hasta paneli</value>
+  </data>
+  <data name="Hata" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Henüz bölüm yok." xml:space="preserve">
+    <value>Henüz bölüm yok.</value>
+  </data>
+  <data name="Henüz haftalık program kaydedilmedi." xml:space="preserve">
+    <value>Henüz haftalık program kaydedilmedi.</value>
+  </data>
+  <data name="Henüz hesabınız yok mu?" xml:space="preserve">
+    <value>Henüz hesabınız yok mu?</value>
+  </data>
+  <data name="Henüz hizmet yok." xml:space="preserve">
+    <value>Henüz hizmet yok.</value>
+  </data>
+  <data name="Henüz randevunuz bulunmuyor" xml:space="preserve">
+    <value>Henüz randevunuz bulunmuyor</value>
+  </data>
+  <data name="Henüz randevunuz bulunmuyor. İlk randevunuzu oluşturabilirsiniz." xml:space="preserve">
+    <value>Henüz randevunuz bulunmuyor. İlk randevunuzu oluşturabilirsiniz.</value>
+  </data>
+  <data name="Henüz Şube yok." xml:space="preserve">
+    <value>Henüz Şube yok.</value>
+  </data>
+  <data name="Her gün başlangıç saati (İstanbul)" xml:space="preserve">
+    <value>Her gün başlangıç saati (İstanbul)</value>
+  </data>
+  <data name="Her gün bitiş saati (İstanbul)" xml:space="preserve">
+    <value>Her gün bitiş saati (İstanbul)</value>
+  </data>
+  <data name="Hesabınızın bu sayfaya erişim yetkisi bulunmuyor." xml:space="preserve">
+    <value>Hesabınızın bu sayfaya erişim yetkisi bulunmuyor.</value>
+  </data>
+  <data name="Hesap" xml:space="preserve">
+    <value>Hesap</value>
+  </data>
+  <data name="Hesap e-postası" xml:space="preserve">
+    <value>Hesap e-postası</value>
+  </data>
+  <data name="Hesap işlemi tamamlanamadı. Bilgilerinizi kontrol edip yeniden deneyiniz." xml:space="preserve">
+    <value>Hesap işlemi tamamlanamadı. Bilgilerinizi kontrol edip yeniden deneyiniz.</value>
+  </data>
+  <data name="Hesap oluşturmak için ilk parola zorunludur." xml:space="preserve">
+    <value>Hesap oluşturmak için ilk parola zorunludur.</value>
+  </data>
+  <data name="Hesap oluşturulamadı. E-posta benzersiz olmalı; parola en az 12 karakter, büyük/küçük harf, rakam ve özel karakter içermelidir." xml:space="preserve">
+    <value>Hesap oluşturulamadı. E-posta benzersiz olmalı; parola en az 12 karakter, büyük/küçük harf, rakam ve özel karakter içermelidir.</value>
+  </data>
+  <data name="Hesap yalnızca Personel yetkisi alır. İlk parolayı çalışanla güvenli bir kanaldan paylaşınız. Parola tekrar gösterilmez." xml:space="preserve">
+    <value>Hesap yalnızca Personel yetkisi alır. İlk parolayı çalışanla güvenli bir kanaldan paylaşınız. Parola tekrar gösterilmez.</value>
+  </data>
+  <data name="Hesap yok" xml:space="preserve">
+    <value>Hesap yok</value>
+  </data>
+  <data name="Hizmet" xml:space="preserve">
+    <value>Hizmet</value>
+  </data>
+  <data name="Hizmet oluştur" xml:space="preserve">
+    <value>Hizmet oluştur</value>
+  </data>
+  <data name="Hizmet seçimi" xml:space="preserve">
+    <value>Hizmet seçimi</value>
+  </data>
+  <data name="Hizmet seçimini değiştir" xml:space="preserve">
+    <value>Hizmet seçimini değiştir</value>
+  </data>
+  <data name="Hizmet seçiminiz kaydedildi. Tarih ve saat seçimine devam edebilirsiniz." xml:space="preserve">
+    <value>Hizmet seçiminiz kaydedildi. Tarih ve saat seçimine devam edebilirsiniz.</value>
+  </data>
+  <data name="Hizmeti düzenle" xml:space="preserve">
+    <value>Hizmeti düzenle</value>
+  </data>
+  <data name="Hizmeti düzenle: {0}" xml:space="preserve">
+    <value>Hizmeti düzenle: {0}</value>
+  </data>
+  <data name="Hoş geldiniz" xml:space="preserve">
+    <value>Hoş geldiniz</value>
+  </data>
+  <data name="Hızlı işlemler" xml:space="preserve">
+    <value>Hızlı işlemler</value>
+  </data>
+  <data name="Kapalı" xml:space="preserve">
+    <value>Kapalı</value>
+  </data>
+  <data name="Kapanış" xml:space="preserve">
+    <value>Kapanış</value>
+  </data>
+  <data name="Kapanış saati açılıştan sonra olmalıdır." xml:space="preserve">
+    <value>Kapanış saati açılıştan sonra olmalıdır.</value>
+  </data>
+  <data name="Karar gerekçesi" xml:space="preserve">
+    <value>Karar gerekçesi</value>
+  </data>
+  <data name="Kaydediliyor…" xml:space="preserve">
+    <value>Kaydediliyor…</value>
+  </data>
+  <data name="Kaydet" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="Kayıt hataları" xml:space="preserve">
+    <value>Kayıt hataları</value>
+  </data>
+  <data name="Kayıt ol" xml:space="preserve">
+    <value>Kayıt ol</value>
+  </data>
+  <data name="Kayıt talebiniz alındı" xml:space="preserve">
+    <value>Kayıt talebiniz alındı</value>
+  </data>
+  <data name="Kayıt yapılamadı. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyiniz." xml:space="preserve">
+    <value>Kayıt yapılamadı. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyiniz.</value>
+  </data>
+  <data name="Klinik" xml:space="preserve">
+    <value>Klinik</value>
+  </data>
+  <data name="Klinik / şube / bölüm" xml:space="preserve">
+    <value>Klinik / şube / bölüm</value>
+  </data>
+  <data name="Klinik oluştur" xml:space="preserve">
+    <value>Klinik oluştur</value>
+  </data>
+  <data name="Klinik randevuları" xml:space="preserve">
+    <value>Klinik randevuları</value>
+  </data>
+  <data name="Klinik yöneticisi" xml:space="preserve">
+    <value>Klinik yöneticisi</value>
+  </data>
+  <data name="Klinik, şube, bölüm ve hizmetlerinizi yönetin." xml:space="preserve">
+    <value>Klinik, şube, bölüm ve hizmetlerinizi yönetin.</value>
+  </data>
+  <data name="Klinik, şube, bölüm, doktor ve hizmeti sırayla seçin. Seçenekler otomatik güncellenir." xml:space="preserve">
+    <value>Klinik, şube, bölüm, doktor ve hizmeti sırayla seçin. Seçenekler otomatik güncellenir.</value>
+  </data>
+  <data name="Klinik:" xml:space="preserve">
+    <value>Klinik:</value>
+  </data>
+  <data name="Kliniği düzenle" xml:space="preserve">
+    <value>Kliniği düzenle</value>
+  </data>
+  <data name="Kliniğinizde seçilen filtrelere uygun randevu bulunmuyor. Diğer durumları veya tarihleri kontrol edebilirsiniz." xml:space="preserve">
+    <value>Kliniğinizde seçilen filtrelere uygun randevu bulunmuyor. Diğer durumları veya tarihleri kontrol edebilirsiniz.</value>
+  </data>
+  <data name="Kliniğinizdeki talepleri inceleyin ve randevuları yönetin." xml:space="preserve">
+    <value>Kliniğinizdeki talepleri inceleyin ve randevuları yönetin.</value>
+  </data>
+  <data name="Kontrol ve talep" xml:space="preserve">
+    <value>Kontrol ve talep</value>
+  </data>
+  <data name="Koyu temaya geç" xml:space="preserve">
+    <value>Koyu temaya geç</value>
+  </data>
+  <data name="Kurum bilgileri" xml:space="preserve">
+    <value>Kurum bilgileri</value>
+  </data>
+  <data name="Kurum filtreleri" xml:space="preserve">
+    <value>Kurum filtreleri</value>
+  </data>
+  <data name="Kurum yönetimi" xml:space="preserve">
+    <value>Kurum yönetimi</value>
+  </data>
+  <data name="Listeye dön" xml:space="preserve">
+    <value>Listeye dön</value>
+  </data>
+  <data name="Lütfen bir hizmet seçin." xml:space="preserve">
+    <value>Lütfen bir hizmet seçin.</value>
+  </data>
+  <data name="Lütfen bir randevu saati seçin." xml:space="preserve">
+    <value>Lütfen bir randevu saati seçin.</value>
+  </data>
+  <data name="Lütfen daha sonra tekrar deneyin." xml:space="preserve">
+    <value>Lütfen daha sonra tekrar deneyin.</value>
+  </data>
+  <data name="Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın." xml:space="preserve">
+    <value>Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın.</value>
+  </data>
+  <data name="Lütfen uygun saatlerden birini seçin." xml:space="preserve">
+    <value>Lütfen uygun saatlerden birini seçin.</value>
+  </data>
+  <data name="MEDICLINIC’E KATILIN" xml:space="preserve">
+    <value>MEDICLINIC’E KATILIN</value>
+  </data>
+  <data name="MediClinic" xml:space="preserve">
+    <value>MediClinic</value>
+  </data>
+  <data name="MediClinic hesabınızla size özel panelinize ulaşın." xml:space="preserve">
+    <value>MediClinic hesabınızla size özel panelinize ulaşın.</value>
+  </data>
+  <data name="MediClinic uygulamasına hoş geldiniz." xml:space="preserve">
+    <value>MediClinic uygulamasına hoş geldiniz.</value>
+  </data>
+  <data name="MediClinic · Hasta ve klinik portalı" xml:space="preserve">
+    <value>MediClinic · Hasta ve klinik portalı</value>
+  </data>
+  <data name="MediClinic · Sağlık hizmetlerine kolay erişim" xml:space="preserve">
+    <value>MediClinic · Sağlık hizmetlerine kolay erişim</value>
+  </data>
+  <data name="Menüden hesabınıza açık sayfalara ulaşabilirsiniz." xml:space="preserve">
+    <value>Menüden hesabınıza açık sayfalara ulaşabilirsiniz.</value>
+  </data>
+  <data name="Mevcut giriş hesabı korunur." xml:space="preserve">
+    <value>Mevcut giriş hesabı korunur.</value>
+  </data>
+  <data name="Onayla" xml:space="preserve">
+    <value>Onayla</value>
+  </data>
+  <data name="Onaylandı" xml:space="preserve">
+    <value>Onaylandı</value>
+  </data>
+  <data name="Onaylı yaklaşan randevu" xml:space="preserve">
+    <value>Onaylı yaklaşan randevu</value>
+  </data>
+  <data name="Oturumunuz açık. İşlemlerinize gezinme menüsünden ulaşabilirsiniz." xml:space="preserve">
+    <value>Oturumunuz açık. İşlemlerinize gezinme menüsünden ulaşabilirsiniz.</value>
+  </data>
+  <data name="PERSONEL PANELİ" xml:space="preserve">
+    <value>PERSONEL PANELİ</value>
+  </data>
+  <data name="Panelime dön" xml:space="preserve">
+    <value>Panelime dön</value>
+  </data>
+  <data name="Parola" xml:space="preserve">
+    <value>Parola</value>
+  </data>
+  <data name="Parola alanı zorunludur." xml:space="preserve">
+    <value>Parola alanı zorunludur.</value>
+  </data>
+  <data name="Parola daha fazla farklı karakter içermelidir." xml:space="preserve">
+    <value>Parola daha fazla farklı karakter içermelidir.</value>
+  </data>
+  <data name="Parola en az 12 karakter olmalıdır." xml:space="preserve">
+    <value>Parola en az 12 karakter olmalıdır.</value>
+  </data>
+  <data name="Parola en az bir büyük harf içermelidir." xml:space="preserve">
+    <value>Parola en az bir büyük harf içermelidir.</value>
+  </data>
+  <data name="Parola en az bir küçük harf içermelidir." xml:space="preserve">
+    <value>Parola en az bir küçük harf içermelidir.</value>
+  </data>
+  <data name="Parola en az bir rakam içermelidir." xml:space="preserve">
+    <value>Parola en az bir rakam içermelidir.</value>
+  </data>
+  <data name="Parola en az bir özel karakter içermelidir." xml:space="preserve">
+    <value>Parola en az bir özel karakter içermelidir.</value>
+  </data>
+  <data name="Parola yalnızca yeni hesap oluştururken kullanılabilir." xml:space="preserve">
+    <value>Parola yalnızca yeni hesap oluştururken kullanılabilir.</value>
+  </data>
+  <data name="Parolanız büyük ve küçük harflere duyarlıdır." xml:space="preserve">
+    <value>Parolanız büyük ve küçük harflere duyarlıdır.</value>
+  </data>
+  <data name="Parolayı gizle" xml:space="preserve">
+    <value>Parolayı gizle</value>
+  </data>
+  <data name="Parolayı göster" xml:space="preserve">
+    <value>Parolayı göster</value>
+  </data>
+  <data name="Pazar" xml:space="preserve">
+    <value>Pazar</value>
+  </data>
+  <data name="Pazartesi" xml:space="preserve">
+    <value>Pazartesi</value>
+  </data>
+  <data name="Personel" xml:space="preserve">
+    <value>Personel</value>
+  </data>
+  <data name="Personel / " xml:space="preserve">
+    <value>Personel / </value>
+  </data>
+  <data name="Personel hesabı (isteğe bağlı)" xml:space="preserve">
+    <value>Personel hesabı (isteğe bağlı)</value>
+  </data>
+  <data name="Personel paneli" xml:space="preserve">
+    <value>Personel paneli</value>
+  </data>
+  <data name="Personel paneline dön" xml:space="preserve">
+    <value>Personel paneline dön</value>
+  </data>
+  <data name="Personel randevuları" xml:space="preserve">
+    <value>Personel randevuları</value>
+  </data>
+  <data name="Perşembe" xml:space="preserve">
+    <value>Perşembe</value>
+  </data>
+  <data name="RANDEVU YÖNETİMİ" xml:space="preserve">
+    <value>RANDEVU YÖNETİMİ</value>
+  </data>
+  <data name="RANDEVULARIM" xml:space="preserve">
+    <value>RANDEVULARIM</value>
+  </data>
+  <data name="Randevu" xml:space="preserve">
+    <value>Randevu</value>
+  </data>
+  <data name="Randevu aşamaları" xml:space="preserve">
+    <value>Randevu aşamaları</value>
+  </data>
+  <data name="Randevu bulunamadı" xml:space="preserve">
+    <value>Randevu bulunamadı</value>
+  </data>
+  <data name="Randevu detayı" xml:space="preserve">
+    <value>Randevu detayı</value>
+  </data>
+  <data name="Randevu detayını görüntüle" xml:space="preserve">
+    <value>Randevu detayını görüntüle</value>
+  </data>
+  <data name="Randevu durumu filtreleri" xml:space="preserve">
+    <value>Randevu durumu filtreleri</value>
+  </data>
+  <data name="Randevu inceleme" xml:space="preserve">
+    <value>Randevu inceleme</value>
+  </data>
+  <data name="Randevu iptal edildi." xml:space="preserve">
+    <value>Randevu iptal edildi.</value>
+  </data>
+  <data name="Randevu iptal edilemedi. Güncel randevu durumunu kontrol edin." xml:space="preserve">
+    <value>Randevu iptal edilemedi. Güncel randevu durumunu kontrol edin.</value>
+  </data>
+  <data name="Randevu listesine dön" xml:space="preserve">
+    <value>Randevu listesine dön</value>
+  </data>
+  <data name="Randevu oluştur" xml:space="preserve">
+    <value>Randevu oluştur</value>
+  </data>
+  <data name="Randevu oluşturulamadı. Seçtiğiniz saat dolmuş olabilir. Güncel saatleri kontrol ederek tekrar deneyin." xml:space="preserve">
+    <value>Randevu oluşturulamadı. Seçtiğiniz saat dolmuş olabilir. Güncel saatleri kontrol ederek tekrar deneyin.</value>
+  </data>
+  <data name="Randevu onaylandı." xml:space="preserve">
+    <value>Randevu onaylandı.</value>
+  </data>
+  <data name="Randevu reddedildi." xml:space="preserve">
+    <value>Randevu reddedildi.</value>
+  </data>
+  <data name="Randevu saatleri: uygun bir saat seçin" xml:space="preserve">
+    <value>Randevu saatleri: uygun bir saat seçin</value>
+  </data>
+  <data name="Randevu süresi" xml:space="preserve">
+    <value>Randevu süresi</value>
+  </data>
+  <data name="Randevu talebini gönder" xml:space="preserve">
+    <value>Randevu talebini gönder</value>
+  </data>
+  <data name="Randevu talebiniz alındı. Beklemede; personel incelemesinden sonra sonuçlandırılacaktır." xml:space="preserve">
+    <value>Randevu talebiniz alındı. Beklemede; personel incelemesinden sonra sonuçlandırılacaktır.</value>
+  </data>
+  <data name="Randevu tamamlandı." xml:space="preserve">
+    <value>Randevu tamamlandı.</value>
+  </data>
+  <data name="Randevu tarihi" xml:space="preserve">
+    <value>Randevu tarihi</value>
+  </data>
+  <data name="Randevu özeti" xml:space="preserve">
+    <value>Randevu özeti</value>
+  </data>
+  <data name="Randevu, planlanan bitiş saatinden sonra tamamlanabilir." xml:space="preserve">
+    <value>Randevu, planlanan bitiş saatinden sonra tamamlanabilir.</value>
+  </data>
+  <data name="Randevulara dön" xml:space="preserve">
+    <value>Randevulara dön</value>
+  </data>
+  <data name="Randevulara genel bakış" xml:space="preserve">
+    <value>Randevulara genel bakış</value>
+  </data>
+  <data name="Randevularım" xml:space="preserve">
+    <value>Randevularım</value>
+  </data>
+  <data name="Randevularımı görüntüle" xml:space="preserve">
+    <value>Randevularımı görüntüle</value>
+  </data>
+  <data name="Randevularınız, başlangıç tarihine göre yeniden eskiye" xml:space="preserve">
+    <value>Randevularınız, başlangıç tarihine göre yeniden eskiye</value>
+  </data>
+  <data name="Randevularınızı takip edin" xml:space="preserve">
+    <value>Randevularınızı takip edin</value>
+  </data>
+  <data name="Randevularınızı takip edin, sağlık planınızı kolayca yönetin." xml:space="preserve">
+    <value>Randevularınızı takip edin, sağlık planınızı kolayca yönetin.</value>
+  </data>
+  <data name="Randevusu veya uygunluk kaydı olan çalışan başka bölüme taşınamaz." xml:space="preserve">
+    <value>Randevusu veya uygunluk kaydı olan çalışan başka bölüme taşınamaz.</value>
+  </data>
+  <data name="Randevuyu iptal et" xml:space="preserve">
+    <value>Randevuyu iptal et</value>
+  </data>
+  <data name="Randevuyu onayla" xml:space="preserve">
+    <value>Randevuyu onayla</value>
+  </data>
+  <data name="Randevuyu reddet" xml:space="preserve">
+    <value>Randevuyu reddet</value>
+  </data>
+  <data name="Randevuyu tamamla" xml:space="preserve">
+    <value>Randevuyu tamamla</value>
+  </data>
+  <data name="Reddedildi" xml:space="preserve">
+    <value>Reddedildi</value>
+  </data>
+  <data name="Reddet" xml:space="preserve">
+    <value>Reddet</value>
+  </data>
+  <data name="Ret gerekçesi (zorunlu)" xml:space="preserve">
+    <value>Ret gerekçesi (zorunlu)</value>
+  </data>
+  <data name="Ret gerekçesi zorunludur." xml:space="preserve">
+    <value>Ret gerekçesi zorunludur.</value>
+  </data>
+  <data name="Rol / uzmanlık" xml:space="preserve">
+    <value>Rol / uzmanlık</value>
+  </data>
+  <data name="SAĞLIK YÖNETİMİ" xml:space="preserve">
+    <value>SAĞLIK YÖNETİMİ</value>
+  </data>
+  <data name="SAĞLIĞINIZ İÇİN BİR ADIM" xml:space="preserve">
+    <value>SAĞLIĞINIZ İÇİN BİR ADIM</value>
+  </data>
+  <data name="SONRAKİ ADIM" xml:space="preserve">
+    <value>SONRAKİ ADIM</value>
+  </data>
+  <data name="Saat" xml:space="preserve">
+    <value>Saat</value>
+  </data>
+  <data name="Saat kaynağı" xml:space="preserve">
+    <value>Saat kaynağı</value>
+  </data>
+  <data name="Saatler Europe/Istanbul saat diliminde gösterilir." xml:space="preserve">
+    <value>Saatler Europe/Istanbul saat diliminde gösterilir.</value>
+  </data>
+  <data name="Saatler açık günlere uygulandı. Değişiklikleri kaydediniz." xml:space="preserve">
+    <value>Saatler açık günlere uygulandı. Değişiklikleri kaydediniz.</value>
+  </data>
+  <data name="Saatler İstanbul saatine göredir." xml:space="preserve">
+    <value>Saatler İstanbul saatine göredir.</value>
+  </data>
+  <data name="Saatler İstanbul saatine göredir. Bugünkü sayılar randevunun başlangıç tarihine göre hesaplanır; bekleyen talepler tüm tarihleri kapsar." xml:space="preserve">
+    <value>Saatler İstanbul saatine göredir. Bugünkü sayılar randevunun başlangıç tarihine göre hesaplanır; bekleyen talepler tüm tarihleri kapsar.</value>
+  </data>
+  <data name="Salı" xml:space="preserve">
+    <value>Salı</value>
+  </data>
+  <data name="Sağlık personeli" xml:space="preserve">
+    <value>Sağlık personeli</value>
+  </data>
+  <data name="Sağlık personeli için görev giriniz. Doktor rolü otomatik belirlenir." xml:space="preserve">
+    <value>Sağlık personeli için görev giriniz. Doktor rolü otomatik belirlenir.</value>
+  </data>
+  <data name="Sağlık planınıza ilk randevunuzu oluşturarak başlayabilirsiniz." xml:space="preserve">
+    <value>Sağlık planınıza ilk randevunuzu oluşturarak başlayabilirsiniz.</value>
+  </data>
+  <data name="Sağlığınız için, birlikte." xml:space="preserve">
+    <value>Sağlığınız için, birlikte.</value>
+  </data>
+  <data name="Seçenekler değişti veya seçim geçersiz. Lütfen seçimlerinizi güncelleyin." xml:space="preserve">
+    <value>Seçenekler değişti veya seçim geçersiz. Lütfen seçimlerinizi güncelleyin.</value>
+  </data>
+  <data name="Seçenekler güncellendi. Sıradaki seçiminizi yapabilirsiniz." xml:space="preserve">
+    <value>Seçenekler güncellendi. Sıradaki seçiminizi yapabilirsiniz.</value>
+  </data>
+  <data name="Seçenekler otomatik yüklenemedi. Seçenekleri güncelle düğmesiyle devam edin." xml:space="preserve">
+    <value>Seçenekler otomatik yüklenemedi. Seçenekleri güncelle düğmesiyle devam edin.</value>
+  </data>
+  <data name="Seçenekler veya uygun saatler yüklenemedi. Tarihi ve seçimlerinizi kontrol edin." xml:space="preserve">
+    <value>Seçenekler veya uygun saatler yüklenemedi. Tarihi ve seçimlerinizi kontrol edin.</value>
+  </data>
+  <data name="Seçenekler yükleniyor…" xml:space="preserve">
+    <value>Seçenekler yükleniyor…</value>
+  </data>
+  <data name="Seçenekleri güncelle" xml:space="preserve">
+    <value>Seçenekleri güncelle</value>
+  </data>
+  <data name="Seçilen bölümün hizmetlerini işaretleyiniz. İşaretlenmeyen hizmetler için yeni randevu alınamaz; mevcut randevular korunur." xml:space="preserve">
+    <value>Seçilen bölümün hizmetlerini işaretleyiniz. İşaretlenmeyen hizmetler için yeni randevu alınamaz; mevcut randevular korunur.</value>
+  </data>
+  <data name="Seçilen günlerden biri geçmişte veya mevcut uygunlukla çakışıyor. Hiçbir kayıt oluşturulmadı." xml:space="preserve">
+    <value>Seçilen günlerden biri geçmişte veya mevcut uygunlukla çakışıyor. Hiçbir kayıt oluşturulmadı.</value>
+  </data>
+  <data name="Seçimleri ve tarih bilgisini kontrol edin." xml:space="preserve">
+    <value>Seçimleri ve tarih bilgisini kontrol edin.</value>
+  </data>
+  <data name="Seçin" xml:space="preserve">
+    <value>Seçin</value>
+  </data>
+  <data name="Seçtiğiniz günler için ayrı tarih aralıkları oluşturulur. Bu işlem şubenin çalışma saatlerini değiştirmez. Randevu alınabilmesi için hem doktorun uygun hem şubenin açık olması gerekir." xml:space="preserve">
+    <value>Seçtiğiniz günler için ayrı tarih aralıkları oluşturulur. Bu işlem şubenin çalışma saatlerini değiştirmez. Randevu alınabilmesi için hem doktorun uygun hem şubenin açık olması gerekir.</value>
+  </data>
+  <data name="Seçtiğiniz saat artık uygun değil. Lütfen güncel saatlerden birini seçin." xml:space="preserve">
+    <value>Seçtiğiniz saat artık uygun değil. Lütfen güncel saatlerden birini seçin.</value>
+  </data>
+  <data name="Size uygun hizmeti ve zamanı seçin. Tüm saatler İstanbul saat dilimindedir." xml:space="preserve">
+    <value>Size uygun hizmeti ve zamanı seçin. Tüm saatler İstanbul saat dilimindedir.</value>
+  </data>
+  <data name="Son tarih (dahil, en fazla 91 gün)" xml:space="preserve">
+    <value>Son tarih (dahil, en fazla 91 gün)</value>
+  </data>
+  <data name="Soyad" xml:space="preserve">
+    <value>Soyad</value>
+  </data>
+  <data name="Soyad alanı zorunludur." xml:space="preserve">
+    <value>Soyad alanı zorunludur.</value>
+  </data>
+  <data name="Soyad en fazla 100 karakter olabilir." xml:space="preserve">
+    <value>Soyad en fazla 100 karakter olabilir.</value>
+  </data>
+  <data name="Soyad zorunludur." xml:space="preserve">
+    <value>Soyad zorunludur.</value>
+  </data>
+  <data name="Süre" xml:space="preserve">
+    <value>Süre</value>
+  </data>
+  <data name="Süre (dakika)" xml:space="preserve">
+    <value>Süre (dakika)</value>
+  </data>
+  <data name="Süre 1-1440 dakika olmalıdır." xml:space="preserve">
+    <value>Süre 1-1440 dakika olmalıdır.</value>
+  </data>
+  <data name="Sıradaki randevunuz" xml:space="preserve">
+    <value>Sıradaki randevunuz</value>
+  </data>
+  <data name="Talebi değerlendir" xml:space="preserve">
+    <value>Talebi değerlendir</value>
+  </data>
+  <data name="Talep özetini gör" xml:space="preserve">
+    <value>Talep özetini gör</value>
+  </data>
+  <data name="Talepler tarih sırasıyla gösterilir. İlk 6 talep listelenir." xml:space="preserve">
+    <value>Talepler tarih sırasıyla gösterilir. İlk 6 talep listelenir.</value>
+  </data>
+  <data name="Tamamla" xml:space="preserve">
+    <value>Tamamla</value>
+  </data>
+  <data name="Tamamlanan randevu" xml:space="preserve">
+    <value>Tamamlanan randevu</value>
+  </data>
+  <data name="Tamamlandı" xml:space="preserve">
+    <value>Tamamlandı</value>
+  </data>
+  <data name="Tarih" xml:space="preserve">
+    <value>Tarih</value>
+  </data>
+  <data name="Tarih aralığında seçilen gün bulunmuyor." xml:space="preserve">
+    <value>Tarih aralığında seçilen gün bulunmuyor.</value>
+  </data>
+  <data name="Tarih ve başlangıç saati" xml:space="preserve">
+    <value>Tarih ve başlangıç saati</value>
+  </data>
+  <data name="Tarih ve saat" xml:space="preserve">
+    <value>Tarih ve saat</value>
+  </data>
+  <data name="Tarih ve saat (İstanbul)" xml:space="preserve">
+    <value>Tarih ve saat (İstanbul)</value>
+  </data>
+  <data name="Tarih ve saate devam et" xml:space="preserve">
+    <value>Tarih ve saate devam et</value>
+  </data>
+  <data name="Tarih ve saati değiştir" xml:space="preserve">
+    <value>Tarih ve saati değiştir</value>
+  </data>
+  <data name="Tarihe göre filtrele" xml:space="preserve">
+    <value>Tarihe göre filtrele</value>
+  </data>
+  <data name="Tek seferlik tarih aralığı: başlangıç ve bitiş için tarih ve saat seçin. Saatler İstanbul saatidir. Doktor uygunluğu şube çalışma saatlerini değiştirmez." xml:space="preserve">
+    <value>Tek seferlik tarih aralığı: başlangıç ve bitiş için tarih ve saat seçin. Saatler İstanbul saatidir. Doktor uygunluğu şube çalışma saatlerini değiştirmez.</value>
+  </data>
+  <data name="Tekrarlanacak günler" xml:space="preserve">
+    <value>Tekrarlanacak günler</value>
+  </data>
+  <data name="Tema" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="Temizle" xml:space="preserve">
+    <value>Temizle</value>
+  </data>
+  <data name="Toplam randevu" xml:space="preserve">
+    <value>Toplam randevu</value>
+  </data>
+  <data name="Tüm bölümler" xml:space="preserve">
+    <value>Tüm bölümler</value>
+  </data>
+  <data name="Tüm haftayı kaydet" xml:space="preserve">
+    <value>Tüm haftayı kaydet</value>
+  </data>
+  <data name="Tüm klinikler" xml:space="preserve">
+    <value>Tüm klinikler</value>
+  </data>
+  <data name="Tüm randevular" xml:space="preserve">
+    <value>Tüm randevular</value>
+  </data>
+  <data name="Tüm randevuları görüntüle" xml:space="preserve">
+    <value>Tüm randevuları görüntüle</value>
+  </data>
+  <data name="Tüm randevuları incele" xml:space="preserve">
+    <value>Tüm randevuları incele</value>
+  </data>
+  <data name="Tüm saatler İstanbul saat dilimindedir." xml:space="preserve">
+    <value>Tüm saatler İstanbul saat dilimindedir.</value>
+  </data>
+  <data name="Tüm tarihler" xml:space="preserve">
+    <value>Tüm tarihler</value>
+  </data>
+  <data name="Tüm şubeler" xml:space="preserve">
+    <value>Tüm şubeler</value>
+  </data>
+  <data name="Tümü" xml:space="preserve">
+    <value>Tümü</value>
+  </data>
+  <data name="Türkiye yerel saati. Kaydedilen program hasta randevu ekranındaki uygun saatlere uygulanır. Henüz kaydedilmemiş günlerde şube saat kısıtlaması uygulanmaz. İlk kayıtta yedi günün tamamı kaydedilir; kaydetmeden önce açık ve kapalı günleri kontrol edin." xml:space="preserve">
+    <value>Türkiye yerel saati. Kaydedilen program hasta randevu ekranındaki uygun saatlere uygulanır. Henüz kaydedilmemiş günlerde şube saat kısıtlaması uygulanmaz. İlk kayıtta yedi günün tamamı kaydedilir; kaydetmeden önce açık ve kapalı günleri kontrol edin.</value>
+  </data>
+  <data name="Uygulama menüsü" xml:space="preserve">
+    <value>Uygulama menüsü</value>
+  </data>
+  <data name="Uygulama yalnızca saatleri kopyalar; kapalı günler kapalı kalır." xml:space="preserve">
+    <value>Uygulama yalnızca saatleri kopyalar; kapalı günler kapalı kalır.</value>
+  </data>
+  <data name="Uygun saatleri göster" xml:space="preserve">
+    <value>Uygun saatleri göster</value>
+  </data>
+  <data name="Uygunluk" xml:space="preserve">
+    <value>Uygunluk</value>
+  </data>
+  <data name="Uygunluk aralıkları" xml:space="preserve">
+    <value>Uygunluk aralıkları</value>
+  </data>
+  <data name="Uygunluk aralığı mevcut bir kayıtla çakışıyor." xml:space="preserve">
+    <value>Uygunluk aralığı mevcut bir kayıtla çakışıyor.</value>
+  </data>
+  <data name="Uygunluk düzenle" xml:space="preserve">
+    <value>Uygunluk düzenle</value>
+  </data>
+  <data name="Uygunluk ekle" xml:space="preserve">
+    <value>Uygunluk ekle</value>
+  </data>
+  <data name="Uygunluk kaydedildi." xml:space="preserve">
+    <value>Uygunluk kaydedildi.</value>
+  </data>
+  <data name="Uygunluk listesine dön" xml:space="preserve">
+    <value>Uygunluk listesine dön</value>
+  </data>
+  <data name="Uygunluk oluşturuldu: {0} gün." xml:space="preserve">
+    <value>Uygunluk oluşturuldu: {0} gün.</value>
+  </data>
+  <data name="Uygunluk silindi." xml:space="preserve">
+    <value>Uygunluk silindi.</value>
+  </data>
+  <data name="Uzmanlık" xml:space="preserve">
+    <value>Uzmanlık</value>
+  </data>
+  <data name="Uzmanlık en fazla 150 karakter olabilir." xml:space="preserve">
+    <value>Uzmanlık en fazla 150 karakter olabilir.</value>
+  </data>
+  <data name="Uzmanlık zorunludur." xml:space="preserve">
+    <value>Uzmanlık zorunludur.</value>
+  </data>
+  <data name="Yaklaşan randevular, başlangıç saati henüz gelmemiş bekleyen veya onaylı randevulardır. Saatler İstanbul saatine göre gösterilir." xml:space="preserve">
+    <value>Yaklaşan randevular, başlangıç saati henüz gelmemiş bekleyen veya onaylı randevulardır. Saatler İstanbul saatine göre gösterilir.</value>
+  </data>
+  <data name="Yaklaşan randevunuz bulunmuyor. Geçmiş ve diğer randevularınızı randevu listenizden inceleyebilirsiniz." xml:space="preserve">
+    <value>Yaklaşan randevunuz bulunmuyor. Geçmiş ve diğer randevularınızı randevu listenizden inceleyebilirsiniz.</value>
+  </data>
+  <data name="Yaklaşan talepler önce gösterilir. İlk 6 talep listelenir; tüm talepler için randevu listesini açın." xml:space="preserve">
+    <value>Yaklaşan talepler önce gösterilir. İlk 6 talep listelenir; tüm talepler için randevu listesini açın.</value>
+  </data>
+  <data name="Yalnızca gelecek aralıklar düzenlenebilir. Aktif randevuları kapsayan uygunluk korunmalıdır." xml:space="preserve">
+    <value>Yalnızca gelecek aralıklar düzenlenebilir. Aktif randevuları kapsayan uygunluk korunmalıdır.</value>
+  </data>
+  <data name="Yalnızca gelecek uygunluklar düzenlenebilir." xml:space="preserve">
+    <value>Yalnızca gelecek uygunluklar düzenlenebilir.</value>
+  </data>
+  <data name="Yalnızca seçilen bölüme ait hizmetler atanabilir." xml:space="preserve">
+    <value>Yalnızca seçilen bölüme ait hizmetler atanabilir.</value>
+  </data>
+  <data name="Yeni klinik oluşturma yetkiniz bulunmuyor." xml:space="preserve">
+    <value>Yeni klinik oluşturma yetkiniz bulunmuyor.</value>
+  </data>
+  <data name="Yeni randevu oluştur" xml:space="preserve">
+    <value>Yeni randevu oluştur</value>
+  </data>
+  <data name="Yeni randevular" xml:space="preserve">
+    <value>Yeni randevular</value>
+  </data>
+  <data name="Yeni çalışan" xml:space="preserve">
+    <value>Yeni çalışan</value>
+  </data>
+  <data name="Yetkili kliniklerinizde çalışan bulunamadı." xml:space="preserve">
+    <value>Yetkili kliniklerinizde çalışan bulunamadı.</value>
+  </data>
+  <data name="Yetkili olduğunuz klinik bulunmuyor. Klinik yetkisi için sistem sorumlusuna başvurunuz." xml:space="preserve">
+    <value>Yetkili olduğunuz klinik bulunmuyor. Klinik yetkisi için sistem sorumlusuna başvurunuz.</value>
+  </data>
+  <data name="Yetkili olduğunuz kliniklerin randevu akışını takip edin." xml:space="preserve">
+    <value>Yetkili olduğunuz kliniklerin randevu akışını takip edin.</value>
+  </data>
+  <data name="YÖNETİCİ PANELİ" xml:space="preserve">
+    <value>YÖNETİCİ PANELİ</value>
+  </data>
+  <data name="Yönetici paneli" xml:space="preserve">
+    <value>Yönetici paneli</value>
+  </data>
+  <data name="Yönetici paneline dön" xml:space="preserve">
+    <value>Yönetici paneline dön</value>
+  </data>
+  <data name="Yönetici randevuları" xml:space="preserve">
+    <value>Yönetici randevuları</value>
+  </data>
+  <data name="Zaten hesabınız var mı?" xml:space="preserve">
+    <value>Zaten hesabınız var mı?</value>
+  </data>
+  <data name="dakika" xml:space="preserve">
+    <value>dakika</value>
+  </data>
+  <data name="durumunda oluşturulur. Talebiniz personel tarafından incelenir; gönderim kesin onay anlamına gelmez." xml:space="preserve">
+    <value>durumunda oluşturulur. Talebiniz personel tarafından incelenir; gönderim kesin onay anlamına gelmez.</value>
+  </data>
+  <data name="{0} - {1} dakika - {2}" xml:space="preserve">
+    <value>{0} - {1} dakika - {2}</value>
+  </data>
+  <data name="{0} bilgilerini düzenle" xml:space="preserve">
+    <value>{0} bilgilerini düzenle</value>
+  </data>
+  <data name="{0} dakika" xml:space="preserve">
+    <value>{0} dakika</value>
+  </data>
+  <data name="{0} randevu detayını görüntüle" xml:space="preserve">
+    <value>{0} randevu detayını görüntüle</value>
+  </data>
+  <data name="{0} randevu gösteriliyor. Saatler İstanbul saatine göredir." xml:space="preserve">
+    <value>{0} randevu gösteriliyor. Saatler İstanbul saatine göredir.</value>
+  </data>
+  <data name="{0} uygunluğunu yönet" xml:space="preserve">
+    <value>{0} uygunluğunu yönet</value>
+  </data>
+  <data name="{0} — Haftalık uygunluk oluştur" xml:space="preserve">
+    <value>{0} — Haftalık uygunluk oluştur</value>
+  </data>
+  <data name="{0} — Uygunluk" xml:space="preserve">
+    <value>{0} — Uygunluk</value>
+  </data>
+  <data name="Çalışan bilgileri kaydedildi." xml:space="preserve">
+    <value>Çalışan bilgileri kaydedildi.</value>
+  </data>
+  <data name="Çalışan listesine dön" xml:space="preserve">
+    <value>Çalışan listesine dön</value>
+  </data>
+  <data name="Çalışan yönetimi" xml:space="preserve">
+    <value>Çalışan yönetimi</value>
+  </data>
+  <data name="Çalışanı düzenle" xml:space="preserve">
+    <value>Çalışanı düzenle</value>
+  </data>
+  <data name="Çalışma saatleri kaydedilemedi. Değerleriniz korunuyor; lütfen tekrar deneyiniz." xml:space="preserve">
+    <value>Çalışma saatleri kaydedilemedi. Değerleriniz korunuyor; lütfen tekrar deneyiniz.</value>
+  </data>
+  <data name="Çalışma saatlerini düzenle" xml:space="preserve">
+    <value>Çalışma saatlerini düzenle</value>
+  </data>
+  <data name="Çarşamba" xml:space="preserve">
+    <value>Çarşamba</value>
+  </data>
+  <data name="Çıkış yap" xml:space="preserve">
+    <value>Çıkış yap</value>
+  </data>
+  <data name="Önce kliniği seçip “Seçenekleri güncelle” düğmesine basın. Ardından sırayla şube, bölüm, doktor ve hizmet seçin. Üst seçimi değiştirirseniz alt seçimleri yeniden yapın." xml:space="preserve">
+    <value>Önce kliniği seçip “Seçenekleri güncelle” düğmesine basın. Ardından sırayla şube, bölüm, doktor ve hizmet seçin. Üst seçimi değiştirirseniz alt seçimleri yeniden yapın.</value>
+  </data>
+  <data name="Önce üst seçimi tamamlayın" xml:space="preserve">
+    <value>Önce üst seçimi tamamlayın</value>
+  </data>
+  <data name="Öğle arası için sabah ve öğleden sonra aralıklarını ayrı ayrı oluşturabilirsiniz. Çakışma varsa işlemin tamamı iptal edilir; mevcut uygunluk ve randevular korunur." xml:space="preserve">
+    <value>Öğle arası için sabah ve öğleden sonra aralıklarını ayrı ayrı oluşturabilirsiniz. Çakışma varsa işlemin tamamı iptal edilir; mevcut uygunluk ve randevular korunur.</value>
+  </data>
+  <data name="Ücret (TL)" xml:space="preserve">
+    <value>Ücret (TL)</value>
+  </data>
+  <data name="Ücret (TRY)" xml:space="preserve">
+    <value>Ücret (TRY)</value>
+  </data>
+  <data name="Ücret en fazla iki ondalık basamak içermelidir." xml:space="preserve">
+    <value>Ücret en fazla iki ondalık basamak içermelidir.</value>
+  </data>
+  <data name="Ücret:" xml:space="preserve">
+    <value>Ücret:</value>
+  </data>
+  <data name="çalışma saatleri kaydedildi." xml:space="preserve">
+    <value>çalışma saatleri kaydedildi.</value>
+  </data>
+  <data name="İlk parola (en az 12 karakter)" xml:space="preserve">
+    <value>İlk parola (en az 12 karakter)</value>
+  </data>
+  <data name="İlk tarih (dahil)" xml:space="preserve">
+    <value>İlk tarih (dahil)</value>
+  </data>
+  <data name="İptal edildi" xml:space="preserve">
+    <value>İptal edildi</value>
+  </data>
+  <data name="İptal gerekçesi" xml:space="preserve">
+    <value>İptal gerekçesi</value>
+  </data>
+  <data name="İptal gerekçesi zorunludur ve en fazla 2000 karakter olabilir." xml:space="preserve">
+    <value>İptal gerekçesi zorunludur ve en fazla 2000 karakter olabilir.</value>
+  </data>
+  <data name="İstek kimliği:" xml:space="preserve">
+    <value>İstek kimliği:</value>
+  </data>
+  <data name="İçeriğe geç" xml:space="preserve">
+    <value>İçeriğe geç</value>
+  </data>
+  <data name="İşlem" xml:space="preserve">
+    <value>İşlem</value>
+  </data>
+  <data name="İşlem gerçekleştirilemedi. Randevunun durumu değişmiş veya bitiş saati henüz gelmemiş olabilir. Güncel bilgileri kontrol edin." xml:space="preserve">
+    <value>İşlem gerçekleştirilemedi. Randevunun durumu değişmiş veya bitiş saati henüz gelmemiş olabilir. Güncel bilgileri kontrol edin.</value>
+  </data>
+  <data name="İşlem tamamlanamadı. Aşağıdaki bilgileri kontrol edin." xml:space="preserve">
+    <value>İşlem tamamlanamadı. Aşağıdaki bilgileri kontrol edin.</value>
+  </data>
+  <data name="İşlemler" xml:space="preserve">
+    <value>İşlemler</value>
+  </data>
+  <data name="Şu anda randevu alınabilecek hizmet bulunmuyor. Lütfen daha sonra tekrar deneyin." xml:space="preserve">
+    <value>Şu anda randevu alınabilecek hizmet bulunmuyor. Lütfen daha sonra tekrar deneyin.</value>
+  </data>
+  <data name="Şube" xml:space="preserve">
+    <value>Şube</value>
+  </data>
+  <data name="Şube bu tarihte kapalı. Başka bir tarih seçin." xml:space="preserve">
+    <value>Şube bu tarihte kapalı. Başka bir tarih seçin.</value>
+  </data>
+  <data name="Şube oluştur" xml:space="preserve">
+    <value>Şube oluştur</value>
+  </data>
+  <data name="Şubeyi düzenle" xml:space="preserve">
+    <value>Şubeyi düzenle</value>
+  </data>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>Bu alan zorunludur.</value>
+  </data>
+  <data name="The field {0} must be a string with a maximum length of {1}." xml:space="preserve">
+    <value>Bu alan en fazla {1} karakter olabilir.</value>
+  </data>
+  <data name="Hizmetler" xml:space="preserve"><value>Hizmetler</value></data>
+  <data name="Bilinmeyen durum" xml:space="preserve"><value>Bilinmeyen durum</value></data>
+  <data name="Randevu listesi" xml:space="preserve"><value>Randevu listesi</value></data>
+</root>

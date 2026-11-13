@@ -1,12 +1,12 @@
 @model MediClinic.Web.Models.AvailabilityEditModel
-@{ ViewData["Title"] = "Uygunluk düzenle"; }
-<h1>@Model.DoctorName — Uygunluk</h1>
-<p>Tek seferlik tarih aralığı: başlangıç ve bitiş için tarih ve saat seçin. Saatler İstanbul saatidir. Doktor uygunluğu şube çalışma saatlerini değiştirmez.</p>
+@{ ViewData["Title"] = Ui.Text("Uygunluk düzenle"); }
+<h1>@Ui.Format("{0} — Uygunluk", Model.DoctorName)</h1>
+<p>@Ui.Text("Tek seferlik tarih aralığı: başlangıç ve bitiş için tarih ve saat seçin. Saatler İstanbul saatidir. Doktor uygunluğu şube çalışma saatlerini değiştirmez.")</p>
 <form asp-action="Interval" method="post" class="form-stack">
     <div asp-validation-summary="All" role="alert"></div>
     <input asp-for="Id" type="hidden" /><input asp-for="DoctorId" type="hidden" />
-    <label asp-for="StartsAt">Başlangıç tarihi ve saati (İstanbul)</label><input asp-for="StartsAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
-    <label asp-for="EndsAt">Bitiş tarihi ve saati (İstanbul)</label><input asp-for="EndsAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
-    <p>Yalnızca gelecek aralıklar düzenlenebilir. Aktif randevuları kapsayan uygunluk korunmalıdır.</p>
-    <button type="submit">Kaydet</button><a asp-action="Availability" asp-route-doctorId="@Model.DoctorId">Uygunluk listesine dön</a>
+    <label asp-for="StartsAt">@Ui.Text("Başlangıç tarihi ve saati (İstanbul)")</label><input asp-for="StartsAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+    <label asp-for="EndsAt">@Ui.Text("Bitiş tarihi ve saati (İstanbul)")</label><input asp-for="EndsAt" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+    <p>@Ui.Text("Yalnızca gelecek aralıklar düzenlenebilir. Aktif randevuları kapsayan uygunluk korunmalıdır.")</p>
+    <button type="submit">@Ui.Text("Kaydet")</button><a asp-action="Availability" asp-route-doctorId="@Model.DoctorId">@Ui.Text("Uygunluk listesine dön")</a>
 </form>

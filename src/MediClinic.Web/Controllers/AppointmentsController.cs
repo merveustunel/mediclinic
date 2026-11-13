@@ -1,3 +1,4 @@
+using MediClinic.Web.Localization;
 using System.Security.Claims;
 using MediClinic.Application;
 using MediClinic.Infrastructure.Identity;
@@ -17,7 +18,7 @@ public sealed class AppointmentsController(IAppointmentBooking booking, TimeProv
         {
             var appointments = await booking.List(UserId, false);
             if (!PatientAppointmentsModel.IsValidFilter(status))
-                return BadRequest("Geçersiz randevu durumu.");
+                return BadRequest(Ui.Text("Geçersiz randevu durumu."));
             return View("PatientList", PatientAppointmentsModel.Create(appointments, status));
         }
         catch (BookingException) { return Forbid(); }
@@ -47,7 +48,7 @@ public sealed class AppointmentsController(IAppointmentBooking booking, TimeProv
         if (!ModelState.IsValid)
         {
             ModelState.Clear();
-            ModelState.AddModelError("", "Seçimleri ve tarih bilgisini kontrol edin.");
+            ModelState.AddModelError("", Ui.Text("Seçimleri ve tarih bilgisini kontrol edin."));
         }
         try
         {
@@ -60,21 +61,21 @@ public sealed class AppointmentsController(IAppointmentBooking booking, TimeProv
                 candidates = candidates.Where(x => keys[i](x) == ids[i]).ToArray();
                 if (ids[i] == Guid.Empty || candidates.Count == 0)
                 {
-                    if (ids[i] != Guid.Empty) ModelState.AddModelError("", "Seçenekler değişti veya seçim geçersiz. Lütfen seçimlerinizi güncelleyin.");
+                    if (ids[i] != Guid.Empty) ModelState.AddModelError("", Ui.Text("Seçenekler değişti veya seçim geçersiz. Lütfen seçimlerinizi güncelleyin."));
                     for (var j = i; j < ids.Length; j++) ids[j] = Guid.Empty;
                     break;
                 }
             }
             (model.ClinicId, model.BranchId, model.DepartmentId, model.DoctorId, model.ServiceId) = (ids[0], ids[1], ids[2], ids[3], ids[4]);
             if (model.Selection == null && model.Stage >= 2)
-                ModelState.AddModelError("", "Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın.");
+                ModelState.AddModelError("", Ui.Text("Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın."));
             model.Stage = model.Selection == null ? 1 : Math.Clamp(model.Stage, 1, 3);
             if (model.Stage == 3 && !ModelState.IsValid) model.Stage = 2;
             if (model.Stage >= 2 && ModelState.IsValid)
             {
                 if (model.Date < today)
                 {
-                    ModelState.AddModelError(nameof(model.Date), "Geçmiş bir tarihe randevu alınamaz. Lütfen bugün veya ileri bir tarih seçin.");
+                    ModelState.AddModelError(nameof(model.Date), Ui.Text("Geçmiş bir tarihe randevu alınamaz. Lütfen bugün veya ileri bir tarih seçin."));
                     model.Stage = 2;
                     model.LocalStart = null;
                     return;
@@ -85,14 +86,14 @@ public sealed class AppointmentsController(IAppointmentBooking booking, TimeProv
                     || Scheduling.ToUtc(model.LocalStart.Value) <= clock.GetUtcNow()))
                 {
                     ModelState.AddModelError("", model.LocalStart.HasValue
-                        ? "Seçtiğiniz saat artık uygun değil. Lütfen güncel saatlerden birini seçin."
-                        : "Lütfen uygun saatlerden birini seçin.");
+                        ? Ui.Text("Seçtiğiniz saat artık uygun değil. Lütfen güncel saatlerden birini seçin.")
+                        : Ui.Text("Lütfen uygun saatlerden birini seçin."));
                     model.Stage = 2;
                     model.LocalStart = null;
                 }
             }
         }
-        catch (BookingException) { model.Stage = 1; ModelState.AddModelError("", "Seçenekler veya uygun saatler yüklenemedi. Tarihi ve seçimlerinizi kontrol edin."); }
+        catch (BookingException) { model.Stage = 1; ModelState.AddModelError("", Ui.Text("Seçenekler veya uygun saatler yüklenemedi. Tarihi ve seçimlerinizi kontrol edin.")); }
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -102,16 +103,16 @@ public sealed class AppointmentsController(IAppointmentBooking booking, TimeProv
             return BadRequest();
         model.Stage = 3;
         await PrepareBooking(model);
-        if (model.Selection == null) ModelState.AddModelError("", "Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın.");
+        if (model.Selection == null) ModelState.AddModelError("", Ui.Text("Lütfen klinik, şube, bölüm, doktor ve hizmet seçimlerini tamamlayın."));
         if (ModelState.IsValid && model.Selection != null && model.Stage == 3)
         {
             try
             {
                 var id = await booking.Book(UserId, new(model.ClinicId, model.BranchId, model.DepartmentId, model.DoctorId, model.ServiceId, model.LocalStart!.Value));
-                TempData["Message"] = "Randevu talebiniz alındı. Beklemede; personel incelemesinden sonra sonuçlandırılacaktır.";
+                TempData["Message"] = Ui.Text("Randevu talebiniz alındı. Beklemede; personel incelemesinden sonra sonuçlandırılacaktır.");
                 return RedirectToAction(nameof(Details), new { id });
             }
-            catch (BookingException) { ModelState.AddModelError("", "Randevu oluşturulamadı. Seçtiğiniz saat dolmuş olabilir. Güncel saatleri kontrol ederek tekrar deneyin."); model.Stage = 2; }
+            catch (BookingException) { ModelState.AddModelError("", Ui.Text("Randevu oluşturulamadı. Seçtiğiniz saat dolmuş olabilir. Güncel saatleri kontrol ederek tekrar deneyin.")); model.Stage = 2; }
         }
         return View(model);
     }
@@ -120,9 +121,9 @@ public sealed class AppointmentsController(IAppointmentBooking booking, TimeProv
     {
         // Action comes from the endpoint, never from the submitted form.
         ModelState.Remove(nameof(model.Action));
-        if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Reason)) { TempData["Message"] = "İptal gerekçesi zorunludur ve en fazla 2000 karakter olabilir."; return RedirectToAction(nameof(Details), new { model.Id }); }
-        try { await booking.Act(UserId, model.Id, "Cancel", model.Reason); TempData["Message"] = "Randevu iptal edildi."; }
-        catch (BookingException) { TempData["Message"] = "Randevu iptal edilemedi. Güncel randevu durumunu kontrol edin."; }
+        if (!ModelState.IsValid || string.IsNullOrWhiteSpace(model.Reason)) { TempData["Message"] = Ui.Text("İptal gerekçesi zorunludur ve en fazla 2000 karakter olabilir."); return RedirectToAction(nameof(Details), new { model.Id }); }
+        try { await booking.Act(UserId, model.Id, "Cancel", model.Reason); TempData["Message"] = Ui.Text("Randevu iptal edildi."); }
+        catch (BookingException) { TempData["Message"] = Ui.Text("Randevu iptal edilemedi. Güncel randevu durumunu kontrol edin."); }
         return RedirectToAction(nameof(Details), new { model.Id });
     }
 }

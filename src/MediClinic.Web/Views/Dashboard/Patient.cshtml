@@ -1,46 +1,46 @@
 @model MediClinic.Web.Models.PatientDashboardModel
 @using MediClinic.Application
 @using System.Globalization
-@{ ViewData["Title"] = "Hasta paneli"; }
+@{ ViewData["Title"] = Ui.Text("Hasta paneli"); }
 <header>
-    <p class="eyebrow">HASTA PANELİ</p>
-    <h1>Hoş geldiniz</h1>
-    <p>Randevularınızı takip edin, sağlık planınızı kolayca yönetin.</p>
+    <p class="eyebrow">@Ui.Text("HASTA PANELİ")</p>
+    <h1>@Ui.Text("Hoş geldiniz")</h1>
+    <p>@Ui.Text("Randevularınızı takip edin, sağlık planınızı kolayca yönetin.")</p>
 </header>
-<dl class="dashboard-metrics" aria-label="Randevu özeti">
-    <div class="card"><dt>Toplam randevu</dt><dd>@Model.TotalAppointments</dd></div>
-    <div class="card"><dt>Bekleyen randevu</dt><dd>@Model.PendingAppointments</dd></div>
-    <div class="card"><dt>Onaylı yaklaşan randevu</dt><dd>@Model.ConfirmedUpcomingAppointments</dd></div>
-    <div class="card"><dt>Tamamlanan randevu</dt><dd>@Model.CompletedAppointments</dd></div>
+<dl class="dashboard-metrics" aria-label="@Ui.Text("Randevu özeti")">
+    <div class="card"><dt>@Ui.Text("Toplam randevu")</dt><dd>@Model.TotalAppointments</dd></div>
+    <div class="card"><dt>@Ui.Text("Bekleyen randevu")</dt><dd>@Model.PendingAppointments</dd></div>
+    <div class="card"><dt>@Ui.Text("Onaylı yaklaşan randevu")</dt><dd>@Model.ConfirmedUpcomingAppointments</dd></div>
+    <div class="card"><dt>@Ui.Text("Tamamlanan randevu")</dt><dd>@Model.CompletedAppointments</dd></div>
 </dl>
 <section class="card" aria-labelledby="next-appointment-title">
-    <h2 id="next-appointment-title">Sıradaki randevunuz</h2>
+    <h2 id="next-appointment-title">@Ui.Text("Sıradaki randevunuz")</h2>
     @if (Model.NextAppointment is { } next)
     {
         <partial name="_StatusBadge" model="next.Status" />
         <dl class="dashboard-details">
-            <div><dt>Doktor</dt><dd>@next.Doctor</dd></div>
-            <div><dt>Hizmet</dt><dd>@next.Service</dd></div>
-            <div><dt>Şube</dt><dd>@next.Branch</dd></div>
-            <div><dt>Tarih ve saat (İstanbul)</dt><dd><time datetime="@next.StartsAt.ToString("O")">@Scheduling.Local(next.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.GetCultureInfo("tr-TR"))</time></dd></div>
+            <div><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@next.Doctor</dd></div>
+            <div><dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@next.Service</dd></div>
+            <div><dt>@Ui.Text("Şube")</dt><dd data-user-content>@next.Branch</dd></div>
+            <div><dt>@Ui.Text("Tarih ve saat (İstanbul)")</dt><dd><time datetime="@next.StartsAt.ToString("O")">@Scheduling.Local(next.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.CurrentCulture)</time></dd></div>
         </dl>
-        <a class="button button-secondary" asp-controller="Appointments" asp-action="Details" asp-route-id="@next.Id">Randevu detayını görüntüle</a>
+        <a class="button button-secondary" asp-controller="Appointments" asp-action="Details" asp-route-id="@next.Id">@Ui.Text("Randevu detayını görüntüle")</a>
     }
     else
     {
         <div class="empty-state">
             @if (Model.TotalAppointments == 0)
-            { <p>Henüz randevunuz bulunmuyor. İlk randevunuzu oluşturabilirsiniz.</p> }
+            { <p>@Ui.Text("Henüz randevunuz bulunmuyor. İlk randevunuzu oluşturabilirsiniz.")</p> }
             else
-            { <p>Yaklaşan randevunuz bulunmuyor. Geçmiş ve diğer randevularınızı randevu listenizden inceleyebilirsiniz.</p> }
+            { <p>@Ui.Text("Yaklaşan randevunuz bulunmuyor. Geçmiş ve diğer randevularınızı randevu listenizden inceleyebilirsiniz.")</p> }
         </div>
     }
-    <p class="field-hint">Yaklaşan randevular, başlangıç saati henüz gelmemiş bekleyen veya onaylı randevulardır. Saatler İstanbul saatine göre gösterilir.</p>
+    <p class="field-hint">@Ui.Text("Yaklaşan randevular, başlangıç saati henüz gelmemiş bekleyen veya onaylı randevulardır. Saatler İstanbul saatine göre gösterilir.")</p>
 </section>
 <section aria-labelledby="quick-actions-title">
-    <h2 id="quick-actions-title">Hızlı işlemler</h2>
+    <h2 id="quick-actions-title">@Ui.Text("Hızlı işlemler")</h2>
     <div class="dashboard-actions">
-        <a class="button" asp-controller="Appointments" asp-action="Book">Randevu oluştur</a>
-        <a class="button button-secondary" asp-controller="Appointments" asp-action="Index">Randevularımı görüntüle</a>
+        <a class="button" asp-controller="Appointments" asp-action="Book">@Ui.Text("Randevu oluştur")</a>
+        <a class="button button-secondary" asp-controller="Appointments" asp-action="Index">@Ui.Text("Randevularımı görüntüle")</a>
     </div>
 </section>

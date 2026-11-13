@@ -1,32 +1,32 @@
 @model MediClinic.Application.AppointmentSummary
 @using MediClinic.Domain
 @{ var staff = ViewContext.RouteData.Values["controller"]?.ToString() == "StaffAppointments"; }
-<h1>Randevu</h1>
+<h1>@Ui.Text("Randevu")</h1>
 <p class="alert" role="status">@TempData["Message"]</p>
-<p>Klinik: @Model.Clinic - Bölüm: @Model.Department</p>
-<p>Ücret: @(Model.Price.HasValue ? Model.Price.Value.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("tr-TR")) + " TL" : "Bilinmiyor (eski kayıt)")</p>
+<p>@Ui.Text("Klinik:") <span data-user-content>@Model.Clinic</span> - @Ui.Text("Bölüm:") <span data-user-content>@Model.Department</span></p>
+<p>@Ui.Text("Ücret:") @if (Model.Price.HasValue) { <span data-money="@Model.Price.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Ui.Money(Model.Price.Value)</span> } else { @Ui.Text("Bilinmiyor (eski kayıt)") }</p>
 <dl>
-    <dt>Hizmet</dt><dd>@Model.Service</dd><dt>Doktor</dt><dd>@Model.Doctor</dd><dt>Şube</dt><dd>@Model.Branch</dd>
-    <dt>Saat</dt><dd>@MediClinic.Application.Scheduling.Local(Model.StartsAt).ToString("dd.MM.yyyy HH:mm") – @MediClinic.Application.Scheduling.Local(Model.EndsAt).ToString("dd.MM.yyyy HH:mm")</dd>
-    <dt>Randevu süresi</dt><dd>@((Model.EndsAt - Model.StartsAt).TotalMinutes) dakika</dd>
-    <dt>Durum</dt><dd><partial name="_StatusBadge" model="Model.Status" /></dd><dt>Karar gerekçesi</dt><dd>@Model.Reason</dd>
+    <dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@Model.Service</dd><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@Model.Doctor</dd><dt>@Ui.Text("Şube")</dt><dd data-user-content>@Model.Branch</dd>
+    <dt>@Ui.Text("Saat")</dt><dd><time datetime="@Model.StartsAt.ToString("O")">@Ui.Date(MediClinic.Application.Scheduling.Local(Model.StartsAt))</time> – <time datetime="@Model.EndsAt.ToString("O")">@Ui.Date(MediClinic.Application.Scheduling.Local(Model.EndsAt))</time></dd>
+    <dt>@Ui.Text("Randevu süresi")</dt><dd>@((Model.EndsAt - Model.StartsAt).TotalMinutes) @Ui.Text("dakika")</dd>
+    <dt>@Ui.Text("Durum")</dt><dd><partial name="_StatusBadge" model="Model.Status" /></dd><dt>@Ui.Text("Karar gerekçesi")</dt><dd data-user-content>@Model.Reason</dd>
 </dl>
 @if (!staff && Model.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
 {
     <form asp-action="Cancel" method="post">
         <input type="hidden" name="Id" value="@Model.Id" />
-        <label for="reason">İptal gerekçesi</label><textarea id="reason" name="Reason" required maxlength="2000"></textarea>
-        <button type="submit">Randevuyu iptal et</button>
+        <label for="reason">@Ui.Text("İptal gerekçesi")</label><textarea id="reason" name="Reason" required maxlength="2000"></textarea>
+        <button type="submit">@Ui.Text("Randevuyu iptal et")</button>
     </form>
 }
 @if (staff && User.IsInRole(MediClinic.Infrastructure.Identity.AuthRoles.Staff) && Model.Status is AppointmentStatus.Pending or AppointmentStatus.Confirmed)
 {
     <form asp-action="Review" method="post">
         <input type="hidden" name="Id" value="@Model.Id" />
-        <label for="reason">Gerekçe (ret için zorunlu)</label><textarea id="reason" name="Reason" maxlength="2000"></textarea>
+        <label for="reason">@Ui.Text("Gerekçe (ret için zorunlu)")</label><textarea id="reason" name="Reason" maxlength="2000"></textarea>
         @if (Model.Status == AppointmentStatus.Pending)
-        { <button name="Action" value="Confirm">Onayla</button><button name="Action" value="Reject">Reddet</button> }
-        else { <button name="Action" value="Complete">Tamamla</button> }
+        { <button name="Action" value="Confirm">@Ui.Text("Onayla")</button><button name="Action" value="Reject">@Ui.Text("Reddet")</button> }
+        else { <button name="Action" value="Complete">@Ui.Text("Tamamla")</button> }
     </form>
 }
-<a asp-action="Index">Randevulara dön</a>
+<a asp-action="Index">@Ui.Text("Randevulara dön")</a>

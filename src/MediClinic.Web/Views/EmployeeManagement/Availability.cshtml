@@ -1,25 +1,25 @@
 @model MediClinic.Web.Models.AvailabilityListModel
 @using MediClinic.Application
 @inject TimeProvider Clock
-@{ ViewData["Title"] = "Doktor uygunluğu"; }
-<h1>@Model.Doctor.FullName — Uygunluk</h1>
-<p>Tüm saatler İstanbul saat dilimindedir.</p>
+@{ ViewData["Title"] = Ui.Text("Doktor uygunluğu"); }
+<h1>@Ui.Format("{0} — Uygunluk", Model.Doctor.FullName)</h1>
+<p>@Ui.Text("Tüm saatler İstanbul saat dilimindedir.")</p>
 @if (TempData["EmployeeSuccess"] is string success) { <p role="status">@success</p> }
 @if (TempData["EmployeeError"] is string error) { <p role="alert">@error</p> }
 <form method="get" class="filter-form"><input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
-<label for="date">Tarih</label><input id="date" name="date" type="date" value="@(Model.Date?.ToString("yyyy-MM-dd"))" /><button type="submit">Filtrele</button>
-<a asp-action="Availability" asp-route-doctorId="@Model.Doctor.Id">Tüm tarihler</a></form>
-<a class="button" asp-action="Interval" asp-route-doctorId="@Model.Doctor.Id">Uygunluk ekle</a>
-<p>Doktor uygunluğu şubenin çalışma saatlerinden ayrıdır. Randevu için her iki koşul da sağlanmalıdır.</p><a class="button button-secondary" asp-action="Weekly" asp-route-doctorId="@Model.Doctor.Id">Haftalık uygunluk oluştur</a>
-<div class="table-scroll"><table><caption>Uygunluk aralıkları</caption><thead><tr><th scope="col">Başlangıç</th><th scope="col">Bitiş</th><th scope="col">İşlemler</th></tr></thead><tbody>
+<label for="date">@Ui.Text("Tarih")</label><input id="date" name="date" type="date" value="@(Model.Date?.ToString("yyyy-MM-dd"))" /><button type="submit">@Ui.Text("Filtrele")</button>
+<a asp-action="Availability" asp-route-doctorId="@Model.Doctor.Id">@Ui.Text("Tüm tarihler")</a></form>
+<a class="button" asp-action="Interval" asp-route-doctorId="@Model.Doctor.Id">@Ui.Text("Uygunluk ekle")</a>
+<p>@Ui.Text("Doktor uygunluğu şubenin çalışma saatlerinden ayrıdır. Randevu için her iki koşul da sağlanmalıdır.")</p><a class="button button-secondary" asp-action="Weekly" asp-route-doctorId="@Model.Doctor.Id">@Ui.Text("Haftalık uygunluk oluştur")</a>
+<div class="table-scroll"><table><caption>@Ui.Text("Uygunluk aralıkları")</caption><thead><tr><th scope="col">@Ui.Text("Başlangıç")</th><th scope="col">@Ui.Text("Bitiş")</th><th scope="col">@Ui.Text("İşlemler")</th></tr></thead><tbody>
 @foreach (var interval in Model.Intervals)
 {
-    <tr><td>@Scheduling.Local(interval.StartsAt).ToString("dd.MM.yyyy HH:mm")</td><td>@Scheduling.Local(interval.EndsAt).ToString("dd.MM.yyyy HH:mm")</td><td>
+    <tr><td><time datetime="@interval.StartsAt.ToString("O")">@Ui.Date(MediClinic.Application.Scheduling.Local(interval.StartsAt))</time></td><td><time datetime="@interval.EndsAt.ToString("O")">@Ui.Date(MediClinic.Application.Scheduling.Local(interval.EndsAt))</time></td><td>
     @if (interval.StartsAt > Clock.GetUtcNow())
     {
-        <a asp-action="Interval" asp-route-doctorId="@Model.Doctor.Id" asp-route-id="@interval.Id">Düzenle</a>
-        <form asp-action="RemoveInterval" method="post"><input type="hidden" name="doctorId" value="@Model.Doctor.Id" /><input type="hidden" name="id" value="@interval.Id" /><button type="submit">Güvenliyse sil</button></form>
+        <a asp-action="Interval" asp-route-doctorId="@Model.Doctor.Id" asp-route-id="@interval.Id">@Ui.Text("Düzenle")</a>
+        <form asp-action="RemoveInterval" method="post"><input type="hidden" name="doctorId" value="@Model.Doctor.Id" /><input type="hidden" name="id" value="@interval.Id" /><button type="submit">@Ui.Text("Güvenliyse sil")</button></form>
     }
-    else { <span>Geçmiş / başlamış kayıt</span> }</td></tr>
+    else { <span>@Ui.Text("Geçmiş / başlamış kayıt")</span> }</td></tr>
 }
-</tbody></table></div><a asp-action="Index">Çalışan listesine dön</a>
+</tbody></table></div><a asp-action="Index">@Ui.Text("Çalışan listesine dön")</a>

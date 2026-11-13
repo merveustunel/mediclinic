@@ -21,41 +21,45 @@
                 fields(row).forEach((input, i) => input.value = i ? '17:00' : '09:00');
                 sync(row);
             });
-            status.textContent = 'Hafta içi dolduruldu. Değişiklikleri kaydediniz.';
+            status.textContent = (globalThis.mediClinicText?.('Hafta içi dolduruldu. Değişiklikleri kaydediniz.') || 'Hafta içi dolduruldu. Değişiklikleri kaydediniz.');
         });
         form.querySelector('[data-copy]').addEventListener('click', () => {
             const source = rows.find(row => row.dataset.day === form.querySelector('[data-source]').value);
             const times = fields(source).map(input => input.value);
             if (closed(source) || !times[0] || !times[1] || times[0] >= times[1]) {
-                status.textContent = 'Geçerli saatleri olan açık bir kaynak gün seçiniz.';
+                status.textContent = (globalThis.mediClinicText?.('Geçerli saatleri olan açık bir kaynak gün seçiniz.') || 'Geçerli saatleri olan açık bir kaynak gün seçiniz.');
                 return;
             }
             rows.filter(row => !closed(row)).forEach(row => {
                 fields(row).forEach((input, i) => input.value = times[i]);
                 sync(row);
             });
-            status.textContent = 'Saatler açık günlere uygulandı. Değişiklikleri kaydediniz.';
+            status.textContent = (globalThis.mediClinicText?.('Saatler açık günlere uygulandı. Değişiklikleri kaydediniz.') || 'Saatler açık günlere uygulandı. Değişiklikleri kaydediniz.');
         });
         form.addEventListener('submit', async event => {
             event.preventDefault();
             rows.forEach(row => {
                 const [opens, closes] = fields(row);
-                closes.setCustomValidity(!closed(row) && opens.value >= closes.value ? 'Kapanış saati açılıştan sonra olmalıdır.' : '');
+                closes.setCustomValidity(!closed(row) && opens.value >= closes.value ? (globalThis.mediClinicText?.('Kapanış saati açılıştan sonra olmalıdır.') || 'Kapanış saati açılıştan sonra olmalıdır.') : '');
             });
             if (!form.reportValidity()) return;
             const body = new FormData(form);
-            const savedSummary = rows.map(row => `${row.dataset.dayName}: ${closed(row) ? 'Kapalı' : fields(row).map(input => input.value).join('–')}`).join(' · ');
+            const savedSummary = rows.map(row => `${row.dataset.dayName}: ${closed(row) ? (globalThis.mediClinicText?.('Kapalı') || 'Kapalı') : fields(row).map(input => input.value).join('–')}`).join(' · ');
             controls.forEach(control => control.disabled = true);
-            status.textContent = 'Kaydediliyor…';
+            status.textContent = (globalThis.mediClinicText?.('Kaydediliyor…') || 'Kaydediliyor…');
+            let failureMessage;
             try {
                 const response = await fetch(form.action, { method: 'POST', body, headers: { Accept: 'application/json' } });
                 const result = (response.headers.get('content-type') || '').includes('application/json') ? await response.json() : null;
-                if (!response.ok || !result) throw new Error(result?.message || 'Kayıt yapılamadı. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyiniz.');
-                status.textContent = result.message;
+                if (!response.ok || !result) {
+                    failureMessage = result?.message || (globalThis.mediClinicText?.('Kayıt yapılamadı. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyiniz.') || 'Kayıt yapılamadı. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyiniz.');
+                    throw new Error('save');
+                }
+                status.textContent = globalThis.mediClinicLocalize?.(result.message) || result.message;
                 const summary = form.closest('.branch-hours')?.querySelector('[data-hours-summary]');
                 if (summary) summary.textContent = savedSummary;
             } catch (error) {
-                status.textContent = error.message || 'Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz.';
+                status.textContent = (failureMessage && (globalThis.mediClinicLocalize?.(failureMessage) || failureMessage)) || (globalThis.mediClinicText?.('Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz.') || 'Bağlantı hatası. Değerleriniz korunuyor; tekrar deneyiniz.');
             } finally {
                 controls.forEach(control => control.disabled = false);
                 rows.forEach(sync);
