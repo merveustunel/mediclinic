@@ -14,7 +14,7 @@ public static class DemoSeed
 {
     public static Guid Id(string key) => new(SHA256.HashData(Encoding.UTF8.GetBytes("MediClinic.demo.v1/" + key))[..16]);
     public static bool IsDemoUser(string id) => new[] { "patient", "staff-central", "staff-riverside" }
-        .Any(key => id == Id("user/" + key).ToString());
+        .Any(key => id == Id("user/" + key).ToString()) || RealisticDemoSeed.IsDemoUser(id);
 
     public static async Task RunAsync(WebApplication app)
     {

@@ -61,6 +61,11 @@ builder.Services.AddAuthorization(options =>
     foreach (var role in AuthRoles.All) options.AddPolicy(role, policy => policy.RequireAuthenticatedUser().RequireRole(role));
 });
 var app = builder.Build();
+if (args.Contains("--seed-realistic-demo"))
+{
+    await MediClinic.Web.RealisticDemoSeed.RunAsync(app);
+    return;
+}
 if (args.Contains("--seed-demo"))
 {
     await MediClinic.Web.DemoSeed.RunAsync(app);
