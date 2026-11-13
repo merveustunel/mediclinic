@@ -16,6 +16,19 @@ namespace MediClinic.Tests;
 
 public sealed class EmployeeManagementTests
 {
+    [Theory]
+    [InlineData("9999-12-31")]
+    [InlineData("invalid-date")]
+    public async Task AvailabilityRejectsInvalidDateFilters(string date)
+    {
+        await using var data = await BookingTests.Database.Create();
+        using var site = new BookingMvcTests.Site(data);
+        using var admin = await Admin(site, data);
+        var response = await admin.GetAsync($"/EmployeeManagement/Availability?doctorId={data.Fixture.Doctor.Id}&date={date}");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("Geçerli bir tarih seçin.", await response.Content.ReadAsStringAsync());
+    }
+
     private sealed class BeforeSave(Func<Task> action) : SaveChangesInterceptor
     {
         public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)

@@ -146,6 +146,8 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
     {
         var doctor = await Doctors.SingleOrDefaultAsync(d => d.Id == doctorId);
         if (doctor is null) return NotFound();
+        if (!ModelState.IsValid || date == DateOnly.MaxValue)
+            return BadRequest("Geçerli bir tarih seçin.");
         var query = db.StaffAvailabilities.Where(a => EF.Property<Guid>(a, "StaffKey") == doctorId);
         if (date.HasValue)
         {
