@@ -59,6 +59,8 @@ th, td { padding: 1rem; border-bottom: 1px solid var(--border); }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover { background: #faf9ff; }
 td a { display: inline-block; padding: .4rem 0; }
+td a.employee-action { display: inline-flex; gap: .5rem; padding: .65rem 1.1rem; margin: .2rem; }
+input[type="checkbox"] { display: inline-block; width: 1.25rem; min-height: 1.25rem; margin-right: .5rem; vertical-align: middle; }
 .status-badge { display: inline-block; white-space: nowrap; padding: .25rem .7rem; border-radius: 999px; font-size: .8rem; font-weight: 650; }
 .status-pending { background: #fff3d5; color: #795200; }
 .status-confirmed { background: var(--soft); color: #5440aa; }

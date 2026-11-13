@@ -14,7 +14,7 @@
     <div><label for="date">Randevu tarihi</label><input id="date" type="date" name="date" value="@Model.Date?.ToString("yyyy-MM-dd")" /></div>
     <button type="submit">Tarihe göre filtrele</button><a asp-action="Index">Filtreleri temizle</a>
 </form>
-<p class="field-hint">@Model.Appointments.Count randevu gösteriliyor. Saatler İstanbul saatine (Europe/Istanbul) göredir.</p>
+<p class="field-hint">@Model.Appointments.Count randevu gösteriliyor. Saatler İstanbul saatine göredir.</p>
 @if (Model.Appointments.Count == 0)
 {
     <section class="empty-state"><h2>Randevu bulunamadı</h2><p>Bölümünüzde seçilen filtrelere uygun randevu bulunmuyor. Diğer durumları veya tarihleri kontrol edebilirsiniz.</p><a class="button button-secondary" asp-action="Index">Tüm randevuları görüntüle</a></section>

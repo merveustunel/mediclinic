@@ -28,7 +28,7 @@ else { <a class="button button-secondary" asp-action="Edit" asp-route-kind="Clin
 <div class="catalog-actions"><a class="button button-secondary" asp-action="Edit" asp-route-kind="Department" asp-route-id="@department.Id">Bölümü düzenle</a> <a class="button button-secondary" asp-action="Edit" asp-route-kind="Service" asp-route-parentId="@department.Id">Hizmet oluştur</a></div></header>
 @if (department.Services.Count == 0) { <p>Henüz hizmet yok.</p> }
 <ul class="service-list">@foreach(var service in department.Services) {
-<li><div class="service-info"><h5>@service.Name</h5><dl><div><dt>Süre</dt><dd>@service.Duration.TotalMinutes dakika</dd></div><div><dt>Fiyat</dt><dd>@service.Price.ToString("N2") TRY</dd></div></dl></div>
+<li><div class="service-info"><h5>@service.Name</h5><dl><div><dt>Süre</dt><dd>@service.Duration.TotalMinutes dakika</dd></div><div><dt>Fiyat</dt><dd>@service.Price.ToString("N2") TL</dd></div></dl></div>
 <a class="button button-secondary" asp-action="Edit" asp-route-kind="Service" asp-route-id="@service.Id" aria-label="@("Hizmeti düzenle: " + service.Name)">Hizmeti düzenle</a></li>
 }</ul>
 </section>

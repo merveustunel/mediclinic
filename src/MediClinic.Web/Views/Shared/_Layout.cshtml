@@ -41,6 +41,7 @@
                 <nav aria-label="Ana gezinme">
                     @if (canAdmin)
                     {
+                        <a asp-controller="AdminAppointments" asp-action="Index">Tüm randevular</a>
                         <a asp-controller="EmployeeManagement" asp-action="Index">Çalışan yönetimi</a>
                         <a asp-controller="ClinicManagement" asp-action="Index">Kurum yönetimi</a>
                     }

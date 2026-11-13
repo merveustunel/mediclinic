@@ -197,6 +197,45 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         TempData["EmployeeSuccess"] = "Uygunluk kaydedildi.";
         return RedirectToAction(nameof(Availability), new { doctorId = doctor.Id });
     }
+    public async Task<IActionResult> Weekly(Guid doctorId)
+    {
+        var doctor = await Doctors.SingleOrDefaultAsync(d => d.Id == doctorId);
+        return doctor is null ? NotFound() : View(new WeeklyAvailabilityModel { DoctorId = doctorId, DoctorName = doctor.FullName });
+    }
+    [HttpPost]
+    public async Task<IActionResult> Weekly(WeeklyAvailabilityModel model)
+    {
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        var doctor = await Doctors.SingleOrDefaultAsync(d => d.Id == model.DoctorId);
+        if (doctor is null) return NotFound();
+        model.DoctorName = doctor.FullName;
+        if (!ModelState.IsValid) return View(model);
+        if (model.From > model.To || model.To!.Value.DayNumber - model.From!.Value.DayNumber > 90 ||
+            model.To == DateOnly.MaxValue || model.Opens >= model.Closes || model.Days.Count == 0 || model.Days.Any(d => !Enum.IsDefined(d)))
+        {
+            ModelState.AddModelError("", "En fazla 91 günlük bir tarih aralığı ve en az bir gün seçin. Bitiş saati başlangıçtan sonra olmalıdır.");
+            return View(model);
+        }
+        var intervals = new List<StaffAvailability>();
+        var existing = await db.StaffAvailabilities.Where(a => EF.Property<Guid>(a, "StaffKey") == doctor.Id).ToListAsync();
+        for (var date = model.From.Value; date <= model.To.Value; date = date.AddDays(1))
+        {
+            if (!model.Days.Contains(date.DayOfWeek)) continue;
+            var start = Scheduling.ToUtc(date.ToDateTime(model.Opens!.Value));
+            var end = Scheduling.ToUtc(date.ToDateTime(model.Closes!.Value));
+            if (start <= clock.GetUtcNow() || existing.Any(a => a.StartsAt < end && a.EndsAt > start))
+            {
+                ModelState.AddModelError("", "Seçilen günlerden biri geçmişte veya mevcut uygunlukla çakışıyor. Hiçbir kayıt oluşturulmadı.");
+                return View(model);
+            }
+            intervals.Add(new StaffAvailability(Guid.NewGuid(), doctor, start, end));
+        }
+        if (intervals.Count == 0) { ModelState.AddModelError("", "Tarih aralığında seçilen gün bulunmuyor."); return View(model); }
+        db.StaffAvailabilities.AddRange(intervals);
+        await db.SaveChangesAsync(); await transaction.CommitAsync();
+        TempData["EmployeeSuccess"] = $"{intervals.Count} günlük uygunluk oluşturuldu.";
+        return RedirectToAction(nameof(Availability), new { doctorId = doctor.Id });
+    }
     private async Task<bool> PreservesAppointments(Guid doctorId, Guid excluded, DateTimeOffset? start, DateTimeOffset? end)
     {
         var remaining = await db.StaffAvailabilities.Where(a => EF.Property<Guid>(a, "StaffKey") == doctorId && a.Id != excluded).ToListAsync();

@@ -8,7 +8,7 @@
     <tbody>
     @foreach (var item in Model)
     {
-        <tr><td>@item.Service</td><td>@item.Doctor</td><td>@item.Branch</td><td>@MediClinic.Application.Scheduling.Local(item.StartsAt).ToString("yyyy-MM-dd HH:mm")</td><td><partial name="_StatusBadge" model="item.Status" /></td><td><a asp-action="Details" asp-route-id="@item.Id">Detaylar</a></td></tr>
+        <tr><td>@item.Service</td><td>@item.Doctor</td><td>@item.Branch</td><td>@MediClinic.Application.Scheduling.Local(item.StartsAt).ToString("dd.MM.yyyy HH:mm")</td><td><partial name="_StatusBadge" model="item.Status" /></td><td><a asp-action="Details" asp-route-id="@item.Id">Detaylar</a></td></tr>
     }
     </tbody>
 </table></div>

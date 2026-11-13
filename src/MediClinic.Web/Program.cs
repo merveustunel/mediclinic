@@ -6,7 +6,26 @@ using MediClinic.Infrastructure;
 using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    var messages = options.ModelBindingMessageProvider;
+    messages.SetAttemptedValueIsInvalidAccessor((value, field) => "Geçerli bir değer giriniz.");
+    messages.SetNonPropertyAttemptedValueIsInvalidAccessor(value => "Geçerli bir değer giriniz.");
+    messages.SetValueIsInvalidAccessor(value => "Geçerli bir değer giriniz.");
+    messages.SetValueMustNotBeNullAccessor(value => "Bu alan zorunludur.");
+    messages.SetMissingBindRequiredValueAccessor(field => "Bu alan zorunludur.");
+    messages.SetValueMustBeANumberAccessor(field => "Geçerli bir sayı giriniz.");
+    messages.SetNonPropertyValueMustBeANumberAccessor(() => "Geçerli bir sayı giriniz.");
+    messages.SetUnknownValueIsInvalidAccessor(field => "Geçerli bir değer giriniz.");
+    messages.SetNonPropertyUnknownValueIsInvalidAccessor(() => "Geçerli bir değer giriniz.");
+    messages.SetMissingKeyOrValueAccessor(() => "Bu alan zorunludur.");
+    messages.SetMissingRequestBodyRequiredValueAccessor(() => "Form bilgileri zorunludur.");
+});
+builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
+{
+    options.SetDefaultCulture("tr-TR").AddSupportedCultures("tr-TR").AddSupportedUICultures("tr-TR");
+    options.RequestCultureProviders.Clear();
+});
 builder.Services.AddApplication();
 var connection = new SqliteConnectionStringBuilder(
     builder.Configuration.GetConnectionString("MediClinic")
@@ -54,6 +73,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseRequestLocalization();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

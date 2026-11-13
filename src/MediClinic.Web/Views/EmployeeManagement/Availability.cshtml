@@ -3,13 +3,14 @@
 @inject TimeProvider Clock
 @{ ViewData["Title"] = "Doktor uygunluğu"; }
 <h1>@Model.Doctor.FullName — Uygunluk</h1>
-<p>Tüm saatler Europe/Istanbul saat dilimindedir.</p>
+<p>Tüm saatler İstanbul saat dilimindedir.</p>
 @if (TempData["EmployeeSuccess"] is string success) { <p role="status">@success</p> }
 @if (TempData["EmployeeError"] is string error) { <p role="alert">@error</p> }
 <form method="get" class="filter-form"><input type="hidden" name="doctorId" value="@Model.Doctor.Id" />
 <label for="date">Tarih</label><input id="date" name="date" type="date" value="@(Model.Date?.ToString("yyyy-MM-dd"))" /><button type="submit">Filtrele</button>
 <a asp-action="Availability" asp-route-doctorId="@Model.Doctor.Id">Tüm tarihler</a></form>
 <a class="button" asp-action="Interval" asp-route-doctorId="@Model.Doctor.Id">Uygunluk ekle</a>
+<p>Doktor uygunluğu şubenin çalışma saatlerinden ayrıdır. Randevu için her iki koşul da sağlanmalıdır.</p><a class="button button-secondary" asp-action="Weekly" asp-route-doctorId="@Model.Doctor.Id">Haftalık uygunluk oluştur</a>
 <div class="table-scroll"><table><caption>Uygunluk aralıkları</caption><thead><tr><th scope="col">Başlangıç</th><th scope="col">Bitiş</th><th scope="col">İşlemler</th></tr></thead><tbody>
 @foreach (var interval in Model.Intervals)
 {

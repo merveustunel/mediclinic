@@ -159,6 +159,10 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
     {
         var appointment = await (await Scoped(userId, action != "Cancel")).SingleOrDefaultAsync(x => x.Id == id)
             ?? throw new BookingException("Appointment not found or outside your scope.");
+        await ApplyAction(appointment, action, reason);
+    }
+    private async Task ApplyAction(Appointment appointment, string action, string? reason)
+    {
         try
         {
             switch (action)

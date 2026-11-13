@@ -56,7 +56,7 @@ public sealed class BookingMvcTests
         var request = data.Request();
         var page = await client.GetStringAsync($"/Appointments/Book?ClinicId={request.ClinicId}&BranchId={request.BranchId}&DepartmentId={request.DepartmentId}&DoctorId={request.DoctorId}&ServiceId={request.ServiceId}&Date=2030-01-02&Stage=2");
         Assert.Contains(data.Fixture.Clinic.Name, page);
-        Assert.Contains("Europe/Istanbul", page);
+        Assert.Contains("İstanbul", WebUtility.HtmlDecode(page));
         Assert.Contains("2030-01-02T12:00:00", page);
         var form = Form(data);
         var response = await Post(client, "/Appointments/Book", "/Appointments/Book", form);

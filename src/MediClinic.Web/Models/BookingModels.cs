@@ -43,6 +43,6 @@ public sealed record BookingTimeCard(DateTime LocalStart, bool IsPast);
 public sealed class AppointmentActionModel
 {
     public Guid Id { get; set; }
-    [Required] public string Action { get; set; } = "";
-    [StringLength(2000)] public string? Reason { get; set; }
+    [Required(ErrorMessage = "Geçerli bir işlem seçin.")] public string Action { get; set; } = "";
+    [StringLength(2000, ErrorMessage = "Gerekçe en fazla 2000 karakter olabilir.")] public string? Reason { get; set; }
 }

@@ -40,16 +40,16 @@ public static class DemoSeed
         var doctors = new List<Doctor>();
         foreach (var (key, branchName, departmentName, names) in new[]
         {
-            ("central", "Central", "General Medicine", new[] { "Deniz", "Ece" }),
-            ("riverside", "Riverside", "Cardiology", new[] { "Can" })
+            ("central", "Merkez", "Genel Tıp", new[] { "Deniz", "Ece" }),
+            ("riverside", "Sahil", "Kardiyoloji", new[] { "Can" })
         })
         {
             var branch = clinic.Branches.SingleOrDefault(x => x.Id == Id(key + "/branch"))
-                ?? clinic.AddBranch(Id(key + "/branch"), branchName, branchName + " Demo Street, Istanbul");
+                ?? clinic.AddBranch(Id(key + "/branch"), branchName, branchName + " Örnek Sokak, İstanbul");
             var department = branch.Departments.SingleOrDefault(x => x.Id == Id(key + "/department"))
                 ?? branch.AddDepartment(Id(key + "/department"), departmentName);
             if (!department.Services.Any(x => x.Id == Id(key + "/service")))
-                department.AddService(Id(key + "/service"), departmentName + " consultation", TimeSpan.FromMinutes(30));
+                department.AddService(Id(key + "/service"), departmentName + " muayenesi", TimeSpan.FromMinutes(30));
             foreach (var name in names)
             {
                 var doctor = await db.Doctors.FindAsync(Id("doctor/" + name));
@@ -64,7 +64,7 @@ public static class DemoSeed
             var staff = await db.Staff.FindAsync(Id(key + "/staff"));
             if (staff == null)
             {
-                staff = new Staff(Id(key + "/staff"), branchName, "Demo Reviewer", department, "Receptionist");
+                staff = new Staff(Id(key + "/staff"), branchName, "Demo Görevlisi", department, "Danışma görevlisi");
                 db.Add(staff);
             }
             await Account("staff-" + key, ApplicationUser.ForStaff($"demo.staff.{key}@example.test", staff), AuthRoles.Staff, staffPassword);
@@ -72,7 +72,7 @@ public static class DemoSeed
         var patient = await db.Patients.FindAsync(Id("patient"));
         if (patient == null)
         {
-            patient = new Patient(Id("patient"), "Demo", "Patient", new DateOnly(1990, 1, 1));
+            patient = new Patient(Id("patient"), "Ayşe", "Demo", new DateOnly(1990, 1, 1));
             db.Add(patient);
         }
         await Account("patient", ApplicationUser.ForPatient("demo.patient@example.test", patient), AuthRoles.Patient, patientPassword);

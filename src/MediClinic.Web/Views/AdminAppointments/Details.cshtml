@@ -1,0 +1,32 @@
+@model StaffAppointmentDetailsModel
+@using MediClinic.Application
+@using MediClinic.Domain
+@using MediClinic.Infrastructure.Identity
+@using System.Globalization
+@{ var item = Model.Item.Appointment; var culture = CultureInfo.GetCultureInfo("tr-TR"); ViewData["Title"] = "Randevu detayı"; }
+<header class="appointments-heading"><div><p class="eyebrow">RANDEVU YÖNETİMİ</p><h1>Randevu detayı</h1></div><partial name="_StatusBadge" model="item.Status" /></header>
+@if (TempData["Message"] is string message) { <p class="alert" role="status">@message</p> }
+<div asp-validation-summary="All" role="alert"></div>
+<p>Klinik: @item.Clinic - Bölüm: @item.Department</p>
+<p>Ücret: @(item.Price.HasValue ? item.Price.Value.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("tr-TR")) + " TL" : "Bilinmiyor (eski kayıt)")</p>
+<dl class="booking-summary staff-details">
+    <div><dt>Hasta</dt><dd>@Model.Item.Patient</dd></div><div><dt>Doktor</dt><dd>@item.Doctor</dd></div>
+    <div><dt>Hizmet</dt><dd>@item.Service</dd></div><div><dt>Şube</dt><dd>@item.Branch</dd></div>
+    <div><dt>Tarih ve başlangıç saati</dt><dd><time datetime="@item.StartsAt.ToString("O")">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", culture)</time></dd></div>
+    <div><dt>Bitiş saati</dt><dd><time datetime="@item.EndsAt.ToString("O")">@Scheduling.Local(item.EndsAt).ToString("dd MMMM yyyy, HH:mm", culture)</time></dd></div>
+    <div><dt>Süre</dt><dd>@((item.EndsAt-item.StartsAt).TotalMinutes) dakika</dd></div>
+    @if (!string.IsNullOrEmpty(item.Reason)) { <div><dt>Karar gerekçesi</dt><dd class="staff-reason">@item.Reason</dd></div> }
+</dl>
+<p class="field-hint">Saatler İstanbul saatine göredir.</p>
+@if (User.IsInRole(AuthRoles.ClinicAdmin))
+{
+    @if (item.Status == AppointmentStatus.Pending)
+    {
+        <section class="staff-actions"><h2>Talebi değerlendir</h2>
+        <form asp-action="Review" method="post"><input type="hidden" name="Id" value="@item.Id" /><button name="Action" value="Confirm">Randevuyu onayla</button></form>
+        <form asp-action="Review" method="post"><input type="hidden" name="Id" value="@item.Id" /><label for="reason">Ret gerekçesi (zorunlu)</label><textarea id="reason" name="Reason" required maxlength="2000" aria-describedby="reason-hint">@Model.Reason</textarea><p class="field-hint" id="reason-hint">En fazla 2000 karakter. Gerekçe hasta tarafından da görüntülenebilir.</p><button class="button-danger" name="Action" value="Reject">Randevuyu reddet</button></form></section>
+    }
+
+}
+else { <p class="field-hint">Bu sayfaya yalnızca görüntüleme erişiminiz bulunmaktadır.</p> }
+<p><a class="button button-secondary" asp-action="Index">Randevu listesine dön</a></p>

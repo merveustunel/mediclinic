@@ -8,7 +8,7 @@
 @if (TempData["Message"] is string message) { <p class="alert" role="status">@message</p> }
 <div asp-validation-summary="All" role="alert"></div>
 <p>Klinik: @item.Clinic - Bölüm: @item.Department</p>
-<p>Ücret: @(item.Price.HasValue ? item.Price.Value.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("tr-TR")) + " TRY" : "Bilinmiyor (eski kayıt)")</p>
+<p>Ücret: @(item.Price.HasValue ? item.Price.Value.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("tr-TR")) + " TL" : "Bilinmiyor (eski kayıt)")</p>
 <dl class="booking-summary staff-details">
     <div><dt>Hasta</dt><dd>@Model.Item.Patient</dd></div><div><dt>Doktor</dt><dd>@item.Doctor</dd></div>
     <div><dt>Hizmet</dt><dd>@item.Service</dd></div><div><dt>Şube</dt><dd>@item.Branch</dd></div>
@@ -17,7 +17,7 @@
     <div><dt>Süre</dt><dd>@((item.EndsAt-item.StartsAt).TotalMinutes) dakika</dd></div>
     @if (!string.IsNullOrEmpty(item.Reason)) { <div><dt>Karar gerekçesi</dt><dd class="staff-reason">@item.Reason</dd></div> }
 </dl>
-<p class="field-hint">Saatler İstanbul saatine (Europe/Istanbul) göredir.</p>
+<p class="field-hint">Saatler İstanbul saatine göredir.</p>
 @if (User.IsInRole(AuthRoles.Staff))
 {
     @if (item.Status == AppointmentStatus.Pending)
