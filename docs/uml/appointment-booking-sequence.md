@@ -38,7 +38,7 @@ sequenceDiagram
         Booking->>DB: Appointments.Add(appointment), SaveChangesAsync()
         Note over DB: SQLite trigger rejects overlapping blocking writes
         Booking->>DB: Revalidate assignment, availability, hours, duration and price under write lock
-        Note over Booking,DB: Commit only if still valid; otherwise rollback and retry feedback
+        Note over Booking,DB: Commit only if still valid, otherwise rollback and retry feedback
         alt Saved
             DB-->>Booking: Persisted
             Booking-->>MVC: Appointment Id
