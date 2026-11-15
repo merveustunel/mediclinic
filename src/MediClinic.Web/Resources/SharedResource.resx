@@ -1299,4 +1299,10 @@
   <data name="Hizmetler" xml:space="preserve"><value>Hizmetler</value></data>
   <data name="Bilinmeyen durum" xml:space="preserve"><value>Bilinmeyen durum</value></data>
   <data name="Randevu listesi" xml:space="preserve"><value>Randevu listesi</value></data>
+  <data name="Çalışan ara" xml:space="preserve"><value>Çalışan ara</value></data>
+  <data name="Rol" xml:space="preserve"><value>Rol</value></data>
+  <data name="Seçilen filtrelere uygun çalışan bulunamadı." xml:space="preserve"><value>Seçilen filtrelere uygun çalışan bulunamadı.</value></data>
+  <data name="Türkçe ad" xml:space="preserve"><value>Türkçe ad</value></data>
+  <data name="İngilizce ad" xml:space="preserve"><value>İngilizce ad</value></data>
+  <data name="Çeviri boşsa kayıtlı ad veya tıbbi terimler sözlüğü kullanılır." xml:space="preserve"><value>Çeviri boşsa kayıtlı ad veya tıbbi terimler sözlüğü kullanılır.</value></data>
 </root>

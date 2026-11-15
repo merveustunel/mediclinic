@@ -3,10 +3,10 @@
 @{ var staff = ViewContext.RouteData.Values["controller"]?.ToString() == "StaffAppointments"; }
 <h1>@Ui.Text("Randevu")</h1>
 <p class="alert" role="status">@TempData["Message"]</p>
-<p>@Ui.Text("Klinik:") <span data-user-content>@Model.Clinic</span> - @Ui.Text("Bölüm:") <span data-user-content>@Model.Department</span></p>
+<p>@Ui.Text("Klinik:") <span data-user-content>@Model.Clinic</span> - @Ui.Text("Bölüm:") <span data-user-content>@Ui.Medical(Model.Department, "Department:" + Model.Id)</span></p>
 <p>@Ui.Text("Ücret:") @if (Model.Price.HasValue) { <span data-money="@Model.Price.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Ui.Money(Model.Price.Value)</span> } else { @Ui.Text("Bilinmiyor (eski kayıt)") }</p>
 <dl>
-    <dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@Model.Service</dd><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@Model.Doctor</dd><dt>@Ui.Text("Şube")</dt><dd data-user-content>@Model.Branch</dd>
+    <dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@Ui.Medical(Model.Service, "Service:" + Model.Id)</dd><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@Model.Doctor</dd><dt>@Ui.Text("Şube")</dt><dd data-user-content>@Model.Branch</dd>
     <dt>@Ui.Text("Saat")</dt><dd><time datetime="@Model.StartsAt.ToString("O")">@Ui.Date(MediClinic.Application.Scheduling.Local(Model.StartsAt))</time> – <time datetime="@Model.EndsAt.ToString("O")">@Ui.Date(MediClinic.Application.Scheduling.Local(Model.EndsAt))</time></dd>
     <dt>@Ui.Text("Randevu süresi")</dt><dd>@((Model.EndsAt - Model.StartsAt).TotalMinutes) @Ui.Text("dakika")</dd>
     <dt>@Ui.Text("Durum")</dt><dd><partial name="_StatusBadge" model="Model.Status" /></dd><dt>@Ui.Text("Karar gerekçesi")</dt><dd data-user-content>@Model.Reason</dd>

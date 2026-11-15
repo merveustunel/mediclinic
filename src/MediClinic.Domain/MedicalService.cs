@@ -17,6 +17,14 @@ public sealed class MedicalService : Entity
     public Department Department { get; } = null!;
     public Guid DepartmentId => Department.Id;
     public string Name { get; private set; } = null!;
+    public string? NameTr { get; private set; }
+    public string? NameEn { get; private set; }
+    public void Translate(string? turkish, string? english)
+    {
+        if (turkish?.Length > 200 || english?.Length > 200) throw new ArgumentException("Translation exceeds 200 characters.");
+        NameTr = string.IsNullOrWhiteSpace(turkish) ? null : turkish.Trim();
+        NameEn = string.IsNullOrWhiteSpace(english) ? null : english.Trim();
+    }
     public TimeSpan Duration { get; private set; }
     public decimal Price { get; private set; }
     public void Update(string name, int durationMinutes, decimal price)

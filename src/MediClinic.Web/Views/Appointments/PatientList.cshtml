@@ -46,7 +46,7 @@ else
             {
                 <tr>
                     <td><span class="appointment-field-label" aria-hidden="true">@Ui.Text("Doktor")</span>@item.Doctor</td>
-                    <td><span class="appointment-field-label" aria-hidden="true">@Ui.Text("Hizmet")</span>@item.Service</td>
+                    <td><span class="appointment-field-label" aria-hidden="true">@Ui.Text("Hizmet")</span>@Ui.Medical(item.Service, "Service:" + item.Id)</td>
                     <td><span class="appointment-field-label" aria-hidden="true">@Ui.Text("Şube")</span>@item.Branch</td>
                     <td><span class="appointment-field-label" aria-hidden="true">@Ui.Text("Tarih ve saat")</span><time datetime="@item.StartsAt.ToString("O", CultureInfo.InvariantCulture)">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.CurrentCulture)</time></td>
                     <td><span class="appointment-field-label" aria-hidden="true">@Ui.Text("Durum")</span><partial name="_StatusBadge" model="item.Status" /></td>

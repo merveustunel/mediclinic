@@ -1,0 +1,7 @@
+@model AdminFilters
+<div><label for="branchId">@Ui.Text("Şube")</label><select id="branchId" name="branchId" data-filter-branch><option value="">@Ui.Text("Tüm şubeler")</option>
+@foreach (var branch in Model.Branches) { <option value="@branch.Id" selected="@(branch.Id == Model.BranchId)">@branch.Clinic.Name / @branch.Name</option> }
+</select></div>
+<div><label for="departmentId">@Ui.Text("Bölüm")</label><select id="departmentId" name="departmentId" data-filter-department><option value="">@Ui.Text("Tüm bölümler")</option>
+@foreach (var department in Model.Departments) { <option value="@department.Id" data-medical-option data-branch="@department.BranchId" selected="@(department.Id == Model.DepartmentId)" hidden="@(Model.BranchId.HasValue && department.BranchId != Model.BranchId)">@department.Branch.Name / @MediClinic.Domain.MedicalNames.Display(department)</option> }
+</select></div>

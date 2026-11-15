@@ -61,6 +61,8 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
         var department = Root<Department>(modelBuilder, "Departments");
         department.Ignore(x => x.BranchId);
         department.Property<Guid>("BranchKey").HasColumnName("BranchId");
+        department.Property(x => x.NameTr).HasMaxLength(200);
+        department.Property(x => x.NameEn).HasMaxLength(200);
         Text(department, nameof(Department.Name));
         department.Navigation(x => x.Branch).UsePropertyAccessMode(PropertyAccessMode.Field);
         department.HasMany(x => x.Services).WithOne(x => x.Department).HasForeignKey("DepartmentKey")
@@ -71,6 +73,8 @@ public sealed class MediClinicDbContext(DbContextOptions<MediClinicDbContext> op
         service.Property(x => x.Price).HasPrecision(11, 2).HasDefaultValue(0m);
         service.Ignore(x => x.DepartmentId);
         service.Property<Guid>("DepartmentKey").HasColumnName("DepartmentId");
+        service.Property(x => x.NameTr).HasMaxLength(200);
+        service.Property(x => x.NameEn).HasMaxLength(200);
         Text(service, nameof(MedicalService.Name));
         service.Property(x => x.Duration).HasConversion(x => x.Ticks, x => TimeSpan.FromTicks(x)).IsRequired();
         service.ToTable(t => t.HasCheckConstraint("CK_MedicalServices_Duration", "\"Duration\" > 0"));

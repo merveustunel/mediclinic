@@ -1,4 +1,4 @@
-﻿@model StaffAppointmentsModel
+@model StaffAppointmentsModel
 @using MediClinic.Application
 @using System.Globalization
 @{ ViewData["Title"] = Ui.Text("Personel randevuları"); }
@@ -25,7 +25,7 @@ else
     @foreach (var entry in Model.Appointments)
     {
         var item = entry.Appointment;
-        <li><div><h2 data-user-content>@entry.Patient</h2><p>@item.Doctor · @item.Service</p><p data-user-content>@item.Branch</p><time datetime="@item.StartsAt.ToString("O")">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.CurrentCulture)</time></div><partial name="_StatusBadge" model="item.Status" /><a class="button button-secondary" asp-action="Details" asp-route-id="@item.Id">@Ui.Text("Detayları görüntüle")<span class="visually-hidden">: @entry.Patient</span></a></li>
+        <li><div><h2 data-user-content>@entry.Patient</h2><p>@item.Doctor · @Ui.Medical(item.Service, "Service:" + item.Id)</p><p data-user-content>@item.Branch</p><time datetime="@item.StartsAt.ToString("O")">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.CurrentCulture)</time></div><partial name="_StatusBadge" model="item.Status" /><a class="button button-secondary" asp-action="Details" asp-route-id="@item.Id">@Ui.Text("Detayları görüntüle")<span class="visually-hidden">: @entry.Patient</span></a></li>
     }
     </ul>
 }

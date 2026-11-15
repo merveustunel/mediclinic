@@ -79,6 +79,19 @@
         // Disabling the submitter here would remove its Stage value from the native GET.
     });
     window.addEventListener('pageshow', () => { submitting = false; updateState(); });
+    document.addEventListener('mediclinic:language', () => {
+        ++revision;
+        request?.abort();
+        loading = false;
+        updateState();
+    });
+    document.addEventListener('mediclinic:medical', updateState);
+    document.addEventListener('mediclinic:medical-error', () => {
+        active = false;
+        manual.hidden = false;
+        help.textContent = globalThis.mediClinicLocalize?.(originalHelp) || originalHelp;
+        updateState();
+    });
     help.textContent = (globalThis.mediClinicText?.('Klinik, şube, bölüm, doktor ve hizmeti sırayla seçin. Seçenekler otomatik güncellenir.') || 'Klinik, şube, bölüm, doktor ve hizmeti sırayla seçin. Seçenekler otomatik güncellenir.');
     manual.hidden = true;
     updateState();

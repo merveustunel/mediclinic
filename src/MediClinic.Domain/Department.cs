@@ -16,6 +16,14 @@ public sealed class Department : Entity
     public Branch Branch { get; } = null!;
     public Guid BranchId => Branch.Id;
     public string Name { get; private set; } = null!;
+    public string? NameTr { get; private set; }
+    public string? NameEn { get; private set; }
+    public void Translate(string? turkish, string? english)
+    {
+        if (turkish?.Length > 200 || english?.Length > 200) throw new ArgumentException("Translation exceeds 200 characters.");
+        NameTr = string.IsNullOrWhiteSpace(turkish) ? null : turkish.Trim();
+        NameEn = string.IsNullOrWhiteSpace(english) ? null : english.Trim();
+    }
     public IReadOnlyList<MedicalService> Services => _services.AsReadOnly();
 
     public MedicalService AddService(Guid id, string name, TimeSpan duration)

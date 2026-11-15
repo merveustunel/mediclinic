@@ -23,3 +23,5 @@
     else { <span>@Ui.Text("Geçmiş / başlamış kayıt")</span> }</td></tr>
 }
 </tbody></table></div><a asp-action="Index">@Ui.Text("Çalışan listesine dön")</a>
+
+<a class="button button-secondary" href="@(Url.IsLocalUrl(Context.Request.Query["returnUrl"].ToString()) ? Context.Request.Query["returnUrl"].ToString() : Url.Action("Index"))">@Ui.Text("Listeye dön")</a>

@@ -5,6 +5,7 @@ namespace MediClinic.Web.Models;
 
 public sealed class EmployeeEditModel
 {
+    public string? ReturnUrl { get; set; }
     public Guid? Id { get; set; }
     [Display(Name = "Doktor")] public bool IsDoctor { get; set; }
     [Required(ErrorMessage = "Ad zorunludur."), StringLength(100, ErrorMessage = "Ad en fazla 100 karakter olabilir."), Display(Name = "Ad")] public string FirstName { get; set; } = "";
