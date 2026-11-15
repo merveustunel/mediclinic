@@ -5,6 +5,11 @@
     <div asp-validation-summary="All" role="alert"></div>
     <input asp-for="Kind" type="hidden" /><input asp-for="Id" type="hidden" /><input asp-for="ParentId" type="hidden" />
     <label asp-for="Name"></label><input asp-for="Name" /><span asp-validation-for="Name"></span>
+    @if (Model.Kind is "Department" or "Service") {
+        <label asp-for="NameTr"></label><input asp-for="NameTr" lang="tr" /><span asp-validation-for="NameTr"></span>
+        <label asp-for="NameEn"></label><input asp-for="NameEn" lang="en" /><span asp-validation-for="NameEn"></span>
+        <p class="field-hint">@Ui.Text("Çeviri boşsa kayıtlı ad veya tıbbi terimler sözlüğü kullanılır.")</p>
+    }
     @if (Model.Kind == "Branch") { <label asp-for="Address"></label><input asp-for="Address" /><span asp-validation-for="Address"></span> }
     @if (Model.Kind == "Service") {
         <label asp-for="DurationMinutes"></label><input asp-for="DurationMinutes" type="number" min="1" max="1440" /><span asp-validation-for="DurationMinutes"></span>

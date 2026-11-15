@@ -11,6 +11,8 @@ public sealed class ClinicManagementModel
 }
 public sealed class CatalogEditModel
 {
+    [StringLength(200, ErrorMessage = "Ad en fazla 200 karakter olabilir."), Display(Name = "Türkçe ad")] public string? NameTr { get; set; }
+    [StringLength(200, ErrorMessage = "Ad en fazla 200 karakter olabilir."), Display(Name = "İngilizce ad")] public string? NameEn { get; set; }
     public string Kind { get; set; } = "Clinic";
     public Guid? Id { get; set; }
     public Guid? ParentId { get; set; }

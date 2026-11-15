@@ -63,7 +63,7 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         return (from doctor in doctors from service in services where doctor.Offers(service)
             let department = doctor.Department let branch = department.Branch
             select new BookingOption(branch.Clinic.Id, branch.Id, department.Id, doctor.Id, service.Id,
-                branch.Clinic.Name, branch.Name, department.Name, doctor.FullName, service.Name, service.Duration, service.Price, closedDays.Where(h => h.BranchId == branch.Id).Select(h => h.Day).ToArray())).ToList();
+                branch.Clinic.Name, branch.Name, MedicalNames.Display(department), doctor.FullName, MedicalNames.Display(service), service.Duration, service.Price, closedDays.Where(h => h.BranchId == branch.Id).Select(h => h.Day).ToArray())).ToList();
     }
 
     private IQueryable<Appointment> Blocking(Guid doctorId) => db.Appointments.Where(x =>
@@ -147,7 +147,7 @@ public sealed partial class AppointmentBooking(MediClinicDbContext db, TimeProvi
         return staff ? query.Where(x => x.Service.Department.Id == user.Staff!.Department.Id)
             : query.Where(x => EF.Property<Guid>(x, "PatientKey") == user.PatientId);
     }
-    private static AppointmentSummary Summary(Appointment x) => new(x.Id, x.Service.Name, x.Doctor.FullName, x.Branch.Name, x.StartsAt, x.EndsAt, x.Status, x.DecisionReason, x.Price, x.Branch.Clinic.Name, x.Service.Department.Name);
+    private static AppointmentSummary Summary(Appointment x) => new(x.Id, MedicalNames.Display(x.Service), x.Doctor.FullName, x.Branch.Name, x.StartsAt, x.EndsAt, x.Status, x.DecisionReason, x.Price, x.Branch.Clinic.Name, MedicalNames.Display(x.Service.Department));
     public async Task<IReadOnlyList<AppointmentSummary>> List(string userId, bool staff) =>
         (await (await Scoped(userId, staff, true)).OrderByDescending(x => x.StartsAt).ToListAsync()).Select(Summary).ToList();
     public async Task<AppointmentSummary?> Find(string userId, Guid id, bool staff)

@@ -1,16 +1,22 @@
 @model MediClinic.Web.Models.EmployeeListModel
-@{ ViewData["Title"] = Ui.Text("Çalışan yönetimi"); }
+@{ var filters = (AdminFilters)ViewData["Filters"]!; ViewData["Title"] = Ui.Text("Çalışan yönetimi"); }
 <h1>@Ui.Text("Çalışan yönetimi")</h1>
 @if (TempData["EmployeeSuccess"] is string success) { <p role="status">@success</p> }
 <a class="button" asp-action="Edit">@Ui.Text("Yeni çalışan")</a>
-@if (Model.Employees.Count == 0) { <p>@Ui.Text("Yetkili kliniklerinizde çalışan bulunamadı.")</p> }
+<form method="get" class="admin-filter-grid">
+<div><label for="search">@Ui.Text("Çalışan ara")</label><input id="search" name="search" value="@filters.Search" type="search" maxlength="200" /></div>
+<partial name="_AdminFilters" model="filters" />
+<div><label for="role">@Ui.Text("Rol")</label><select id="role" name="role"><option value="">@Ui.Text("Tümü")</option><option value="Doctor" selected="@(filters.Role == "Doctor")">@Ui.Text("Doktor")</option><option value="Staff" selected="@(filters.Role == "Staff")">@Ui.Text("Personel")</option></select></div>
+<button type="submit">@Ui.Text("Filtrele")</button><a asp-action="Index">@Ui.Text("Filtreleri temizle")</a>
+</form>
+@if (Model.Employees.Count == 0) { <p>@Ui.Text("Seçilen filtrelere uygun çalışan bulunamadı.")</p> }
 <div class="table-scroll"><table><caption>@Ui.Text("Doktorlar ve sağlık personeli")</caption><thead><tr><th scope="col">@Ui.Text("Ad soyad")</th><th scope="col">@Ui.Text("Rol / uzmanlık")</th><th scope="col">@Ui.Text("Klinik / şube / bölüm")</th><th scope="col">@Ui.Text("Hesap")</th><th scope="col">@Ui.Text("İşlemler")</th></tr></thead><tbody>
 @foreach (var employee in Model.Employees)
 {
     <tr><td data-user-content>@employee.FullName</td><td>@(employee is MediClinic.Domain.Doctor d ? Ui.Text("Doktor / ") + d.Specialty : Ui.Text("Personel / ") + employee.JobTitle)</td>
-    <td>@employee.Department.Branch.Clinic.Name / @employee.Department.Branch.Name / @employee.Department.Name</td>
+    <td>@employee.Department.Branch.Clinic.Name / @employee.Department.Branch.Name / @Ui.Medical(employee.Department)</td>
     <td>@(Model.Emails.GetValueOrDefault(employee.Id) ?? Ui.Text("Hesap yok"))</td>
-    <td><a class="button button-secondary employee-action" aria-label="@Ui.Format("{0} bilgilerini düzenle", employee.FullName)" asp-action="Edit" asp-route-id="@employee.Id"><span aria-hidden="true">✎</span> @Ui.Text("Düzenle")</a>
-    @if (employee is MediClinic.Domain.Doctor) { <a class="button button-secondary employee-action" aria-label="@Ui.Format("{0} uygunluğunu yönet", employee.FullName)" asp-action="Availability" asp-route-doctorId="@employee.Id"><span aria-hidden="true">▦</span> @Ui.Text("Uygunluk")</a> }</td></tr>
+    <td><a class="button button-secondary employee-action" aria-label="@Ui.Format("{0} bilgilerini düzenle", employee.FullName)" asp-action="Edit" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" asp-route-id="@employee.Id"><span aria-hidden="true">✎</span> @Ui.Text("Düzenle")</a>
+    @if (employee is MediClinic.Domain.Doctor) { <a class="button button-secondary employee-action" aria-label="@Ui.Format("{0} uygunluğunu yönet", employee.FullName)" asp-action="Availability" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" asp-route-doctorId="@employee.Id"><span aria-hidden="true">▦</span> @Ui.Text("Uygunluk")</a> }</td></tr>
 }
 </tbody></table></div>

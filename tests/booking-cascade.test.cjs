@@ -17,14 +17,14 @@ function select(name, value = empty, disabled = false) {
 function setup({ supported = true } = {}) {
     const selects = names.map(name => select(name));
     const manual = { hidden: false }, next = {}, status = {}, help = { textContent: 'Manual instructions' };
-    const listeners = {}, windowListeners = {}, requests = [];
+    const listeners = {}, windowListeners = {}, documentListeners = {}, requests = [];
     const controls = { '[data-booking-update]': manual, '[data-booking-continue]': next, '[data-booking-status]': status };
     const form = { action: 'https://localhost/Appointments/Book', attributes: {},
         querySelectorAll: () => selects, querySelector: selector => controls[selector],
         setAttribute(name, value) { this.attributes[name] = value; },
         addEventListener(name, listener) { listeners[name] = listener; } };
     const fetch = (url, options) => new Promise((resolve, reject) => requests.push({ url, options, resolve, reject }));
-    const context = { document: { querySelector: () => form, getElementById: () => help },
+    const context = { document: { querySelector: () => form, getElementById: () => help, addEventListener: (name, fn) => documentListeners[name] = fn },
         window: { fetch: supported && fetch, AbortController, DOMParser: true,
             location: { href: form.action }, addEventListener(name, listener) { windowListeners[name] = listener; } },
         fetch, AbortController, URL, URLSearchParams,
@@ -52,8 +52,19 @@ function setup({ supported = true } = {}) {
         requests[index].resolve({ ok: true, redirected: false, text: async () => JSON.stringify(values) });
     };
     const submit = () => { let prevented = false; listeners.submit({ preventDefault: () => { prevented = true; } }); return prevented; };
-    return { selects, manual, next, status, help, requests, change, respond, submit, form, listeners, windowListeners };
+    return { selects, manual, next, status, help, requests, change, respond, submit, form, listeners, windowListeners, documentListeners };
 }
+
+test('language change aborts an old booking request and ignores its stale response', async () => {
+    const ui = setup();
+    const pending = ui.change(0, 'clinic');
+    ui.documentListeners['mediclinic:language']();
+    assert.equal(ui.requests[0].options.signal.aborted, true);
+    ui.respond(0, ['stale-clinic'], ['stale-branch']);
+    await pending;
+    assert.equal(ui.selects[0].value, 'clinic');
+    assert.equal(ui.form.attributes['aria-busy'], 'false');
+});
 
 test('automatic cascades retain ancestors, clear descendants and never auto-select the next option', async () => {
     const ui = setup();

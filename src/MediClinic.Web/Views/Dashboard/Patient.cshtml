@@ -20,7 +20,7 @@
         <partial name="_StatusBadge" model="next.Status" />
         <dl class="dashboard-details">
             <div><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@next.Doctor</dd></div>
-            <div><dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@next.Service</dd></div>
+            <div><dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@Ui.Medical(next.Service, "Service:" + next.Id)</dd></div>
             <div><dt>@Ui.Text("Şube")</dt><dd data-user-content>@next.Branch</dd></div>
             <div><dt>@Ui.Text("Tarih ve saat (İstanbul)")</dt><dd><time datetime="@next.StartsAt.ToString("O")">@Scheduling.Local(next.StartsAt).ToString("dd MMMM yyyy, HH:mm", CultureInfo.CurrentCulture)</time></dd></div>
         </dl>

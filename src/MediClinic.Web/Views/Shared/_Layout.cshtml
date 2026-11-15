@@ -31,6 +31,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script id="ui-messages" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Ui.Catalog(System.Globalization.CultureInfo.CurrentUICulture.Name)))</script>
     <script src="~/js/preferences.js" asp-append-version="true" defer></script>
+    <script src="~/js/admin-filters.js" asp-append-version="true" defer></script>
+    <script src="~/js/medical-names.js" asp-append-version="true" defer></script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
 <body>
@@ -44,9 +46,9 @@
                 <nav aria-label="@Ui.Text("Ana gezinme")">
                     @if (canAdmin)
                     {
-                        <a asp-controller="AdminAppointments" asp-action="Index">@Ui.Text("Tüm randevular")</a>
-                        <a asp-controller="EmployeeManagement" asp-action="Index">@Ui.Text("Çalışan yönetimi")</a>
-                        <a asp-controller="ClinicManagement" asp-action="Index">@Ui.Text("Kurum yönetimi")</a>
+                        <a asp-controller="AdminAppointments" asp-action="Index" aria-current="@(controller == "AdminAppointments" ? "page" : null)">@Ui.Text("Tüm randevular")</a>
+                        <a asp-controller="EmployeeManagement" asp-action="Index" aria-current="@(controller == "EmployeeManagement" ? "page" : null)">@Ui.Text("Çalışan yönetimi")</a>
+                        <a asp-controller="ClinicManagement" asp-action="Index" aria-current="@(controller == "ClinicManagement" ? "page" : null)">@Ui.Text("Kurum yönetimi")</a>
                     }
                     @if (authenticated)
                     {

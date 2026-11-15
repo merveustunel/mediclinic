@@ -4,21 +4,24 @@ using MediClinic.Application;
 using MediClinic.Domain;
 using MediClinic.Infrastructure.Identity;
 using MediClinic.Web.Models;
+using MediClinic.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace MediClinic.Web.Controllers;
 
 [Authorize(Policy = AuthRoles.ClinicAdmin)]
-public sealed class AdminAppointmentsController(IAppointmentBooking booking, TimeProvider clock) : Controller
+public sealed class AdminAppointmentsController(IAppointmentBooking booking, TimeProvider clock, MediClinicDbContext db) : Controller
 {
     private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-    public async Task<IActionResult> Index(string? status, DateOnly? from, DateOnly? to)
+    public async Task<IActionResult> Index(string? status, DateOnly? from, DateOnly? to, AdminFilters filters)
     {
         if (!ModelState.IsValid || !PatientAppointmentsModel.IsValidFilter(status) || to == DateOnly.MaxValue || from > to)
             return BadRequest(Ui.Text("Durum veya tarih filtresi geçersiz."));
+        if (!await filters.Populate(db, UserId)) return NotFound();
+        ViewData["Filters"] = filters;
         try
         {
-            var items = await booking.AdminAppointments(UserId, string.IsNullOrEmpty(status) ? null : Enum.Parse<AppointmentStatus>(status), from, to);
+            var items = await booking.AdminAppointments(UserId, string.IsNullOrEmpty(status) ? null : Enum.Parse<AppointmentStatus>(status), from, to, filters.BranchId, filters.DepartmentId);
             ViewData["From"] = from?.ToString("yyyy-MM-dd"); ViewData["To"] = to?.ToString("yyyy-MM-dd");
             return View(new StaffAppointmentsModel(items, status, null));
         }

@@ -24,9 +24,11 @@ public sealed partial class AppointmentBooking
             .Include(a => a.Patient).Include(a => a.Doctor).Include(a => a.Service).ThenInclude(s => s.Department).ThenInclude(d => d.Branch).ThenInclude(b => b.Clinic);
     }
 
-    public async Task<IReadOnlyList<StaffAppointment>> AdminAppointments(string userId, AppointmentStatus? status, DateOnly? from, DateOnly? to)
+    public async Task<IReadOnlyList<StaffAppointment>> AdminAppointments(string userId, AppointmentStatus? status, DateOnly? from, DateOnly? to, Guid? branchId = null, Guid? departmentId = null)
     {
         var query = (await AdminScope(userId)).AsNoTracking();
+        if (branchId.HasValue) query = query.Where(a => EF.Property<Guid>(a.Service.Department, "BranchKey") == branchId);
+        if (departmentId.HasValue) query = query.Where(a => EF.Property<Guid>(a.Service, "DepartmentKey") == departmentId);
         if (status.HasValue) query = query.Where(a => a.Status == status);
         if (from.HasValue) { var start = Scheduling.ToUtc(from.Value.ToDateTime(TimeOnly.MinValue)); query = query.Where(a => a.StartsAt >= start); }
         if (to.HasValue) { var end = Scheduling.ToUtc(to.Value.AddDays(1).ToDateTime(TimeOnly.MinValue)); query = query.Where(a => a.StartsAt < end); }
@@ -47,6 +49,7 @@ public sealed partial class AppointmentBooking
 
     private async Task<StaffDashboardData> DashboardData(IQueryable<Appointment> query, bool chronological = false)
     {
+        query = query.Include(x => x.Patient);
         var now = clock.GetUtcNow();
         var localDate = Scheduling.Local(now).Date;
         var start = Scheduling.ToUtc(localDate);
@@ -58,12 +61,10 @@ public sealed partial class AppointmentBooking
         var confirmedCount = await today.CountAsync(x => x.Status == AppointmentStatus.Confirmed);
         var completedCount = await today.CountAsync(x => x.Status == AppointmentStatus.Completed);
         // Project names only after applying the caller's authorized scope.
-        var pendingItems = await pending.OrderBy(x => !chronological && x.StartsAt < now).ThenBy(x => x.StartsAt).ThenBy(x => x.Id).Take(6)
-            .Select(x => new StaffDashboardAppointment(x.Id, x.Patient.FirstName + " " + x.Patient.LastName, x.Doctor.FirstName + " " + x.Doctor.LastName,
-                x.Service.Name, x.Service.Department.Branch.Name, x.StartsAt, x.Status)).ToListAsync();
-        var todayItems = await today.OrderBy(x => x.StartsAt).ThenBy(x => x.Id)
-            .Select(x => new StaffDashboardAppointment(x.Id, x.Patient.FirstName + " " + x.Patient.LastName, x.Doctor.FirstName + " " + x.Doctor.LastName,
-                x.Service.Name, x.Service.Department.Branch.Name, x.StartsAt, x.Status)).ToListAsync();
+        static StaffDashboardAppointment Item(Appointment x) => new(x.Id, x.Patient.FullName, x.Doctor.FullName,
+            MedicalNames.Display(x.Service), x.Service.Department.Branch.Name, x.StartsAt, x.Status);
+        var pendingItems = (await pending.OrderBy(x => !chronological && x.StartsAt < now).ThenBy(x => x.StartsAt).ThenBy(x => x.Id).Take(6).ToListAsync()).Select(Item).ToList();
+        var todayItems = (await today.OrderBy(x => x.StartsAt).ThenBy(x => x.Id).ToListAsync()).Select(Item).ToList();
         return new(todayCount, pendingCount, confirmedCount, completedCount, pendingItems, todayItems);
     }
 }

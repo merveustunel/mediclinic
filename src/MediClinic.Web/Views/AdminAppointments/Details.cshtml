@@ -7,11 +7,11 @@
 <header class="appointments-heading"><div><p class="eyebrow">@Ui.Text("RANDEVU YÖNETİMİ")</p><h1>@Ui.Text("Randevu detayı")</h1></div><partial name="_StatusBadge" model="item.Status" /></header>
 @if (TempData["Message"] is string message) { <p class="alert" role="status">@message</p> }
 <div asp-validation-summary="All" role="alert"></div>
-<p>@Ui.Text("Klinik:") <span data-user-content>@item.Clinic</span> - @Ui.Text("Bölüm:") <span data-user-content>@item.Department</span></p>
+<p>@Ui.Text("Klinik:") <span data-user-content>@item.Clinic</span> - @Ui.Text("Bölüm:") <span data-user-content>@Ui.Medical(item.Department, "Department:" + item.Id)</span></p>
 <p>@Ui.Text("Ücret:") @if (item.Price.HasValue) { <span data-money="@item.Price.Value.ToString(CultureInfo.InvariantCulture)">@Ui.Money(item.Price.Value)</span> } else { @Ui.Text("Bilinmiyor (eski kayıt)") }</p>
 <dl class="booking-summary staff-details">
     <div><dt>@Ui.Text("Hasta")</dt><dd data-user-content>@Model.Item.Patient</dd></div><div><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@item.Doctor</dd></div>
-    <div><dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@item.Service</dd></div><div><dt>@Ui.Text("Şube")</dt><dd data-user-content>@item.Branch</dd></div>
+    <div><dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@Ui.Medical(item.Service, "Service:" + item.Id)</dd></div><div><dt>@Ui.Text("Şube")</dt><dd data-user-content>@item.Branch</dd></div>
     <div><dt>@Ui.Text("Tarih ve başlangıç saati")</dt><dd><time datetime="@item.StartsAt.ToString("O")">@Scheduling.Local(item.StartsAt).ToString("dd MMMM yyyy, HH:mm", culture)</time></dd></div>
     <div><dt>@Ui.Text("Bitiş saati")</dt><dd><time datetime="@item.EndsAt.ToString("O")">@Scheduling.Local(item.EndsAt).ToString("dd MMMM yyyy, HH:mm", culture)</time></dd></div>
     <div><dt>@Ui.Text("Süre")</dt><dd>@((item.EndsAt-item.StartsAt).TotalMinutes) @Ui.Text("dakika")</dd></div>

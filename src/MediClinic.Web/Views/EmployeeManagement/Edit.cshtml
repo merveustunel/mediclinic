@@ -3,21 +3,21 @@
 <h1>@ViewData["Title"]</h1>
 <form asp-action="Edit" method="post" class="form-stack">
     <div asp-validation-summary="All" role="alert"></div>
-    <input asp-for="Id" type="hidden" />
+    <input asp-for="Id" type="hidden" /><input asp-for="ReturnUrl" type="hidden" />
     @if (Model.Id.HasValue) { <input asp-for="IsDoctor" type="hidden" /><p>@(Model.IsDoctor ? Ui.Text("Doktor") : Ui.Text("Sağlık personeli"))</p> }
     else { <label asp-for="IsDoctor"></label><input asp-for="IsDoctor" /> }
     <label asp-for="FirstName"></label><input asp-for="FirstName" autocomplete="given-name" />
     <label asp-for="LastName"></label><input asp-for="LastName" autocomplete="family-name" />
     <label asp-for="DepartmentId"></label><select asp-for="DepartmentId">
         <option value="">@Ui.Text("Bölüm seçiniz")</option>
-        @foreach (var department in Model.Departments) { <option value="@department.Id">@department.Branch.Clinic.Name / @department.Branch.Name / @department.Name</option> }
+        @foreach (var department in Model.Departments) { <option data-medical-option value="@department.Id">@department.Branch.Clinic.Name / @department.Branch.Name / @MediClinic.Domain.MedicalNames.Display(department)</option> }
     </select>
     <label asp-for="JobTitle"></label><input asp-for="JobTitle" /><small>@Ui.Text("Sağlık personeli için görev giriniz. Doktor rolü otomatik belirlenir.")</small>
     <label asp-for="Specialty"></label><input asp-for="Specialty" /><small>@Ui.Text("Doktorlar için uzmanlık zorunludur.")</small>
     <fieldset><legend>@Ui.Text("Doktorun sunacağı hizmetler")</legend><p>@Ui.Text("Seçilen bölümün hizmetlerini işaretleyiniz. İşaretlenmeyen hizmetler için yeni randevu alınamaz; mevcut randevular korunur.")</p>
     @foreach (var service in Model.Services)
     {
-        <label for="service-@service.Id"><input id="service-@service.Id" type="checkbox" name="ServiceIds" value="@service.Id" checked="@Model.ServiceIds.Contains(service.Id)" /> @service.Department.Branch.Name / @service.Department.Name / @service.Name</label>
+        <label for="service-@service.Id"><input id="service-@service.Id" type="checkbox" name="ServiceIds" value="@service.Id" checked="@Model.ServiceIds.Contains(service.Id)" /> @service.Department.Branch.Name / @Ui.Medical(service.Department) / @Ui.Medical(service)</label>
     }
     </fieldset>
     @if (!Model.HasAccount)
@@ -28,5 +28,5 @@
         </fieldset>
     }
     else { <p>@Ui.Text("Mevcut giriş hesabı korunur.")</p> }
-    <button type="submit">@Ui.Text("Kaydet")</button><a asp-action="Index">@Ui.Text("Listeye dön")</a>
+    <button type="submit">@Ui.Text("Kaydet")</button><a href="@(Url.IsLocalUrl(Model.ReturnUrl) ? Model.ReturnUrl : Url.Action("Index"))">@Ui.Text("Listeye dön")</a>
 </form>

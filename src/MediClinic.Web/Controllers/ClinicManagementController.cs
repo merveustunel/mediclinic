@@ -50,8 +50,8 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
             {
                 case Clinic c: model.Name = c.Name; break;
                 case Branch b: model.Name = b.Name; model.Address = b.Address; model.ParentId = b.ClinicId; break;
-                case Department d: model.Name = d.Name; model.ParentId = d.BranchId; break;
-                case MedicalService s: model.Name = s.Name; model.ParentId = s.DepartmentId; model.DurationMinutes = (int)s.Duration.TotalMinutes; model.Price = s.Price; break;
+                case Department d: model.NameTr = d.NameTr; model.NameEn = d.NameEn; model.Name = d.Name; model.ParentId = d.BranchId; break;
+                case MedicalService s: model.NameTr = s.NameTr; model.NameEn = s.NameEn; model.Name = s.Name; model.ParentId = s.DepartmentId; model.DurationMinutes = (int)s.Duration.TotalMinutes; model.Price = s.Price; break;
             }
         }
         else if (kind != "Clinic" && !Records(clinics, kind == "Branch" ? "Clinic" : kind == "Department" ? "Branch" : "Department").Any(e => e.Id == parentId)) return NotFound();
@@ -95,12 +95,14 @@ public sealed class ClinicManagementController(MediClinicDbContext db) : Control
                 else db.Branches.Add(((Clinic)parent!).AddBranch(Guid.NewGuid(), model.Name, model.Address!));
                 break;
             case "Department":
-                if (entity is Department d) d.Rename(model.Name);
-                else db.Departments.Add(((Branch)parent!).AddDepartment(Guid.NewGuid(), model.Name));
+                var department = entity as Department ?? ((Branch)parent!).AddDepartment(Guid.NewGuid(), model.Name);
+                department.Rename(model.Name); department.Translate(model.NameTr, model.NameEn);
+                if (entity is null) db.Departments.Add(department);
                 break;
             case "Service":
                 var service = entity as MedicalService ?? ((Department)parent!).AddService(Guid.NewGuid(), model.Name, TimeSpan.FromMinutes(model.DurationMinutes));
                 service.Update(model.Name, model.DurationMinutes, model.Price);
+                service.Translate(model.NameTr, model.NameEn);
                 if (entity is null) db.MedicalServices.Add(service);
                 break;
         }

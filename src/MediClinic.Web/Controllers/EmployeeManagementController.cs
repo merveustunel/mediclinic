@@ -31,17 +31,26 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
             .Include(s => s.Department).OrderBy(s => s.Name).ToListAsync();
         model.HasAccount = model.Id.HasValue && await db.Users.AnyAsync(u => u.StaffId == model.Id);
     }
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(AdminFilters filters)
     {
-        var employees = await Employees.Include(s => s.Department).ThenInclude(d => d.Branch).ThenInclude(b => b.Clinic)
+        if (!ModelState.IsValid || filters.Role is not (null or "" or "Doctor" or "Staff")) return BadRequest();
+        if (!await filters.Populate(db, UserId)) return NotFound();
+        ViewData["Filters"] = filters;
+        var query = Employees;
+        if (filters.BranchId.HasValue) query = query.Where(s => EF.Property<Guid>(s.Department, "BranchKey") == filters.BranchId);
+        if (filters.DepartmentId.HasValue) query = query.Where(s => EF.Property<Guid>(s, "DepartmentKey") == filters.DepartmentId);
+        if (filters.Role == "Doctor") query = query.Where(s => s is Doctor);
+        if (filters.Role == "Staff") query = query.Where(s => !(s is Doctor));
+        var employees = await query.Include(s => s.Department).ThenInclude(d => d.Branch).ThenInclude(b => b.Clinic)
             .OrderBy(s => s.LastName).ThenBy(s => s.FirstName).ToListAsync();
+        if (!string.IsNullOrWhiteSpace(filters.Search)) employees = employees.Where(e => AdminFilters.MatchesName(e.FullName, filters.Search)).ToList();
         var ids = employees.Select(e => e.Id).ToList();
         var accounts = await db.Users.Where(u => u.StaffId.HasValue && ids.Contains(u.StaffId.Value)).ToListAsync();
         return View(new EmployeeListModel(employees, accounts.ToDictionary(u => u.StaffId!.Value, u => u.Email ?? "")));
     }
-    public async Task<IActionResult> Edit(Guid? id)
+    public async Task<IActionResult> Edit(Guid? id, string? returnUrl)
     {
-        var model = new EmployeeEditModel();
+        var model = new EmployeeEditModel { ReturnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null };
         if (id.HasValue)
         {
             var employee = await Employees.Include(s => s.Department).SingleOrDefaultAsync(s => s.Id == id);
@@ -137,7 +146,7 @@ public sealed class EmployeeManagementController(MediClinicDbContext db, UserMan
         }
         await db.SaveChangesAsync(); await transaction.CommitAsync();
         TempData["EmployeeSuccess"] = Ui.Text("Çalışan bilgileri kaydedildi.");
-        return RedirectToAction(nameof(Index));
+        return Url.IsLocalUrl(model.ReturnUrl) ? LocalRedirect(model.ReturnUrl!) : RedirectToAction(nameof(Index));
     }
     private async Task<IActionResult> InvalidEmployee(EmployeeEditModel model)
     {

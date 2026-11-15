@@ -24,8 +24,8 @@
     <div><label for="@field.Item1">@field.Item2</label><select id="@field.Item1" name="@field.Item1" disabled="@(choices.Length == 0)"><option value="@Guid.Empty">@(choices.Length == 0 ? Ui.Text("Önce üst seçimi tamamlayın") : Ui.Text("Seçin"))</option>
     @foreach (var choice in choices) {
         var serviceOption = i == 4 ? Model.Options.FirstOrDefault(o => o.ServiceId == choice.Item1) : null;
-        if (serviceOption is null) { <option value="@choice.Item1" selected="@(choice.Item1 == field.Item3)" data-user-content>@choice.Item2</option> }
-        else { <option value="@choice.Item1" selected="@(choice.Item1 == field.Item3)" data-service-name="@serviceOption.Service" data-service-price="@serviceOption.Price.ToString(CultureInfo.InvariantCulture)" data-service-minutes="@serviceOption.Duration.TotalMinutes.ToString(CultureInfo.InvariantCulture)">@choice.Item2</option> }
+        if (serviceOption is null) { <option value="@choice.Item1" selected="@(choice.Item1 == field.Item3)" data-user-content data-medical-option="@(i == 2 ? "true" : null)">@choice.Item2</option> }
+        else { <option value="@choice.Item1" selected="@(choice.Item1 == field.Item3)" data-medical-option data-service-name="@serviceOption.Service" data-service-price="@serviceOption.Price.ToString(CultureInfo.InvariantCulture)" data-service-minutes="@serviceOption.Duration.TotalMinutes.ToString(CultureInfo.InvariantCulture)">@choice.Item2</option> }
     }
     </select></div>
     candidates = candidates.Where(x => (i switch { 0 => x.ClinicId, 1 => x.BranchId, 2 => x.DepartmentId, 3 => x.DoctorId, _ => x.ServiceId }) == field.Item3).ToArray();
@@ -41,7 +41,7 @@ var selected = Model.Selection!;
 <section class="card"><h2>@(Model.Stage == 2 ? Ui.Text("2. Tarih ve saat seçin") : Ui.Text("3. Talebinizi kontrol edin"))</h2>
 <p>@Ui.Text("Ücret:") <span data-money="@selected.Price.ToString(CultureInfo.InvariantCulture)">@Ui.Money(selected.Price)</span></p>
 <dl class="booking-summary">
-<div><dt>@Ui.Text("Klinik")</dt><dd data-user-content>@selected.Clinic</dd></div><div><dt>@Ui.Text("Şube")</dt><dd data-user-content>@selected.Branch</dd></div><div><dt>@Ui.Text("Bölüm")</dt><dd data-user-content>@selected.Department</dd></div><div><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@selected.Doctor</dd></div><div><dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@selected.Service</dd></div><div><dt>@Ui.Text("Süre")</dt><dd>@selected.Duration.TotalMinutes.ToString(tr) @Ui.Text("dakika")</dd></div>
+<div><dt>@Ui.Text("Klinik")</dt><dd data-user-content>@selected.Clinic</dd></div><div><dt>@Ui.Text("Şube")</dt><dd data-user-content>@selected.Branch</dd></div><div><dt>@Ui.Text("Bölüm")</dt><dd data-user-content>@Ui.Medical(selected.Department, "Department:" + Model.DepartmentId)</dd></div><div><dt>@Ui.Text("Doktor")</dt><dd data-user-content>@selected.Doctor</dd></div><div><dt>@Ui.Text("Hizmet")</dt><dd data-user-content>@Ui.Medical(selected.Service, "Service:" + Model.ServiceId)</dd></div><div><dt>@Ui.Text("Süre")</dt><dd>@selected.Duration.TotalMinutes.ToString(tr) @Ui.Text("dakika")</dd></div>
 @if (Model.Stage == 3) { <div><dt>@Ui.Text("Tarih")</dt><dd><time datetime="@Model.LocalStart!.Value.ToString("yyyy-MM-dd")" data-date-only="true">@Model.LocalStart!.Value.ToString("dd MMMM yyyy, dddd", tr)</time></dd></div><div><dt>@Ui.Text("Saat")</dt><dd>@Model.LocalStart!.Value.ToString("HH:mm", tr)</dd></div> }
 </dl>
 <form asp-action="Book" method="get">
